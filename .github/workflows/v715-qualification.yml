@@ -1,0 +1,21 @@
+name: v7.15 qualification
+
+on:
+  push:
+    branches:
+      - v7.15-chloride-occlusion-implementation
+
+jobs:
+  native-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install package and test dependencies
+        run: python -m pip install -e '.[test,symmetry]'
+      - name: Focused v7.15 tests
+        run: pytest -q tests/test_v715_chloride_occlusion.py
+      - name: Full native suite
+        run: pytest -q
