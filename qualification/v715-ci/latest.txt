@@ -1,40 +1,14 @@
-head_sha=65591320a3da6991dd137849ff017afe8df2aa6c
-run_id=37375589963
+head_sha=aa85f0b5aadbb97789de72c5c353412b68debb45
+run_id=37375807299
 
 === focused ===
 
 ==================================== ERRORS ====================================
 ____________ ERROR collecting tests/test_v715_chloride_occlusion.py ____________
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule
-    mod = import_path(
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/_pytest/pathlib.py:596: in import_path
-    importlib.import_module(module_name)
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/importlib/__init__.py:90: in import_module
-    return _bootstrap._gcd_import(name[level:], package, level)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-<frozen importlib._bootstrap>:1387: in _gcd_import
-    ???
-<frozen importlib._bootstrap>:1360: in _find_and_load
-    ???
-<frozen importlib._bootstrap>:1331: in _find_and_load_unlocked
-    ???
-<frozen importlib._bootstrap>:935: in _load_unlocked
-    ???
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:179: in exec_module
-    source_stat, co = _rewrite_test(fn, self.config)
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/_pytest/assertion/rewrite.py:348: in _rewrite_test
-    tree = ast.parse(source, filename=strfn)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-/opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/ast.py:52: in parse
-    return compile(source, filename, mode, flags,
-E     File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/tests/test_v715_chloride_occlusion.py", line 97
-E       assert same_element.cation_counts["Na"] == 24\n    assert same_element.total_cation_counts["Na"] == 25
-E                                                     ^
-E   SyntaxError: unexpected character after line continuation character
+tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition: 'request' is a reserved name and cannot be used in @pytest.mark.parametrize
 =========================== short test summary info ============================
-ERROR tests/test_v715_chloride_occlusion.py
+ERROR tests/test_v715_chloride_occlusion.py - Failed: tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition: 'request' is a reserved name and cannot be used in @pytest.mark.parametrize
 !!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
-1 error in 0.25s
+1 error in 1.56s
 
 === full ===
