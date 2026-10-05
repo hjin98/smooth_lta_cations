@@ -116,10 +116,12 @@ Dependencies:
 from __future__ import annotations
 
 import argparse
+import hashlib
+import json
 import random
 import shlex
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from numbers import Integral
 from pathlib import Path
 from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
@@ -154,7 +156,7 @@ RING_CLASSES = ("4", "6", "8")
 # element before writing prevents repeated species blocks in POSCAR files and
 # makes CIF and LAMMPS atom lists easier to inspect. Absent elements are simply
 # omitted.
-OUTPUT_SPECIES_ORDER = ("Si", "Al", "O", *SUPPORTED_CATIONS)
+OUTPUT_SPECIES_ORDER = ("Si", "Al", "O", *SUPPORTED_CATIONS, "Cl")
 
 # Dry-LTA reference data used by the affine volume model.
 #
@@ -409,6 +411,32 @@ class PlacedIon:
     ring_class: str
     site_id: str
     variant_id: int
+    role: str = "framework"
+
+
+@dataclass(frozen=True)
+class CageSite:
+    cage_id: str
+    cage_type: str
+    frac: Tuple[float, float, float]
+
+
+@dataclass(frozen=True)
+class OccludedChloride:
+    cage_id: str
+    cage_type: str
+    frac: Tuple[float, float, float]
+
+
+CANONICAL_CAGE_SITES: Tuple[CageSite, ...] = (
+    CageSite("beta-0", "beta", (0.0, 0.0, 0.0)),
+    CageSite("beta-1", "beta", (0.5, 0.5, 0.5)),
+    CageSite("alpha-0", "alpha", (0.25, 0.25, 0.25)),
+    CageSite("alpha-1", "alpha", (0.75, 0.75, 0.75)),
+)
+_CANONICAL_OCCLUSION_TEMPLATE_FILE_SHA256 = (
+    "4035695f9dff3c339e104e3b6c3c9cee661132f6148b5ba07db66b47c6cf6365"
+)
 
 
 @dataclass
@@ -429,6 +457,11 @@ class PopulationResult:
     volume_factor: float
     target_volume_ang3: float
     linear_scale: float
+    occlusion_counterion_counts: Dict[str, int] = field(default_factory=dict)
+    occlusion_allocations: Dict[str, Dict[str, int]] = field(default_factory=dict)
+    occluded_chlorides: List[OccludedChloride] = field(default_factory=list)
+    occlusion_min_distance_ang: Optional[float] = None
+    occlusion_actual_min_distance_ang: Optional[float] = None
 
     # Backward-compatible alias for code that used the old name.
     @property
@@ -436,9 +469,46 @@ class PopulationResult:
         return self.physical_sites_by_ring
 
     @property
+    def framework_cation_counts(self) -> Dict[str, int]:
+        """Framework-compensating cation counts (legacy alkali_counts semantics)."""
+        return dict(self.alkali_counts)
+
+    @property
     def cation_counts(self) -> Dict[str, int]:
-        """Preferred semantic name for the legacy ``alkali_counts`` field."""
-        return self.alkali_counts
+        """Total physical cation counts across framework and occlusion roles."""
+        return {
+            el: int(self.alkali_counts.get(el, 0))
+            + int(self.occlusion_counterion_counts.get(el, 0))
+            for el in SUPPORTED_CATIONS
+        }
+
+    @property
+    def chloride_count(self) -> int:
+        return len(self.occluded_chlorides)
+
+    @property
+    def alpha_chloride_count(self) -> int:
+        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "alpha")
+
+    @property
+    def beta_chloride_count(self) -> int:
+        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "beta")
+
+    @property
+    def framework_positive_charge(self) -> int:
+        return total_cation_charge(self.alkali_counts)
+
+    @property
+    def occlusion_positive_charge(self) -> int:
+        return total_cation_charge(self.occlusion_counterion_counts)
+
+    @property
+    def total_positive_charge(self) -> int:
+        return self.framework_positive_charge + self.occlusion_positive_charge
+
+    @property
+    def required_total_positive_charge(self) -> int:
+        return self.required_cations + self.chloride_count
 
     @property
     def required_positive_charge(self) -> int:
@@ -945,6 +1015,241 @@ def group_candidate_variants(
     return out
 
 
+
+def _validate_chloride_count(name: str, value: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, Integral):
+        raise ValueError(f"{name} must be a nonnegative integer, got {value!r}")
+    value = int(value)
+    if value < 0 or value > 2:
+        raise ValueError(f"{name} must lie in the supported sparse range 0..2, got {value}")
+    return value
+
+
+def _empty_allocations() -> Dict[str, Dict[str, int]]:
+    return {ring: {el: 0 for el in SUPPORTED_CATIONS} for ring in RING_CLASSES}
+
+
+def make_exact_occlusion_allocations(
+    *, n4: Optional[str], n6: Optional[str], n8: Optional[str]
+) -> Dict[str, Dict[str, int]]:
+    specs = {"4": n4, "6": n6, "8": n8}
+    out = _empty_allocations()
+    for ring, spec in specs.items():
+        parsed = parse_species_spec(spec, as_ratio=False)
+        out[ring] = {el: int(parsed[el]) for el in SUPPORTED_CATIONS}
+    return out
+
+
+def _semantic_occlusion_template_fingerprint(
+    data: CifData, framework: Sequence[AtomRow]
+) -> str:
+    symops = []
+    for op in data.symops:
+        rotation = [int(round(float(x))) for x in np.asarray(op.rotation_matrix).ravel()]
+        translation = [round(float(x) % 1.0, 8) for x in np.asarray(op.translation_vector).ravel()]
+        symops.append((rotation, translation))
+    raw_framework = sorted(
+        (
+            atom.label,
+            atom.element,
+            tuple(round(float(x), 8) for x in wrap_frac(atom.frac)),
+        )
+        for atom in data.atoms
+        if atom.element not in SUPPORTED_CATIONS
+    )
+    expanded_framework = sorted(
+        (
+            atom.element,
+            atom.label,
+            tuple(float(x) for x in frac_key(atom.frac, 8)),
+        )
+        for atom in framework
+    )
+    payload = {
+        "lengths": [round(float(x), 8) for x in data.lattice.abc],
+        "angles": [round(float(x), 8) for x in data.lattice.angles],
+        "symops": sorted(symops),
+        "raw_framework": raw_framework,
+        "expanded_framework": expanded_framework,
+    }
+    blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def _cage_orbit(data: CifData, frac: Sequence[float]) -> Tuple[Tuple[float, float, float], ...]:
+    point = np.asarray(frac, dtype=float)
+    return tuple(sorted({frac_key(op.operate(point), 8) for op in data.symops}))
+
+
+def validate_occlusion_template_setting(
+    input_cif: str | Path,
+    framework: Sequence[AtomRow],
+) -> None:
+    """Fail closed unless the input is the canonical supported primitive setting."""
+    data = read_cif_minimal(input_cif)
+    file_digest = hashlib.sha256(Path(input_cif).read_bytes()).hexdigest()
+    if file_digest != _CANONICAL_OCCLUSION_TEMPLATE_FILE_SHA256:
+        raise ValueError(
+            "Occlusion is supported only for the canonical Fm-3c primitive LTA "
+            "template identity; the input does not match tests/real_lta_primitive.cif. "
+            "Shifted, rebased, re-originated, or otherwise unbound templates require "
+            "an explicit coordinate mapping before occlusion can be used."
+        )
+    fingerprint = _semantic_occlusion_template_fingerprint(data, framework)
+    if len(fingerprint) != 64:
+        raise ValueError("Canonical occlusion template semantic fingerprint failed")
+    beta = _cage_orbit(data, (0.0, 0.0, 0.0))
+    alpha = _cage_orbit(data, (0.25, 0.25, 0.25))
+    if beta != ((0.0, 0.0, 0.0), (0.5, 0.5, 0.5)):
+        raise ValueError("Canonical beta-cage center orbit validation failed")
+    if alpha != ((0.25, 0.25, 0.25), (0.75, 0.75, 0.75)):
+        raise ValueError("Canonical alpha-cage center orbit validation failed")
+
+
+def validate_combined_allocations_against_capacity(
+    physical_sites_by_ring: Dict[str, List[PhysicalSite]],
+    framework_allocations: Dict[str, Dict[str, int]],
+    occlusion_allocations: Dict[str, Dict[str, int]],
+) -> None:
+    bad = []
+    for ring in RING_CLASSES:
+        n_avail = len(physical_sites_by_ring[ring])
+        n_fw = sum(framework_allocations[ring].values())
+        n_occ = sum(occlusion_allocations[ring].values())
+        if n_fw + n_occ > n_avail:
+            bad.append((ring, n_fw, n_occ, n_avail))
+    if bad:
+        detail = ", ".join(
+            f"{ring}R framework={n_fw} + occlusion={n_occ} > capacity={cap}"
+            for ring, n_fw, n_occ, cap in bad
+        )
+        raise ValueError("Combined framework/occlusion site capacity exceeded: " + detail)
+
+
+def _secondary_occlusion_rng(seed: Optional[int]) -> random.Random:
+    if seed is None:
+        return random.Random()
+    digest = hashlib.sha256(f"v7.15-occlusion:{seed}".encode("utf-8")).digest()
+    return random.Random(int.from_bytes(digest[:8], "big"))
+
+
+def populate_occlusion_counterions(
+    physical_sites_by_ring: Dict[str, List[PhysicalSite]],
+    allocations: Dict[str, Dict[str, int]],
+    *,
+    occupied_site_ids: Sequence[str],
+    seed: Optional[int],
+) -> List[PlacedIon]:
+    rng = _secondary_occlusion_rng(seed)
+    occupied = set(occupied_site_ids)
+    placed: List[PlacedIon] = []
+    for ring in RING_CLASSES:
+        available = [site for site in physical_sites_by_ring[ring] if site.site_id not in occupied]
+        n_req = sum(allocations[ring].values())
+        if n_req > len(available):
+            raise ValueError(
+                f"{ring}-ring occlusion allocation needs {n_req} empty sites "
+                f"but only {len(available)} remain after framework placement"
+            )
+        chosen = rng.sample(available, n_req)
+        species_list: List[str] = []
+        for elem in SUPPORTED_CATIONS:
+            species_list.extend([elem] * allocations[ring].get(elem, 0))
+        rng.shuffle(species_list)
+        for site, elem in zip(chosen, species_list):
+            variant = site.choose_variant(rng)
+            placed.append(
+                PlacedIon(
+                    element=elem,
+                    frac=variant.frac.copy(),
+                    site_label=site.site_label,
+                    ring_class=ring,
+                    site_id=site.site_id,
+                    variant_id=variant.variant_id,
+                    role="occlusion_counterion",
+                )
+            )
+            occupied.add(site.site_id)
+    return placed
+
+
+def _minimum_distance_to_cations(
+    lattice: Lattice, frac: Sequence[float], placed: Sequence[PlacedIon]
+) -> float:
+    if not placed:
+        return float("inf")
+    return min(
+        periodic_distance(lattice, np.asarray(frac, dtype=float), ion.frac)
+        for ion in placed
+    )
+
+
+def select_occluded_chlorides(
+    lattice: Lattice,
+    placed_ions: Sequence[PlacedIon],
+    *,
+    alpha_cl: int,
+    beta_cl: int,
+) -> List[OccludedChloride]:
+    selected: List[OccludedChloride] = []
+    for cage_type, count in (("alpha", alpha_cl), ("beta", beta_cl)):
+        family = sorted(
+            (site for site in CANONICAL_CAGE_SITES if site.cage_type == cage_type),
+            key=lambda site: site.cage_id,
+        )
+        if count == 0:
+            continue
+        if count == 2:
+            chosen = family
+        else:
+            scored = [
+                (_minimum_distance_to_cations(lattice, site.frac, placed_ions), site)
+                for site in family
+            ]
+            best_distance = max(score for score, _ in scored)
+            chosen = [
+                site
+                for score, site in scored
+                if abs(score - best_distance) <= 1.0e-12
+            ][:1]
+        selected.extend(
+            OccludedChloride(site.cage_id, site.cage_type, site.frac)
+            for site in chosen
+        )
+    return selected
+
+
+def validate_chloride_collisions(
+    lattice: Lattice,
+    framework: Sequence[AtomRow],
+    placed_ions: Sequence[PlacedIon],
+    chlorides: Sequence[OccludedChloride],
+    *,
+    minimum_distance_ang: float,
+) -> Optional[float]:
+    if not np.isfinite(minimum_distance_ang) or minimum_distance_ang <= 0.0:
+        raise ValueError("--occlusion-min-distance must be a positive finite distance")
+    if not chlorides:
+        return None
+    existing = [atom.frac for atom in framework] + [ion.frac for ion in placed_ions]
+    global_min = float("inf")
+    accepted_cl: List[np.ndarray] = []
+    for chloride in chlorides:
+        frac = np.asarray(chloride.frac, dtype=float)
+        distances = [periodic_distance(lattice, frac, other) for other in existing]
+        distances.extend(periodic_distance(lattice, frac, other) for other in accepted_cl)
+        local_min = min(distances) if distances else float("inf")
+        global_min = min(global_min, local_min)
+        if local_min < minimum_distance_ang:
+            raise ValueError(
+                "Chloride collision guard failed: "
+                f"{chloride.cage_id} minimum periodic distance {local_min:.6f} A "
+                f"is below {minimum_distance_ang:.6f} A"
+            )
+        accepted_cl.append(frac)
+    return global_min
+
+
 def parse_species_spec(text: Optional[str], *, as_ratio: bool) -> Dict[str, float | int]:
     out: Dict[str, float | int] = {el: 0.0 if as_ratio else 0 for el in ALLOWED_ALKALI}
     if text is None or not text.strip():
@@ -1341,12 +1646,30 @@ def _build_population_result(
     seed: Optional[int],
     cutoffs: Dict[str, float],
     volume_factor: float,
+    occlusion_allocations: Optional[Dict[str, Dict[str, int]]] = None,
+    alpha_cl: int = 0,
+    beta_cl: int = 0,
+    occlusion_min_distance: float = 1.5,
+    defer_chloride_placement: bool = False,
 ) -> PopulationResult:
-    """Validate chemistry, rescale the lattice, build the structure, and report metadata."""
+    """Validate role-partitioned chemistry, rescale, place Cl, and assemble once."""
     validate_framework_model(framework)
     framework_counts = count_framework_elements(framework)
-    alkali_counts = count_by_species(placed)
+    framework_placed = [ion for ion in placed if ion.role == "framework"]
+    occlusion_placed = [ion for ion in placed if ion.role == "occlusion_counterion"]
+    unknown_roles = sorted({ion.role for ion in placed} - {"framework", "occlusion_counterion"})
+    if unknown_roles:
+        raise ValueError(f"Unsupported PlacedIon role(s): {', '.join(unknown_roles)}")
+    alkali_counts = count_by_species(framework_placed)
+    occlusion_counts = count_by_species(occlusion_placed)
     required_cations = enforce_charge_neutrality(framework_counts, alkali_counts)
+    n_cl = alpha_cl + beta_cl
+    occlusion_charge = total_cation_charge(occlusion_counts)
+    if occlusion_charge != n_cl:
+        raise ValueError(
+            "Occlusion charge-neutrality violation: excess-role cations provide "
+            f"+{occlusion_charge}, but alpha+beta chloride count is {n_cl}."
+        )
     reference_volume, target_volume = interpolated_dry_target_volume(
         alkali_counts,
         volume_factor=volume_factor,
@@ -1355,7 +1678,21 @@ def _build_population_result(
     output_lattice, scale = isotropically_rescaled_lattice(
         input_lattice, target_volume
     )
-    structure = build_p1_structure(output_lattice, framework, placed)
+    if defer_chloride_placement:
+        chlorides: List[OccludedChloride] = []
+        actual_min = None
+    else:
+        chlorides = select_occluded_chlorides(
+            output_lattice, placed, alpha_cl=alpha_cl, beta_cl=beta_cl
+        )
+        actual_min = validate_chloride_collisions(
+            output_lattice,
+            framework,
+            placed,
+            chlorides,
+            minimum_distance_ang=occlusion_min_distance,
+        )
+    structure = build_p1_structure(output_lattice, framework, placed, chlorides)
     return PopulationResult(
         structure=structure,
         framework_atoms=framework,
@@ -1373,6 +1710,55 @@ def _build_population_result(
         volume_factor=volume_factor,
         target_volume_ang3=target_volume,
         linear_scale=scale,
+        occlusion_counterion_counts=occlusion_counts,
+        occlusion_allocations=occlusion_allocations or _empty_allocations(),
+        occluded_chlorides=chlorides,
+        occlusion_min_distance_ang=occlusion_min_distance if chlorides else None,
+        occlusion_actual_min_distance_ang=actual_min,
+    )
+
+
+def finalize_occluded_chlorides(
+    result: PopulationResult,
+    *,
+    alpha_cl: int,
+    beta_cl: int,
+    occlusion_min_distance: float = 1.5,
+) -> PopulationResult:
+    """Place cage-center chloride after the final cation geometry is fixed."""
+    alpha_cl = _validate_chloride_count("alpha_cl", alpha_cl)
+    beta_cl = _validate_chloride_count("beta_cl", beta_cl)
+    n_cl = alpha_cl + beta_cl
+    if result.occlusion_positive_charge != n_cl:
+        raise ValueError(
+            "Occlusion charge-neutrality violation during finalization: "
+            f"+{result.occlusion_positive_charge} excess charge != {n_cl} Cl-"
+        )
+    chlorides = select_occluded_chlorides(
+        result.structure.lattice,
+        result.placed_ions,
+        alpha_cl=alpha_cl,
+        beta_cl=beta_cl,
+    )
+    actual_min = validate_chloride_collisions(
+        result.structure.lattice,
+        result.framework_atoms,
+        result.placed_ions,
+        chlorides,
+        minimum_distance_ang=occlusion_min_distance,
+    )
+    structure = build_p1_structure(
+        result.structure.lattice,
+        result.framework_atoms,
+        result.placed_ions,
+        chlorides,
+    )
+    return replace(
+        result,
+        structure=structure,
+        occluded_chlorides=chlorides,
+        occlusion_min_distance_ang=occlusion_min_distance if chlorides else None,
+        occlusion_actual_min_distance_ang=actual_min,
     )
 
 
@@ -1672,7 +2058,12 @@ def populate_physical_sites(
     return placed
 
 
-def build_p1_structure(lattice: Lattice, framework_atoms: List[AtomRow], placed_ions: List[PlacedIon]) -> Structure:
+def build_p1_structure(
+    lattice: Lattice,
+    framework_atoms: List[AtomRow],
+    placed_ions: List[PlacedIon],
+    occluded_chlorides: Sequence[OccludedChloride] = (),
+) -> Structure:
     species: List[str] = []
     coords: List[np.ndarray] = []
     for atom in framework_atoms:
@@ -1681,6 +2072,9 @@ def build_p1_structure(lattice: Lattice, framework_atoms: List[AtomRow], placed_
     for ion in sorted(placed_ions, key=lambda x: (x.ring_class, x.element, x.site_id, x.variant_id)):
         species.append(ion.element)
         coords.append(ion.frac)
+    for chloride in sorted(occluded_chlorides, key=lambda x: (x.cage_type, x.cage_id)):
+        species.append("Cl")
+        coords.append(np.asarray(chloride.frac, dtype=float))
     return Structure(lattice, species, coords, coords_are_cartesian=False, to_unit_cell=True)
 
 
@@ -1737,6 +2131,12 @@ def generate_lta_cation_structure_from_specs(
     ratio4: Optional[str] = None,
     ratio6: Optional[str] = None,
     ratio8: Optional[str] = None,
+    alpha_cl: int = 0,
+    beta_cl: int = 0,
+    occlusion_n4: Optional[str] = None,
+    occlusion_n6: Optional[str] = None,
+    occlusion_n8: Optional[str] = None,
+    occlusion_min_distance: float = 1.5,
     seed: Optional[int] = None,
     site_map: str = "NA1:6,NA2:8,NA3:4",
     template_elements: str = "Na",
@@ -1746,6 +2146,7 @@ def generate_lta_cation_structure_from_specs(
     auto_rebalance: bool = False,
     volume_factor: float = 1.0,
     _enforce_supported_scope: bool = True,
+    _defer_chloride_placement: bool = False,
 ) -> PopulationResult:
     cutoffs = variant_group_cutoffs or {"4": 2.5, "6": 2.5, "8": 2.5}
     lattice, framework, physical_sites, ignored = load_lta_template(
@@ -1759,14 +2160,48 @@ def generate_lta_cation_structure_from_specs(
     validate_framework_model(framework)
     if _enforce_supported_scope:
         validate_supported_framework_scope(framework)
+    alpha_cl = _validate_chloride_count("alpha_cl", alpha_cl)
+    beta_cl = _validate_chloride_count("beta_cl", beta_cl)
+    occlusion_requested = bool(
+        alpha_cl
+        or beta_cl
+        or any(spec is not None and str(spec).strip() for spec in (occlusion_n4, occlusion_n6, occlusion_n8))
+    )
+    if occlusion_requested and any(spec is not None for spec in (ratio4, ratio6, ratio8)):
+        raise ValueError("Occlusion requires exact --n4/--n6/--n8 allocations; ratio allocations are unsupported")
+    if occlusion_requested and auto_rebalance:
+        raise ValueError("Occlusion is incompatible with auto_rebalance in v7.15")
+    if occlusion_requested:
+        validate_occlusion_template_setting(input_cif, framework)
     allocations = make_allocations_from_cli(
         physical_sites, n4=n4, n6=n6, n8=n8, ratio4=ratio4, ratio6=ratio6, ratio8=ratio8, auto_rebalance=auto_rebalance
     )
     enforce_charge_neutrality(
         count_framework_elements(framework), sum_allocations(allocations)
     )
+    occlusion_allocations = make_exact_occlusion_allocations(
+        n4=occlusion_n4, n6=occlusion_n6, n8=occlusion_n8
+    )
+    validate_combined_allocations_against_capacity(
+        physical_sites, allocations, occlusion_allocations
+    )
+    n_cl = alpha_cl + beta_cl
+    occlusion_charge = total_cation_charge(sum_allocations(occlusion_allocations))
+    if n_cl == 0 and occlusion_charge:
+        raise ValueError("Occlusion counterions are not allowed when total chloride count is zero")
+    if n_cl and occlusion_charge != n_cl:
+        raise ValueError(
+            f"Occlusion counterion charge must equal total chloride charge: +{occlusion_charge} != {n_cl}"
+        )
     rng = random.Random(seed)
-    placed = populate_physical_sites(physical_sites, allocations, rng=rng)
+    framework_placed = populate_physical_sites(physical_sites, allocations, rng=rng)
+    occlusion_placed = populate_occlusion_counterions(
+        physical_sites,
+        occlusion_allocations,
+        occupied_site_ids=[ion.site_id for ion in framework_placed],
+        seed=seed,
+    )
+    placed = framework_placed + occlusion_placed
     return _build_population_result(
         input_lattice=lattice,
         framework=framework,
@@ -1777,6 +2212,11 @@ def generate_lta_cation_structure_from_specs(
         seed=seed,
         cutoffs=cutoffs,
         volume_factor=volume_factor,
+        occlusion_allocations=occlusion_allocations,
+        alpha_cl=alpha_cl,
+        beta_cl=beta_cl,
+        occlusion_min_distance=occlusion_min_distance,
+        defer_chloride_placement=_defer_chloride_placement,
     )
 
 
@@ -1990,7 +2430,34 @@ def make_population_report(result: PopulationResult) -> str:
         )
     positive_charge = total_cation_charge(result.alkali_counts)
     lines.append(
-        f"Charge neutrality: PASS (sum(z_i*N_i)={positive_charge} = N_Al={result.required_cations})"
+        f"Framework charge invariant: PASS (+{positive_charge} = +{result.required_cations})"
+    )
+    occ_nonzero = [
+        el for el in SUPPORTED_CATIONS
+        if int(result.occlusion_counterion_counts.get(el, 0)) > 0
+    ]
+    lines.append(
+        "Occlusion-counterion composition: "
+        + (
+            ", ".join(
+                f"{el}:{result.occlusion_counterion_counts.get(el, 0)}"
+                for el in occ_nonzero
+            )
+            if occ_nonzero else "none"
+        )
+    )
+    lines.append(
+        f"Occlusion charge invariant: PASS (+{result.occlusion_positive_charge} = "
+        f"{result.chloride_count} Cl-)"
+    )
+    lines.append(
+        f"Chloride loading: alpha={result.alpha_chloride_count}, "
+        f"beta={result.beta_chloride_count}, total={result.chloride_count}"
+    )
+    lines.append(
+        f"Total formal charge: +{result.total_positive_charge} positive; "
+        f"-{result.required_total_positive_charge} negative "
+        "(24 framework charge units plus chloride)"
     )
     lines.append("")
     lines.append("Volume model:")
@@ -2011,7 +2478,15 @@ def make_population_report(result: PopulationResult) -> str:
             f"{VOLUME_REFERENCE_KIND[el]}"
         )
     lines.append(f"  input lattice volume: {result.input_volume_ang3:.6f} A^3")
-    lines.append("  reference-volume basis: Group I/II charge-equivalent affine interpolation")
+    lines.append(
+        "  reference-volume basis: dry framework-compensating Group I/II "
+        "charge-equivalent affine interpolation only"
+    )
+    lines.append(
+        "  occlusion-volume policy: no automatic correction for excess cations or Cl; "
+        "this preserves the dry initialization reference and is not a claim of zero "
+        "physical volume response to salt loading"
+    )
     lines.append(f"  reference volume: {result.reference_volume_ang3:.6f} A^3")
     lines.append(f"  applied volume factor: {result.volume_factor:.8f}")
     lines.append(f"  target/output volume: {result.target_volume_ang3:.6f} A^3")
@@ -2038,13 +2513,35 @@ def make_population_report(result: PopulationResult) -> str:
             if count:
                 lines.append(f"      requested {el}: {count}")
     lines.append("")
-    lines.append("Placed ions:")
+    lines.append("Placed cations:")
     for ion in sorted(result.placed_ions, key=lambda x: (x.ring_class, x.site_id, x.element)):
         fx, fy, fz = ion.frac
         lines.append(
-            f"  {ion.element:2s}  {ion.ring_class}R  site={ion.site_id}  "
-            f"variant={ion.variant_id}  frac=({fx:.8f}, {fy:.8f}, {fz:.8f})"
+            f"  {ion.element:2s} role={ion.role} {ion.ring_class}R site={ion.site_id} "
+            f"variant={ion.variant_id} frac=({fx:.8f}, {fy:.8f}, {fz:.8f})"
         )
+    if result.occluded_chlorides:
+        lines.append("")
+        lines.append("Occluded chlorides:")
+        for chloride in sorted(result.occluded_chlorides, key=lambda x: (x.cage_type, x.cage_id)):
+            fx, fy, fz = chloride.frac
+            lines.append(
+                f"  Cl cage={chloride.cage_id} type={chloride.cage_type} "
+                f"frac=({fx:.8f}, {fy:.8f}, {fz:.8f})"
+            )
+        lines.append(
+            f"  final minimum-distance guard: {result.occlusion_actual_min_distance_ang:.6f} A "
+            f">= {result.occlusion_min_distance_ang:.6f} A"
+        )
+        lines.append(
+            "  cage-center coordinates are AIMD initialization conventions, not "
+            "equilibrium-coordinate predictions"
+        )
+        if result.beta_chloride_count:
+            lines.append(
+                "  WARNING: beta-cage Cl is a deliberately sampled trapped/configurational "
+                "training hypothesis, not a demonstrated equilibrium LTA chloride site"
+            )
     if result.ignored_template_atoms:
         lines.append("")
         lines.append(f"Ignored template atoms with unmapped labels: {len(result.ignored_template_atoms)}")
@@ -2086,6 +2583,12 @@ def main() -> None:
     p.add_argument("--ratio4", default=None, help="Fractional 4-ring allocation by physical site, e.g. Li:0.25")
     p.add_argument("--ratio6", default=None)
     p.add_argument("--ratio8", default=None)
+    p.add_argument("--alpha-cl", type=int, default=0)
+    p.add_argument("--beta-cl", type=int, default=0)
+    p.add_argument("--occlusion-n4", default=None)
+    p.add_argument("--occlusion-n6", default=None)
+    p.add_argument("--occlusion-n8", default=None)
+    p.add_argument("--occlusion-min-distance", type=float, default=1.5)
     p.add_argument("--site-map", default="NA1:6,NA2:8,NA3:4")
     p.add_argument("--template-elements", default="Na")
     p.add_argument("--dedup-digits", type=int, default=8)
@@ -2164,6 +2667,25 @@ def main() -> None:
     args = p.parse_args()
 
     cutoffs = parse_cutoffs(args.variant_group_cutoff, args.variant_group_cutoff4, args.variant_group_cutoff6, args.variant_group_cutoff8)
+    occlusion_requested = bool(
+        args.alpha_cl
+        or args.beta_cl
+        or any(
+            spec is not None and str(spec).strip()
+            for spec in (args.occlusion_n4, args.occlusion_n6, args.occlusion_n8)
+        )
+    )
+    if occlusion_requested:
+        if args.population_mode == "maximum-symmetry":
+            p.error("occlusion is unsupported with --population-mode maximum-symmetry in v7.15")
+        if args.unique_batch_size > 1:
+            p.error("occlusion is unsupported with --unique-batch-size > 1 in v7.15")
+        if args.ratio4 is not None or args.ratio6 is not None or args.ratio8 is not None:
+            p.error("occlusion requires exact framework allocations; --ratio4/6/8 are unsupported")
+        if args.auto_rebalance:
+            p.error("occlusion is incompatible with --auto-rebalance in v7.15")
+        if args.write_candidate:
+            p.error("occlusion is incompatible with --write-candidate in v7.15")
     if args.population_mode == "maximum-symmetry":
         if args.seed is not None:
             p.error("--seed is only valid in random population mode")
@@ -2241,6 +2763,12 @@ def main() -> None:
             ratio4=args.ratio4,
             ratio6=args.ratio6,
             ratio8=args.ratio8,
+            alpha_cl=args.alpha_cl,
+            beta_cl=args.beta_cl,
+            occlusion_n4=args.occlusion_n4,
+            occlusion_n6=args.occlusion_n6,
+            occlusion_n8=args.occlusion_n8,
+            occlusion_min_distance=args.occlusion_min_distance,
             seed=args.seed,
             site_map=args.site_map,
             template_elements=args.template_elements,

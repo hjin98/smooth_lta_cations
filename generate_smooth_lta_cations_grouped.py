@@ -58,6 +58,7 @@ from __future__ import annotations
 import argparse
 import copy
 import random
+from dataclasses import replace
 from pathlib import Path
 from typing import List, Optional, Sequence, Tuple
 
@@ -72,6 +73,7 @@ from lta_cation_population_grouped import (
     build_p1_structure,
     build_site_symmetry_group,
     canonical_site_occupation_signature,
+    finalize_occluded_chlorides,
     format_batch_output_path,
     generate_lta_cation_structure_from_specs,
     make_population_report,
@@ -205,23 +207,13 @@ def repair_by_greedy_moves(
         if not current_report.clustered:
             break
 
-    repaired = PopulationResult(
+    repaired = replace(
+        result,
         structure=current_struct,
-        framework_atoms=framework,
-        physical_sites_by_ring=physical_sites_by_ring,
         placed_ions=placed,
-        allocations=result.allocations,
-        ignored_template_atoms=result.ignored_template_atoms,
-        seed=result.seed,
-        variant_group_cutoffs=result.variant_group_cutoffs,
-        framework_counts=result.framework_counts,
-        alkali_counts=result.alkali_counts,
-        required_cations=result.required_cations,
-        input_volume_ang3=result.input_volume_ang3,
-        reference_volume_ang3=result.reference_volume_ang3,
-        volume_factor=result.volume_factor,
-        target_volume_ang3=result.target_volume_ang3,
-        linear_scale=result.linear_scale,
+        occluded_chlorides=[],
+        occlusion_min_distance_ang=None,
+        occlusion_actual_min_distance_ang=None,
     )
     return repaired, current_report, accepted_moves
 
@@ -249,6 +241,12 @@ def generate_one_smooth_population(
             ratio4=args.ratio4,
             ratio6=args.ratio6,
             ratio8=args.ratio8,
+            alpha_cl=args.alpha_cl,
+            beta_cl=args.beta_cl,
+            occlusion_n4=args.occlusion_n4,
+            occlusion_n6=args.occlusion_n6,
+            occlusion_n8=args.occlusion_n8,
+            occlusion_min_distance=args.occlusion_min_distance,
             seed=seed,
             site_map=args.site_map,
             template_elements=args.template_elements,
@@ -257,6 +255,7 @@ def generate_one_smooth_population(
             group_by_label=not args.no_group_by_label,
             auto_rebalance=args.auto_rebalance,
             volume_factor=args.volume_factor,
+            _defer_chloride_placement=True,
         )
         report = analyze_cation_density(
             result.structure,
@@ -307,6 +306,12 @@ def generate_one_smooth_population(
 
     if best_result is None or best_report is None:
         raise RuntimeError("No structure was generated")
+    best_result = finalize_occluded_chlorides(
+        best_result,
+        alpha_cl=args.alpha_cl,
+        beta_cl=args.beta_cl,
+        occlusion_min_distance=args.occlusion_min_distance,
+    )
     return best_result, best_report, best_score, log_lines
 
 
@@ -331,6 +336,12 @@ def main() -> None:
     p.add_argument("--ratio4", default=None)
     p.add_argument("--ratio6", default=None)
     p.add_argument("--ratio8", default=None)
+    p.add_argument("--alpha-cl", type=int, default=0)
+    p.add_argument("--beta-cl", type=int, default=0)
+    p.add_argument("--occlusion-n4", default=None)
+    p.add_argument("--occlusion-n6", default=None)
+    p.add_argument("--occlusion-n8", default=None)
+    p.add_argument("--occlusion-min-distance", type=float, default=1.5)
     p.add_argument("--site-map", default="NA1:6,NA2:8,NA3:4")
     p.add_argument("--template-elements", default="Na")
     p.add_argument("--dedup-digits", type=int, default=8)
@@ -423,6 +434,24 @@ def main() -> None:
 
     if args.unique_batch_size < 1:
         raise ValueError("--unique-batch-size must be at least 1")
+
+    occlusion_requested = bool(
+        args.alpha_cl
+        or args.beta_cl
+        or any(
+            spec is not None and str(spec).strip()
+            for spec in (args.occlusion_n4, args.occlusion_n6, args.occlusion_n8)
+        )
+    )
+    if occlusion_requested:
+        if args.population_mode == "maximum-symmetry":
+            p.error("occlusion is unsupported with --population-mode maximum-symmetry in v7.15")
+        if args.unique_batch_size > 1:
+            p.error("occlusion is unsupported with --unique-batch-size > 1 in v7.15")
+        if args.ratio4 is not None or args.ratio6 is not None or args.ratio8 is not None:
+            p.error("occlusion requires exact framework allocations; --ratio4/6/8 are unsupported")
+        if args.auto_rebalance:
+            p.error("occlusion is incompatible with --auto-rebalance in v7.15")
 
     if args.population_mode == "maximum-symmetry":
         if args.seed is not None:
