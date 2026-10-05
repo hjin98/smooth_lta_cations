@@ -1,5 +1,5 @@
-head_sha=a5f78b42ce901dc1fd03c99b5e64164c0a24f683
-run_id=37376278490
+head_sha=1244a586543167d04545719e3c9b4b380f460eac
+run_id=37376669054
 
 === focused ===
 FFFFFFFF....FFFF.FFFFFF........FFF                                       [100%]
@@ -28,7 +28,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -45,11 +45,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_positive_sparse_occlusion_charge_partition[occlusion_args1-expected_occ1-2-0] _
@@ -76,7 +78,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -93,11 +95,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_positive_sparse_occlusion_charge_partition[occlusion_args2-expected_occ2-1-1] _
@@ -124,7 +128,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -141,11 +145,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _________ test_mixed_framework_beta_cl_and_same_element_role_partition _________
@@ -163,7 +169,7 @@ _________ test_mixed_framework_beta_cl_and_same_element_role_partition _________
 
 tests/test_v715_chloride_occlusion.py:81: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -180,11 +186,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_invalid_occlusion_chemistry_and_count_domain[kwargs0-counterion charge must equal] _
@@ -210,7 +218,7 @@ match = 'counterion charge must equal'
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'counterion charge must equal'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:117: AssertionError
 _ test_invalid_occlusion_chemistry_and_count_domain[kwargs1-counterion charge must equal] _
@@ -236,7 +244,7 @@ match = 'counterion charge must equal'
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'counterion charge must equal'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:117: AssertionError
 _ test_invalid_occlusion_chemistry_and_count_domain[kwargs2-not allowed when total chloride count is zero] _
@@ -262,7 +270,7 @@ match = 'not allowed when total chloride count is zero'
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'not allowed when total chloride count is zero'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:117: AssertionError
 _ test_invalid_occlusion_chemistry_and_count_domain[kwargs3-counterion charge must equal] _
@@ -287,7 +295,7 @@ kwargs = {'alpha_cl': 1}, match = 'counterion charge must equal'
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'counterion charge must equal'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:117: AssertionError
 ______ test_framework_charge_must_pass_independently_of_global_neutrality ______
@@ -297,7 +305,7 @@ ______ test_framework_charge_must_pass_independently_of_global_neutrality ______
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'Charge-neutrality violation'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:122: AssertionError
 ________________ test_combined_capacity_is_shared_between_roles ________________
@@ -307,7 +315,7 @@ ________________ test_combined_capacity_is_shared_between_roles ________________
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'Combined framework/occlusion site capacity'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:135: AssertionError
 _________ test_occlusion_does_not_perturb_framework_rng_or_dry_volume __________
@@ -322,7 +330,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -339,11 +347,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 ________ test_canonical_cage_orbits_and_deterministic_single_selection _________
@@ -365,7 +375,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -382,11 +392,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif] _
@@ -413,7 +425,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -430,11 +442,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.POSCAR] _
@@ -461,7 +475,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -478,11 +492,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.data] _
@@ -509,7 +525,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -526,11 +542,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif] _
@@ -557,7 +575,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -574,11 +592,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.POSCAR] _
@@ -605,7 +625,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -622,11 +642,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 _ test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.data] _
@@ -653,7 +675,7 @@ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 tests/test_v715_chloride_occlusion.py:39: in generate
     return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -670,11 +692,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 ____________________ test_collision_guard_is_hard_rejection ____________________
@@ -684,12 +708,12 @@ ____________________ test_collision_guard_is_hard_rejection ____________________
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 E       AssertionError: Regex pattern did not match.
 E         Expected regex: 'Chloride collision guard failed'
-E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+E         Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 
 tests/test_v715_chloride_occlusion.py:289: AssertionError
 _____ test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move _____
 
-monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4b861f7b60>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fccef79e330>
 
     def test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move(monkeypatch):
 >       result = generate_lta_cation_structure_from_specs(
@@ -703,7 +727,7 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f4b861f7b60>
 
 tests/test_v715_chloride_occlusion.py:298: 
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-lta_cation_population_grouped.py:2177: in generate_lta_cation_structure_from_specs
+lta_cation_population_grouped.py:2179: in generate_lta_cation_structure_from_specs
     validate_occlusion_template_setting(input_cif, framework)
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
@@ -720,11 +744,13 @@ framework = [AtomRow(label='SI1', element='Si', frac=array([0.27815, 0.09183, 0.
         if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
 >           raise ValueError(
                 "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-                "template identity; the semantic framework/template fingerprint does "
-                "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-                "or otherwise unbound templates require an explicit coordinate mapping."
+                "template identity; the semantic framework/template fingerprint "
+                f"{fingerprint} does not match the bound canonical value "
+                f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+                "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+                "otherwise unbound templates require an explicit coordinate mapping."
             )
-E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E           ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 
 lta_cation_population_grouped.py:1097: ValueError
 ____________ test_smooth_cli_places_chloride_after_cation_smoothing ____________
@@ -763,51 +789,51 @@ E                                                               ^^^^^^^^^^^^^^^^
 E           File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/generate_smooth_lta_cations_grouped.py", line 236, in generate_one_smooth_population
 E             result = generate_lta_cation_structure_from_specs(
 E                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-E           File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 2177, in generate_lta_cation_structure_from_specs
+E           File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 2179, in generate_lta_cation_structure_from_specs
 E             validate_occlusion_template_setting(input_cif, framework)
 E           File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 1097, in validate_occlusion_template_setting
 E             raise ValueError(
-E         ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+E         ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 E         
 E       assert 1 == 0
 E        +  where 1 = CompletedProcess(args=['/opt/hostedtoolcache/Python/3.12.14/x64/bin/python', '/home/runner/work/smooth_lta_cations/smo...mitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.\n').returncode
 
 tests/test_v715_chloride_occlusion.py:379: AssertionError
 =========================== short test summary info ============================
-FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args0-expected_occ0-1-0] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args1-expected_occ1-2-0] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args2-expected_occ2-1-1] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_mixed_framework_beta_cl_and_same_element_role_partition - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args0-expected_occ0-1-0] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args1-expected_occ1-2-0] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_positive_sparse_occlusion_charge_partition[occlusion_args2-expected_occ2-1-1] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_mixed_framework_beta_cl_and_same_element_role_partition - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 FAILED tests/test_v715_chloride_occlusion.py::test_invalid_occlusion_chemistry_and_count_domain[kwargs0-counterion charge must equal] - AssertionError: Regex pattern did not match.
   Expected regex: 'counterion charge must equal'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 FAILED tests/test_v715_chloride_occlusion.py::test_invalid_occlusion_chemistry_and_count_domain[kwargs1-counterion charge must equal] - AssertionError: Regex pattern did not match.
   Expected regex: 'counterion charge must equal'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 FAILED tests/test_v715_chloride_occlusion.py::test_invalid_occlusion_chemistry_and_count_domain[kwargs2-not allowed when total chloride count is zero] - AssertionError: Regex pattern did not match.
   Expected regex: 'not allowed when total chloride count is zero'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 FAILED tests/test_v715_chloride_occlusion.py::test_invalid_occlusion_chemistry_and_count_domain[kwargs3-counterion charge must equal] - AssertionError: Regex pattern did not match.
   Expected regex: 'counterion charge must equal'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 FAILED tests/test_v715_chloride_occlusion.py::test_framework_charge_must_pass_independently_of_global_neutrality - AssertionError: Regex pattern did not match.
   Expected regex: 'Charge-neutrality violation'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
 FAILED tests/test_v715_chloride_occlusion.py::test_combined_capacity_is_shared_between_roles - AssertionError: Regex pattern did not match.
   Expected regex: 'Combined framework/occlusion site capacity'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
-FAILED tests/test_v715_chloride_occlusion.py::test_occlusion_does_not_perturb_framework_rng_or_dry_volume - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_canonical_cage_orbits_and_deterministic_single_selection - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.POSCAR] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.data] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.POSCAR] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.data] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+FAILED tests/test_v715_chloride_occlusion.py::test_occlusion_does_not_perturb_framework_rng_or_dry_volume - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_canonical_cage_orbits_and_deterministic_single_selection - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.POSCAR] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.data] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.POSCAR] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.data] - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 FAILED tests/test_v715_chloride_occlusion.py::test_collision_guard_is_hard_rejection - AssertionError: Regex pattern did not match.
   Expected regex: 'Chloride collision guard failed'
-  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
-FAILED tests/test_v715_chloride_occlusion.py::test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+  Actual message: 'Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.'
+FAILED tests/test_v715_chloride_occlusion.py::test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move - ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
 FAILED tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cation_smoothing - AssertionError: Traceback (most recent call last):
     File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/generate_smooth_lta_cations_grouped.py", line 682, in <module>
       main()
@@ -817,15 +843,15 @@ FAILED tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_af
     File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/generate_smooth_lta_cations_grouped.py", line 236, in generate_one_smooth_population
       result = generate_lta_cation_structure_from_specs(
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 2177, in generate_lta_cation_structure_from_specs
+    File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 2179, in generate_lta_cation_structure_from_specs
       validate_occlusion_template_setting(input_cif, framework)
     File "/home/runner/work/smooth_lta_cations/smooth_lta_cations/lta_cation_population_grouped.py", line 1097, in validate_occlusion_template_setting
       raise ValueError(
-  ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint does not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
+  ValueError: Occlusion is supported only for the canonical Fm-3c primitive LTA template identity; the semantic framework/template fingerprint 0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f does not match the bound canonical value ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61 for tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.
   
 assert 1 == 0
  +  where 1 = CompletedProcess(args=['/opt/hostedtoolcache/Python/3.12.14/x64/bin/python', '/home/runner/work/smooth_lta_cations/smo...mitive.cif. Shifted, rebased, re-originated, or otherwise unbound templates require an explicit coordinate mapping.\n').returncode
-21 failed, 13 passed in 17.11s
+21 failed, 13 passed in 17.35s
 
 === full ===
 
