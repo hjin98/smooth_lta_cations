@@ -1096,9 +1096,11 @@ def validate_occlusion_template_setting(
     if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
         raise ValueError(
             "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-            "template identity; the semantic framework/template fingerprint does "
-            "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
-            "or otherwise unbound templates require an explicit coordinate mapping."
+            "template identity; the semantic framework/template fingerprint "
+            f"{fingerprint} does not match the bound canonical value "
+            f"{_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT} for "
+            "tests/real_lta_primitive.cif. Shifted, rebased, re-originated, or "
+            "otherwise unbound templates require an explicit coordinate mapping."
         )
     beta = _cage_orbit(data, (0.0, 0.0, 0.0))
     alpha = _cage_orbit(data, (0.25, 0.25, 0.25))
