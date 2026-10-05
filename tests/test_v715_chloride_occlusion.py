@@ -209,7 +209,7 @@ def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, occl
     if kind == "lammps-data":
         reloaded = LammpsData.from_file(str(path), atom_style="atomic").structure
         text = path.read_text()
-        atoms_match = re.search(r"(?m)^Atoms(?:\\s*#\\s*atomic)?\\s*$", text)
+        atoms_match = re.search(r"(?m)^Atoms(?:\s*#\s*atomic)?\s*$", text)
         assert atoms_match is not None
         atom_lines = [
             line.strip()
