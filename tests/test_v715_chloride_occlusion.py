@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -132,8 +133,10 @@ def test_framework_charge_must_pass_independently_of_global_neutrality():
 
 
 def test_combined_capacity_is_shared_between_roles():
+    # The canonical framework allocation already fills the 6R family (16 sites).
+    # Two Sr2+ exactly balance four Cl- but cannot occupy two additional 6R sites.
     with pytest.raises(ValueError, match="Combined framework/occlusion site capacity"):
-        generate(alpha_cl=2, beta_cl=2, occlusion_n4="Cs:7")
+        generate(alpha_cl=2, beta_cl=2, occlusion_n6="Sr:2")
 
 
 def test_occlusion_does_not_perturb_framework_rng_or_dry_volume():
@@ -206,8 +209,15 @@ def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, occl
     if kind == "lammps-data":
         reloaded = LammpsData.from_file(str(path), atom_style="atomic").structure
         text = path.read_text()
-        atoms_header = text.split("Atoms # atomic", 1)
-        assert len(atoms_header) == 2
+        atoms_match = re.search(r"(?m)^Atoms(?:\\s*#\\s*atomic)?\\s*$", text)
+        assert atoms_match is not None
+        atom_lines = [
+            line.strip()
+            for line in text[atoms_match.end():].splitlines()
+            if line.strip()
+        ]
+        # atom_style atomic: id, type, x, y, z; no per-atom charge column.
+        assert len(atom_lines[0].split()) == 5
     else:
         reloaded = Structure.from_file(str(path))
     counts = composition(reloaded)
