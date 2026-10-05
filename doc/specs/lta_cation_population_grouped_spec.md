@@ -602,8 +602,7 @@ Maximum-symmetry mode accepts `--max-direct-occupation-count N` with default `10
 Random population now supports the bounded role-aware occlusion contract in
 `v7_15_chloride_occlusion_extension.md`. `PlacedIon.role` is
 `framework` by default for compatibility or `occlusion_counterion`.
-`PopulationResult.alkali_counts` remains framework-only while derived total
-views include both roles. Occluded chlorides are authoritative cage records and
+`PopulationResult.alkali_counts` and the legacy `cation_counts` alias remain framework-only; `total_cation_counts` is the derived view that includes both roles. Occluded chlorides are authoritative cage records and
 are appended to the single assembled structure only after the independent
 charge checks and collision guard pass.
 

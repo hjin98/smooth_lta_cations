@@ -435,7 +435,7 @@ CANONICAL_CAGE_SITES: Tuple[CageSite, ...] = (
     CageSite("alpha-1", "alpha", (0.75, 0.75, 0.75)),
 )
 _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT = (
-    "715316a97be240df1331b7ebc46c2fbde436e9d4fc8c8278e13f0d8787e7a2c3"
+    "ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61"
 )
 
 
@@ -1058,6 +1058,7 @@ def _semantic_occlusion_template_fingerprint(
             atom.label,
             atom.element,
             tuple(round(float(x), 8) for x in wrap_frac(atom.frac)),
+            round(float(atom.occ), 8),
         )
         for atom in data.atoms
     )
@@ -2567,7 +2568,7 @@ def main() -> None:
     p = argparse.ArgumentParser(
         description=(
             "Populate Group I/II cations in the supported Al24Si24O96 LTA "
-            "framework; non-24-Al and other Si:Al cases are outside v7.14 scope."
+            "framework; non-24-Al and other Si:Al cases are outside v7.15 scope."
         )
     )
     p.add_argument("input_cif")
