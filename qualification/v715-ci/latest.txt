@@ -1,8 +1,8 @@
-head_sha=e74bd03af07232d5fb5e0cc1ab734e3604a99ea7
-run_id=37390158518
+head_sha=2b9dfc19330d190c07eff62704c797be22c0deb4
+run_id=37390540857
 
 === focused ===
-..................................                                       [100%]
+....................................                                     [100%]
 =============================== warnings summary ===============================
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif]
@@ -11,11 +11,12 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-34 passed, 3 warnings in 16.41s
+36 passed, 3 warnings in 21.22s
 
 === full ===
-........................................................................ [ 50%]
-........................................................................ [100%]
+........................................................................ [ 49%]
+........................................................................ [ 98%]
+..                                                                       [100%]
 =============================== warnings summary ===============================
 tests/test_group1_group2_cations.py::test_supported_real_24al_serialization_preserves_composition_and_volume[supported.cif]
 tests/test_ms4_integration_serialization.py::test_supported_real_lta_maxsym_cif_round_trip
@@ -26,7 +27,7 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-144 passed, 5 warnings in 56.92s
+146 passed, 5 warnings in 62.29s (0:01:02)
 
 === v7.14.2 differential ===
 v7.14.2 differential dry serialization: PASS
