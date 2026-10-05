@@ -435,7 +435,7 @@ CANONICAL_CAGE_SITES: Tuple[CageSite, ...] = (
     CageSite("alpha-1", "alpha", (0.75, 0.75, 0.75)),
 )
 _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT = (
-    "ede5673b0d70bd9600d705a512ab76b8a2564f75722b814332ab0e3b33d99c61"
+    "0872842fdc536445fe8e0966567ec00ea1baf49d2bc3a4fd5581d74b99c7c65f"
 )
 
 
