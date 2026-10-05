@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from types import SimpleNamespace
 from collections import Counter
 from pathlib import Path
 
@@ -9,6 +10,8 @@ import numpy as np
 import pytest
 from pymatgen.core import Structure
 from pymatgen.io.lammps.data import LammpsData
+
+import generate_smooth_lta_cations_grouped as smooth
 
 from lta_cation_population_grouped import (
     CANONICAL_CAGE_SITES,
@@ -260,6 +263,11 @@ def run_cli(script: str, *args: str):
             ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--unique-batch-size", "2"),
             "unique-batch-size",
         ),
+        (
+            "lta_cation_population_grouped.py",
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1.5"),
+            "invalid int value",
+        ),
     ],
 )
 def test_public_cli_guards(script, args, needle, tmp_path: Path):
@@ -272,6 +280,77 @@ def test_public_cli_guards(script, args, needle, tmp_path: Path):
     assert proc.returncode != 0
     assert needle.lower() in (proc.stdout + proc.stderr).lower()
     assert not (tmp_path / "out.cif").exists()
+
+
+
+
+def test_collision_guard_is_hard_rejection():
+    with pytest.raises(ValueError, match="Chloride collision guard failed"):
+        generate(
+            alpha_cl=1,
+            occlusion_n4="Cs:1",
+            occlusion_min_distance=100.0,
+        )
+
+
+def test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move(monkeypatch):
+    result = generate_lta_cation_structure_from_specs(
+        REAL,
+        **FW,
+        alpha_cl=1,
+        occlusion_n4="Cs:1",
+        seed=1715,
+        _defer_chloride_placement=True,
+    )
+    target = next(i for i in result.placed_ions if i.role == "occlusion_counterion")
+    first_report = SimpleNamespace(
+        clustered=True,
+        per_ion_rows=[
+            {
+                "element": target.element,
+                "frac_x": float(target.frac[0]),
+                "frac_y": float(target.frac[1]),
+                "frac_z": float(target.frac[2]),
+                "local_density": 10.0,
+            }
+        ],
+    )
+    later_report = SimpleNamespace(clustered=False, per_ion_rows=[])
+    calls = {"analyze": 0, "score": 0}
+
+    def fake_analyze(*args, **kwargs):
+        calls["analyze"] += 1
+        return first_report if calls["analyze"] == 1 else later_report
+
+    def fake_score(*args, **kwargs):
+        calls["score"] += 1
+        return 1000.0 - calls["score"]
+
+    monkeypatch.setattr(smooth, "analyze_cation_density", fake_analyze)
+    monkeypatch.setattr(smooth, "score_structure", fake_score)
+    repaired, report, moves = smooth.repair_by_greedy_moves(
+        result,
+        species=SUPPORTED_CATIONS,
+        sigma=5.0,
+        max_density_ratio=2.0,
+        max_density_zscore=2.5,
+        min_pair_distance=None,
+        max_moves=1,
+        trial_sites_per_move=3,
+        seed=1716,
+    )
+    assert moves == 1
+    assert report.clustered is False
+    assert repaired.occlusion_counterion_counts["Cs"] == 1
+    moved = [i for i in repaired.placed_ions if i.element == "Cs"]
+    assert len(moved) == 1 and moved[0].role == "occlusion_counterion"
+    assert repaired.occluded_chlorides == []
+
+    finalized = smooth.finalize_occluded_chlorides(
+        repaired, alpha_cl=1, beta_cl=0, occlusion_min_distance=1.5
+    )
+    assert finalized.alpha_chloride_count == 1
+    assert finalized.occlusion_actual_min_distance_ang >= 1.5
 
 
 def test_smooth_cli_places_chloride_after_cation_smoothing(tmp_path: Path):

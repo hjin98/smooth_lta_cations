@@ -434,8 +434,8 @@ CANONICAL_CAGE_SITES: Tuple[CageSite, ...] = (
     CageSite("alpha-0", "alpha", (0.25, 0.25, 0.25)),
     CageSite("alpha-1", "alpha", (0.75, 0.75, 0.75)),
 )
-_CANONICAL_OCCLUSION_TEMPLATE_FILE_SHA256 = (
-    "4035695f9dff3c339e104e3b6c3c9cee661132f6148b5ba07db66b47c6cf6365"
+_CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT = (
+    "715316a97be240df1331b7ebc46c2fbde436e9d4fc8c8278e13f0d8787e7a2c3"
 )
 
 
@@ -1048,14 +1048,13 @@ def _semantic_occlusion_template_fingerprint(
         rotation = [int(round(float(x))) for x in np.asarray(op.rotation_matrix).ravel()]
         translation = [round(float(x) % 1.0, 8) for x in np.asarray(op.translation_vector).ravel()]
         symops.append((rotation, translation))
-    raw_framework = sorted(
+    raw_atoms = sorted(
         (
             atom.label,
             atom.element,
             tuple(round(float(x), 8) for x in wrap_frac(atom.frac)),
         )
         for atom in data.atoms
-        if atom.element not in SUPPORTED_CATIONS
     )
     expanded_framework = sorted(
         (
@@ -1069,7 +1068,7 @@ def _semantic_occlusion_template_fingerprint(
         "lengths": [round(float(x), 8) for x in data.lattice.abc],
         "angles": [round(float(x), 8) for x in data.lattice.angles],
         "symops": sorted(symops),
-        "raw_framework": raw_framework,
+        "raw_atoms": raw_atoms,
         "expanded_framework": expanded_framework,
     }
     blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))
@@ -1087,17 +1086,14 @@ def validate_occlusion_template_setting(
 ) -> None:
     """Fail closed unless the input is the canonical supported primitive setting."""
     data = read_cif_minimal(input_cif)
-    file_digest = hashlib.sha256(Path(input_cif).read_bytes()).hexdigest()
-    if file_digest != _CANONICAL_OCCLUSION_TEMPLATE_FILE_SHA256:
+    fingerprint = _semantic_occlusion_template_fingerprint(data, framework)
+    if fingerprint != _CANONICAL_OCCLUSION_TEMPLATE_FINGERPRINT:
         raise ValueError(
             "Occlusion is supported only for the canonical Fm-3c primitive LTA "
-            "template identity; the input does not match tests/real_lta_primitive.cif. "
-            "Shifted, rebased, re-originated, or otherwise unbound templates require "
-            "an explicit coordinate mapping before occlusion can be used."
+            "template identity; the semantic framework/template fingerprint does "
+            "not match tests/real_lta_primitive.cif. Shifted, rebased, re-originated, "
+            "or otherwise unbound templates require an explicit coordinate mapping."
         )
-    fingerprint = _semantic_occlusion_template_fingerprint(data, framework)
-    if len(fingerprint) != 64:
-        raise ValueError("Canonical occlusion template semantic fingerprint failed")
     beta = _cage_orbit(data, (0.0, 0.0, 0.0))
     alpha = _cage_orbit(data, (0.25, 0.25, 0.25))
     if beta != ((0.0, 0.0, 0.0), (0.5, 0.5, 0.5)):
