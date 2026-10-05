@@ -475,17 +475,17 @@ class PopulationResult:
 
     @property
     def cation_counts(self) -> Dict[str, int]:
-        """Backward-compatible alias for framework-compensating counts."""
-        return dict(self.alkali_counts)
-
-    @property
-    def total_cation_counts(self) -> Dict[str, int]:
         """Total physical cation counts across framework and occlusion roles."""
         return {
             el: int(self.alkali_counts.get(el, 0))
             + int(self.occlusion_counterion_counts.get(el, 0))
             for el in SUPPORTED_CATIONS
         }
+
+    @property
+    def total_cation_counts(self) -> Dict[str, int]:
+        """Compatibility-explicit alias for the total physical cation view."""
+        return self.cation_counts
 
     @property
     def chloride_count(self) -> int:
@@ -2433,8 +2433,12 @@ def make_population_report(result: PopulationResult) -> str:
             + ", ".join(f"x_{el}={fractions[el]:.8f}" for el in nonzero_cations)
         )
     positive_charge = total_cation_charge(result.alkali_counts)
+    framework_status = (
+        "PASS" if positive_charge == result.required_cations else "FAIL"
+    )
     lines.append(
-        f"Framework charge invariant: PASS (+{positive_charge} = +{result.required_cations})"
+        f"Framework charge invariant: {framework_status} "
+        f"(+{positive_charge} = +{result.required_cations})"
     )
     occ_nonzero = [
         el for el in SUPPORTED_CATIONS
@@ -2450,9 +2454,14 @@ def make_population_report(result: PopulationResult) -> str:
             if occ_nonzero else "none"
         )
     )
+    occlusion_status = (
+        "PASS"
+        if result.occlusion_positive_charge == result.chloride_count
+        else "FAIL"
+    )
     lines.append(
-        f"Occlusion charge invariant: PASS (+{result.occlusion_positive_charge} = "
-        f"{result.chloride_count} Cl-)"
+        f"Occlusion charge invariant: {occlusion_status} "
+        f"(+{result.occlusion_positive_charge} = {result.chloride_count} Cl-)"
     )
     lines.append(
         f"Chloride loading: alpha={result.alpha_chloride_count}, "
