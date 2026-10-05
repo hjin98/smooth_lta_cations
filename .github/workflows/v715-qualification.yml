@@ -20,6 +20,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install package and test dependencies
         run: python -m pip install -e '.[test,symmetry]'
       - name: Focused v7.15 tests
@@ -32,6 +34,23 @@ jobs:
         run: |
           set -o pipefail
           pytest -q 2>&1 | tee /tmp/v715-full.txt
+      - name: v7.14.2 dry differential compatibility
+        shell: bash
+        run: |
+          set -euo pipefail
+          base=/tmp/v7142
+          cur=/tmp/v715
+          mkdir -p "$base" "$cur"
+          git archive a10fb47391adc509b6fcd048e261eac82ba83fbd | tar -x -C "$base"
+          for ext in cif POSCAR data; do
+            python "$base/lta_cation_population_grouped.py"               "$base/tests/real_lta_primitive.cif" "$base/dry.$ext"               --n4 Na:2 --n6 Na:16 --n8 Na:6 --seed 1715               > "$base/report.$ext.txt"
+            python lta_cation_population_grouped.py               tests/real_lta_primitive.cif "$cur/dry.$ext"               --n4 Na:2 --n6 Na:16 --n8 Na:6 --seed 1715               > "$cur/report.$ext.txt"
+            cmp "$base/dry.$ext" "$cur/dry.$ext"
+          done
+          {
+            echo "v7.14.2 differential dry serialization: PASS"
+            sha256sum "$base"/dry.* "$cur"/dry.*
+          } | tee /tmp/v715-differential.txt
       - name: Record qualification output
         if: always()
         shell: bash
@@ -46,6 +65,9 @@ jobs:
             echo
             echo "=== full ==="
             cat /tmp/v715-full.txt 2>/dev/null || true
+            echo
+            echo "=== v7.14.2 differential ==="
+            cat /tmp/v715-differential.txt 2>/dev/null || true
           } > qualification/v715-ci/latest.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
