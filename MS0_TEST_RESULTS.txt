@@ -1,0 +1,25 @@
+MS0 focused validation
+Date: 2026-07-21
+
+Canonical command:
+  pytest -q
+
+Result:
+  15 passed
+
+Coverage of focused fixtures:
+- deterministic template ordering under CIF atom-row reordering
+- declared C4 affine closure, identity, inverses, associativity, and action composition
+- symmetry-completed variant library and total parent action
+- strict missing-transition table and reduced library-preserving subgroup G_V
+- retention of distinct affine operations in the physical-site-action kernel
+- explicit transition status semantics
+- auto backend preference for nonidentity declared operations
+- spglib detection without coordinate idealization
+- rejection of coincident unlike framework species
+- all seven original unique-batch regression tests
+
+Additional smoke checks:
+  python -m unittest discover -s tests -v  -> 7 legacy tests passed
+  python lta_cation_population_grouped.py --help  -> success
+  python generate_smooth_lta_cations_grouped.py --help  -> success

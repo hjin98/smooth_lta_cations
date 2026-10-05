@@ -1,0 +1,45 @@
+MS7 benchmark summary
+=====================
+
+Template: real primitive dehydrated LTA template
+Composition: Na24[Al24Si24O96]
+Allocation: 2 Na on 4R, 16 Na on 6R, 6 Na on 8R
+Parent affine group order: 48
+Enumerated subgroups: 98
+Certified occupation/coordinate stabilizer order: 4 / 4
+
+Compatibility-harness benchmark
+-------------------------------
+The execution image did not contain installed pymatgen or spglib. An
+API-compatible local harness outside the deliverable was used for regression
+and relative timing. Absolute timings should be repeated in the production
+pymatgen environment.
+
+v7.11 baseline:
+  template loading:                         0.54 s
+  symmetry-model construction:             31.13 s
+  subgroup lattice, isolated table test:    3.524 s
+  full exact run:                           exceeded 120 s in this harness
+
+v7.12 MS7, median of three runs:
+  template loading:                          0.5191 s
+  symmetry-model construction:               2.7717 s
+  subgroup lattice:                          0.8530 s
+  exact optimizer:                           0.6100 s
+  total core path:                           4.7488 s
+  full CLI including CIF write/read-back:    9.84 s
+
+Measured relative improvements:
+  symmetry-model construction: 11.23x
+  subgroup-lattice construction: 4.13x
+  pre-optimizer cold path:       8.49x
+
+Algorithms selected:
+  framework action: expansion provenance algebra
+  variant completion: generator-orbit closure (4 generators)
+  subgroup states: integer bit masks
+
+Correctness:
+  87/87 tests passed.
+  The real Na-LTA case retained the same certified order-four stabilizer.
+  CIF post-write stabilizer verification passed.

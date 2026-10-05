@@ -1,0 +1,186 @@
+{
+  "case_count": 36,
+  "expected_order_histogram": {
+    "1": 29,
+    "2": 2,
+    "4": 5
+  },
+  "fixture_site_counts": {
+    "4": 24,
+    "6": 16,
+    "8": 6
+  },
+  "format_check_count": 9,
+  "format_checks": [
+    {
+      "format": "cif",
+      "observed_order": 1,
+      "order": 1,
+      "passed": true
+    },
+    {
+      "format": "POSCAR",
+      "observed_order": 1,
+      "order": 1,
+      "passed": true
+    },
+    {
+      "format": "data",
+      "observed_order": 1,
+      "order": 1,
+      "passed": true
+    },
+    {
+      "format": "cif",
+      "observed_order": 2,
+      "order": 2,
+      "passed": true
+    },
+    {
+      "format": "POSCAR",
+      "observed_order": 2,
+      "order": 2,
+      "passed": true
+    },
+    {
+      "format": "data",
+      "observed_order": 2,
+      "order": 2,
+      "passed": true
+    },
+    {
+      "format": "cif",
+      "observed_order": 4,
+      "order": 4,
+      "passed": true
+    },
+    {
+      "format": "POSCAR",
+      "observed_order": 4,
+      "order": 4,
+      "passed": true
+    },
+    {
+      "format": "data",
+      "observed_order": 4,
+      "order": 4,
+      "passed": true
+    }
+  ],
+  "maximum_variant_nodes": 0,
+  "orbit_sizes": {
+    "1": {
+      "4": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "6": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "8": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    "2": {
+      "4": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "6": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "8": [
+        1,
+        1,
+        2,
+        2
+      ]
+    },
+    "4": {
+      "4": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "6": [
+        4,
+        4,
+        4,
+        4
+      ],
+      "8": [
+        1,
+        1,
+        4
+      ]
+    }
+  },
+  "parent_group_order": 4,
+  "passed_case_count": 36,
+  "passed_format_check_count": 9,
+  "strategy_histogram": {
+    "forced_variant_lift": 36
+  }
+}

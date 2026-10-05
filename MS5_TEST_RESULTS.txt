@@ -1,0 +1,46 @@
+MS5 focused and regression test report
+======================================
+Package: smooth_lta_cations_grouped_charge_volume_v7_10_ms5
+Date: 2026-07-21
+
+Implemented scope
+-----------------
+- Complete-orbit relocation under a required coordinate subgroup.
+- Equivariant off-center variant reorientation.
+- Equal-size occupied-orbit species exchange within one ring family.
+- Full candidate rebuild and actual stabilizer verification through MS4.
+- Candidate and selected-variant search guards.
+- Batch certificate retention and uniqueness checks.
+- Maximum-symmetry smoothing CLI integration with mandatory post-write verification.
+- Legacy random smoothing retained as a separate workflow.
+
+Focused tests
+-------------
+Command:
+  pytest -q tests/test_ms5_symmetry_smoothing.py
+
+Result:
+  8 passed in 4.58s
+
+Full regression suite
+---------------------
+Command:
+  pytest -q
+
+Result:
+  74 passed in 12.34s
+
+Additional checks
+-----------------
+- python -m py_compile *.py tests/*.py: passed
+- generate_smooth_lta_cations_grouped.py --help: passed
+- legacy random smoothing CLI smoke test: passed
+- maximum-symmetry smoothing CLI smoke test: passed
+- maximum-symmetry CIF read-back stabilizer verification: passed
+- affected documentation PDFs: openable, text-based, unencrypted, no XFA
+
+Scientific guarantee
+--------------------
+Every accepted MS5 move preserves the requested coordinate subgroup and is
+reverified against the complete parent operation group. MS5 is a deterministic
+local density repair; it does not claim a globally optimal density score.

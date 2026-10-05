@@ -1,0 +1,76 @@
+LTA cation generator v7.14 validation record
+=============================================
+
+Scope
+-----
+This historical v7.14 validation record predates the v7.14.1 provenance
+clarification.  v7.14 replaces v7.13's whole-cell input-volume fallback for
+non-Li/Na/K compositions with a per-cation affine dry-volume model.  Where no
+species-specific dry-LTA volume reference is bound by the package, that species
+is bound to the standard dehydrated Na-A volume as an explicit placeholder.
+This wording describes the package's bound references and is not an exhaustive
+literature-absence claim.
+
+Volume contract
+---------------
+For cation species i with formal charge z_i and population N_i,
+
+    V_ref = (1/24) * sum_i[z_i * N_i * V_i^(24)]
+
+and
+
+    V_target = volume_factor * V_ref.
+
+Charge neutrality supplies sum_i(z_i*N_i) = N_Al.  The formula is therefore
+exactly the historical count/24 interpolation for Li/Na/K-only compositions
+and uses charge-equivalent fractions when +2 cations are present.
+
+Bound V_i^(24) values (A^3)
+---------------------------
+H   3703.2920363857143   Na-A placeholder
+Li  3391.6742041202237    Carey Li92Na4-A affine extrapolation
+Na  3703.2920363857143   Carey Na96-A measured corner
+K   3702.801747275207   Carey K93Na3-A affine extrapolation
+Rb  3699.8758126573443    Carey Rb76Na20-A affine extrapolation
+Cs  3656.9070613029094    Carey Cs56Na40-A affine extrapolation
+Fr  3703.2920363857143   Na-A placeholder
+Be  3703.2920363857143   Na-A placeholder
+Mg  3521.221887387658    Adams/Rees ~Mg2Na8-A charge-equivalent extrapolation
+Ca  3663.0421557499994   Porcher et al. fully exchanged/dehydrated Ca48-A
+Sr  3758.161808          Pluth/Smith impurity-screened dehydrated Sr-A
+Ba  3683.6923334262033   Kim et al. Ba3.5Na5-A charge-equivalent extrapolation
+Ra  3703.2920363857143   Na-A placeholder
+
+Source caveats
+--------------
+- Mg: the source reports a small residual water content despite vigorous
+  dehydration, so the Mg corner is lower-confidence than the dry alkali/Ca data.
+- Sr: the 1982 Pluth/Smith redetermination reports approximately 5.7 Sr per
+  12-Al pseudocell and an extra-framework Al complex.  The stored value is
+  therefore a QUESTIONABLE effective corner, not a clean ideal Sr6-A endpoint.
+- Ba: fully Ba-exchanged LTA is reported unstable toward dehydration.  The Ba
+  value is therefore an affine model corner extrapolated from fully dehydrated
+  Ba3.5Na5-A, not a claim that stable dry Ba6-A exists.
+- H, Be, Fr, Ra: no species-specific dry-LTA volume reference is bound by the
+  package for these species; each uses the Na-A corner by contract.  This is
+  not an exhaustive claim about all literature.
+
+Executed checks
+---------------
+PASS  python -m compileall -q .
+PASS  focused AST-loaded checks against the actual volume owner in
+      lta_cation_population_grouped.py:
+      - legacy Li/Na/K formula is algebraically unchanged;
+      - mixed Na+/Ca2+ uses charge-equivalent weighting;
+      - the legacy 4-Al synthetic fixture exercises charge-equivalent arithmetic
+        only; it is not a supported scientific generator input in v7.14.1;
+      - H/Be/Fr/Ra equal the Na reference and ignore the legacy template fallback;
+      - Rb/Cs/Mg/Ca/Sr/Ba numerical corners reconstruct from the bound source data.
+
+UNAVAILABLE  pytest -q tests/test_group1_group2_cations.py
+Reason: test collection requires pymatgen, which is not installed in this
+execution environment.  Collection stops with ModuleNotFoundError: pymatgen.
+This is an unavailable integration check, not a passing check.  The permanent
+pytest file has nevertheless been extended with v7.14 numerical-corner,
+charge-equivalent interpolation, backward-equivalence, and placeholder tests
+for execution in the normal package environment.

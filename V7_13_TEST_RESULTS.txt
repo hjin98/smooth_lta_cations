@@ -1,0 +1,26 @@
+LTA cation generator v7.13 validation summary
+=============================================
+
+Feature under test:
+  Group I/II cation support with formal-valence charge neutrality.
+
+Static validation:
+  PASS - python -m compileall -q .
+
+Focused executable checks with lightweight pymatgen import stubs:
+  PASS - 4/4 new pure-logic tests:
+         * complete Group I/II species and charge map
+         * new species parser acceptance
+         * mixed +1/+2 charge-neutrality arithmetic and failure cases
+         * maximum-symmetry state alphabet accepts Ca2+
+  PASS - 15 existing MS2 occupation-optimizer tests
+         (1 crystallographic integration test deselected because real pymatgen
+          geometry is unavailable in this execution environment)
+  PASS - direct regression checks preserve historical Li/Na/K reference volumes
+         and select input-volume fallback for compositions containing new cations.
+
+Environment limitation:
+  The container does not provide pymatgen. Outbound pip installation is blocked,
+  so the full pytest suite and real CIF/POSCAR/LAMMPS integration tests could not
+  execute here. The added integration tests are included for execution in the
+  normal project environment where pymatgen is installed.

@@ -1,0 +1,51 @@
+{
+  "benchmark_context": {
+    "date": "2026-07-23",
+    "template": "tests/real_lta_primitive.cif",
+    "composition": "Na24[Al24Si24O96]",
+    "site_allocation": {
+      "4R_Na": 2,
+      "6R_Na": 16,
+      "8R_Na": 6
+    },
+    "parent_group_order": 48,
+    "subgroup_count": 98,
+    "certified_coordinate_order": 4,
+    "note": "The execution image lacked installed pymatgen/spglib. Tests and timings used an API-compatible local harness outside the deliverable; algorithmic equivalence and relative timing are meaningful, but absolute timings should be rerun in the production environment."
+  },
+  "v7_11_baseline": {
+    "template_seconds": 0.54,
+    "symmetry_seconds": 31.13,
+    "subgroup_seconds_isolated": 3.524,
+    "exact_full_run": ">120 s timeout in the compatibility harness",
+    "framework_action_algorithm": "per-operation per-atom geometric search",
+    "variant_completion_algorithm": "all operation images followed by pairwise periodic deduplication",
+    "subgroup_representation": "frozenset closure"
+  },
+  "v7_12_ms7_median_of_3": {
+    "template_seconds": 0.5191,
+    "symmetry_seconds": 2.7717,
+    "subgroup_seconds": 0.853,
+    "optimizer_seconds": 0.61,
+    "core_total_seconds": 4.7488,
+    "full_cli_write_and_readback_seconds": 9.84,
+    "max_rss_kb": 136312,
+    "framework_action_strategy": "expansion_provenance",
+    "variant_completion_strategy": "generator_orbit_closure",
+    "variant_completion_generator_count": 4,
+    "subgroup_representation": "integer bit mask"
+  },
+  "relative_improvements": {
+    "symmetry_model_speedup": 11.23,
+    "subgroup_lattice_speedup": 4.13,
+    "pre_optimizer_cold_path_speedup": 8.49
+  },
+  "correctness": {
+    "tests_passed": 87,
+    "tests_failed": 0,
+    "parent_group_order": 48,
+    "certified_coordinate_order": 4,
+    "certified_occupation_order": 4,
+    "post_write_stabilizer_order": 4
+  }
+}

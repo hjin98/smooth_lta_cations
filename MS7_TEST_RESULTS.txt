@@ -1,0 +1,75 @@
+MS7 test and benchmark report
+=============================
+
+Release: v7.12 MS7
+Date: 2026-07-23
+
+Implemented accelerations
+-------------------------
+- Expansion-provenance framework actions with vectorized geometric fallback.
+- Generator-orbit closure for symmetry-completed variants.
+- Integer-bit-mask subgroup closure and exhaustive lattice enumeration.
+- Exact direct raw-occupation enumeration below a configurable threshold.
+- Reuse of existing DensityReport objects during smoothing score evaluation.
+- Public strategy/work diagnostics in validation and optimality reports.
+
+Correctness tests
+-----------------
+Command:
+  PYTHONPATH=/mnt/data/lta_test_support:. pytest -q
+
+Result:
+  87 passed in 8.52 s
+
+The six new MS7 tests cover:
+- accelerated construction diagnostics;
+- full-group closure of the completed variant domain;
+- direct versus subgroup-orbit occupation-solver equivalence;
+- bit-mask closure on a known cyclic group;
+- density-report score reuse;
+- the real 48-operation primitive Na-LTA case.
+
+Real Na-LTA regression
+----------------------
+Composition: Na24[Al24Si24O96]
+Allocation: 2 Na on 4R, 16 Na on 6R, 6 Na on 8R
+Parent affine group order: 48
+Subgroup count: 98
+Certified occupation stabilizer order: 4
+Certified coordinate stabilizer order: 4
+Post-write CIF stabilizer order: 4
+
+Benchmark, median of three core runs
+------------------------------------
+Template loading:              0.5191 s
+Symmetry-model construction:   2.7717 s
+Subgroup enumeration:          0.8530 s
+Exact optimizer:               0.6100 s
+Core total:                    4.7488 s
+Full CLI + CIF read-back:      9.84 s
+
+Recorded v7.11 baseline in the same compatibility harness:
+Template loading:              0.54 s
+Symmetry-model construction:   31.13 s
+Subgroup enumeration:          3.524 s (isolated table test)
+Full exact run:                exceeded 120 s in this harness
+
+Relative improvement:
+Symmetry model:                11.23x
+Subgroup lattice:               4.13x
+Pre-optimizer cold path:        8.49x
+
+Environment limitation
+----------------------
+The execution image did not contain installed pymatgen or spglib and had no
+network access. Regression tests and timings therefore used an API-compatible
+local harness located outside the release archive. The release itself retains
+its normal numpy/pymatgen dependencies. The algorithmic equivalence tests and
+relative hotspot reductions are valid; absolute wall times should be repeated
+in the production pymatgen environment.
+
+Documentation
+-------------
+The architecture manual and all modified specifications compiled with XeLaTeX,
+opened successfully, and passed PDF preflight. The architecture and MS7 spec
+were rendered and visually inspected.

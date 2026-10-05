@@ -1,0 +1,64 @@
+{
+  "template": "tests/real_lta_primitive.cif",
+  "repeats": 3,
+  "runs": [
+    {
+      "template_seconds": 0.5190661849999287,
+      "symmetry_seconds": 2.7717472209999414,
+      "subgroup_seconds": 0.8479254300000321,
+      "optimizer_seconds": 0.6100213320000876,
+      "core_total_seconds": 4.74876016799999,
+      "parent_group_order": 48,
+      "subgroup_count": 98,
+      "coordinate_stabilizer_order": 4,
+      "occupation_stabilizer_order": 4,
+      "framework_action_strategy": "expansion_provenance",
+      "variant_completion_strategy": "generator_orbit_closure",
+      "variant_completion_generator_count": 4
+    },
+    {
+      "template_seconds": 0.5402737879999222,
+      "symmetry_seconds": 2.839701684000147,
+      "subgroup_seconds": 0.8529558699999598,
+      "optimizer_seconds": 0.6136040290000437,
+      "core_total_seconds": 4.846535371000073,
+      "parent_group_order": 48,
+      "subgroup_count": 98,
+      "coordinate_stabilizer_order": 4,
+      "occupation_stabilizer_order": 4,
+      "framework_action_strategy": "expansion_provenance",
+      "variant_completion_strategy": "generator_orbit_closure",
+      "variant_completion_generator_count": 4
+    },
+    {
+      "template_seconds": 0.49912371400000666,
+      "symmetry_seconds": 2.5935472930000287,
+      "subgroup_seconds": 0.858125235999978,
+      "optimizer_seconds": 0.6097052430000076,
+      "core_total_seconds": 4.560501486000021,
+      "parent_group_order": 48,
+      "subgroup_count": 98,
+      "coordinate_stabilizer_order": 4,
+      "occupation_stabilizer_order": 4,
+      "framework_action_strategy": "expansion_provenance",
+      "variant_completion_strategy": "generator_orbit_closure",
+      "variant_completion_generator_count": 4
+    }
+  ],
+  "median": {
+    "template_seconds": 0.5190661849999287,
+    "symmetry_seconds": 2.7717472209999414,
+    "subgroup_seconds": 0.8529558699999598,
+    "optimizer_seconds": 0.6100213320000876,
+    "core_total_seconds": 4.74876016799999
+  },
+  "verified": {
+    "parent_group_order": 48,
+    "subgroup_count": 98,
+    "coordinate_stabilizer_order": 4,
+    "occupation_stabilizer_order": 4,
+    "framework_action_strategy": "expansion_provenance",
+    "variant_completion_strategy": "generator_orbit_closure",
+    "variant_completion_generator_count": 4
+  }
+}

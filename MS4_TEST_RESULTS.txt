@@ -1,0 +1,38 @@
+MS4 Integration, Serialization, and CLI Test Report
+Package: v7.9 (MS4)
+Date: 2026-07-21
+
+Focused MS4 suite
+-----------------
+Command:
+  pytest -q tests/test_ms4_integration_serialization.py
+
+Result:
+  12 passed in 20.10 s
+
+Full regression suite
+---------------------
+Command:
+  pytest -q
+
+Result:
+  66 passed in 16.96 s
+
+Additional checks
+-----------------
+- python -m py_compile *.py: passed
+- public imports for lta_cation_maxsym_io and lta_cation_population_grouped: passed
+- lta_cation_population_grouped.py --help: passed
+- CIF round-trip verification: covered by focused tests
+- POSCAR round-trip verification: covered by focused tests
+- LAMMPS-data round-trip verification: covered by focused tests
+- symmetry-loss and accidental-symmetry-gain rejection: covered by focused tests
+- bounded-tie hard-filter failure semantics: covered by focused tests
+- legacy random population and unique batching regressions: passed
+
+PDF verification
+----------------
+- lta_cation_generator_architecture.pdf: 28 pages; rendered at 160 dpi; preflight passed
+- lta_cation_maxsym_io_spec.pdf: 7 pages; rendered at 160 dpi; preflight passed
+- lta_cation_population_grouped_spec.pdf: 11 pages; rendered at 160 dpi; preflight passed
+- visual inspection found no clipped text, overlaps, broken glyphs, or black boxes

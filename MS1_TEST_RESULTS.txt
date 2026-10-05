@@ -1,0 +1,42 @@
+MS1 focused test report
+=======================
+Date: 2026-07-21
+Package: lta-cation-generator 7.6.0
+Python: Python 3.13.5
+
+Focused command
+---------------
+pytest -q tests/test_ms1_subgroups.py
+
+..........                                                               [100%]
+10 passed in 3.91s
+
+Full regression command
+-----------------------
+pytest -q
+
+.........................                                                [100%]
+25 passed in 4.34s
+
+Additional verification
+-----------------------
+- python -m compileall -q .: PASS
+- editable-install import smoke: PASS
+- legacy generator modules unchanged from v7.5: PASS
+- MS0 runtime modules unchanged from v7.5: PASS
+- subgroup specification PDF rendered and visually inspected: PASS (8 pages)
+- architecture PDF rendered and visually inspected: PASS (26 pages)
+- PDF preflight for both generated PDFs: PASS
+
+Focused coverage
+----------------
+- C4 subgroup lattice and deterministic generators
+- D4 subgroup counts and subgroup conjugacy orbits
+- conjugation of reflection subgroups
+- orbit-normalizer relation
+- subgroup orbit partitions on the synthetic crystallographic C4 action
+- policy-correct selection of G_site and G_V
+- identity-conjugation singleton classes
+- invalid subgroup and invalid action rejection
+- bounded exhaustive-search failure without a partial certificate
+- deterministic subgroup and conjugacy ordering

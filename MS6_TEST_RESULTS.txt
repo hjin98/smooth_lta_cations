@@ -1,0 +1,63 @@
+MS6 EXACT-SEARCH ACCELERATION AND SCALE VALIDATION
+Package: smooth_lta_cations_grouped_charge_volume_v7_11_ms6
+Date: 2026-07-21
+
+IMPLEMENTED SCOPE
+- Safe forced-variant lift when every physical site has exactly one active,
+  parent-equivariant variant.
+- Cached subgroup-orbit variant-realization catalogs for the general
+  multi-variant path.
+- Separation and reporting of the primary coordinate-symmetry certificate
+  from secondary tie handling.
+- Extended subgroup diagnostics in maximum-symmetry reports.
+- Synthetic 46-site LTA-capacity validation fixture: 24 4R, 16 6R, 6 8R.
+
+FOCUSED MS6 TESTS
+Command:
+  pytest -q tests/test_ms6_exact_search_acceleration.py
+Result:
+  7 passed
+
+FULL REGRESSION SUITE
+Command:
+  pytest -q
+Result:
+  81 passed in 12.89 s
+
+STATIC AND CLI CHECKS
+- python -m py_compile *.py: passed
+- lta_cation_population_grouped.py --help: passed
+- generate_smooth_lta_cations_grouped.py --help: passed
+
+46-SITE SCALE MATRIX
+Command:
+  python validation/run_ms6_scale_matrix.py
+Independent oracle:
+  subgroup-orbit exact population feasibility for the known C4 action
+Results:
+  36 / 36 occupations matched the independent maximum-order oracle
+  expected-order histogram: order 1 = 29, order 2 = 2, order 4 = 5
+  exact-search strategy: forced_variant_lift for all 36 cases
+  maximum variant-search nodes: 0
+
+SERIALIZATION CERTIFICATION
+Representative structures of coordinate-stabilizer orders 1, 2, and 4 were
+written and read back in each format:
+  CIF:          3 / 3 passed
+  POSCAR/VASP:  3 / 3 passed
+  LAMMPS data:  3 / 3 passed
+Total: 9 / 9 exact stabilizer round trips passed.
+
+PDF VALIDATION
+The revised architecture manual and affected specifications were regenerated,
+preflighted, rendered, and visually inspected:
+- doc/archs/lta_cation_generator_architecture.pdf
+- doc/specs/lta_cation_exact_search_acceleration_spec.pdf
+- doc/specs/lta_cation_exact_realization_spec.pdf
+- doc/specs/lta_cation_maxsym_io_spec.pdf
+
+LIMITATION OF THIS TEST CAMPAIGN
+The 46-site fixture reproduces the intended 24/16/6 grouped-site capacities and
+has an independently known C4 action, but it is synthetic and is not a
+chemically realistic production LTA CIF. The production input template should
+still receive a composition matrix validation when supplied.

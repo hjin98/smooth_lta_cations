@@ -1,0 +1,18 @@
+MS2 focused test report
+Date: 2026-07-21
+
+$ pytest -q tests/test_ms2_occupation_optimizer.py
+................                                                         [100%]
+16 passed in 3.81s
+
+$ pytest -q
+.........................................                                [100%]
+41 passed in 4.38s
+
+Legacy/MS0/MS1 runtime-module hash audit:
+  lta_cation_population_grouped.py           unchanged
+  lta_cation_density_grouped.py              unchanged
+  generate_smooth_lta_cations_grouped.py     unchanged
+  lta_cation_template.py                     unchanged
+  lta_cation_symmetry.py                     unchanged
+  lta_cation_subgroups.py                    unchanged

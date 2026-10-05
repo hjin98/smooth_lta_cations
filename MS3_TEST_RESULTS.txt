@@ -1,0 +1,36 @@
+MS3 focused test report
+=======================
+Date: 2026-07-21
+Package: v7.8 MS3
+
+Focused command:
+  pytest -q tests/test_ms3_exact_coordinate_optimizer.py
+
+Result:
+  13 passed in 3.96 s
+
+Full regression command:
+  pytest -q
+
+Result:
+  54 passed in 4.83 s
+
+Static/import checks:
+  python -m compileall -q .       PASS
+  public exact API import         PASS
+
+Coverage summary:
+- completed-library full-symmetry realization
+- strict incomplete-library coordinate-symmetry reduction
+- site-stabilizer fixed-variant rejection
+- occupation stabilizer greater than coordinate stabilizer
+- unused incomplete strict variants with a closed selected orbit
+- higher-order ambiguity refusal
+- geometric coordinate stabilizer and orbit-stabilizer identity
+- full-parent coordinate canonicalization and deduplication
+- independent variant-search guard
+- deterministic first mode
+- secondary occupation-stabilizer optimization
+- bounded all-mode tie truncation
+- synthetic crystallographic C4 integration
+- all legacy and MS0-MS2 regressions
