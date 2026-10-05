@@ -52,7 +52,7 @@ def composition(structure):
 
 
 @pytest.mark.parametrize(
-    "request,expected_occ,expected_alpha,expected_beta",
+    "occlusion_args,expected_occ,expected_alpha,expected_beta",
     [
         (dict(alpha_cl=1, occlusion_n4="Cs:1"), {"Cs": 1}, 1, 0),
         (dict(alpha_cl=2, occlusion_n4="Sr:1"), {"Sr": 1}, 2, 0),
@@ -60,9 +60,9 @@ def composition(structure):
     ],
 )
 def test_positive_sparse_occlusion_charge_partition(
-    request, expected_occ, expected_alpha, expected_beta
+    occlusion_args, expected_occ, expected_alpha, expected_beta
 ):
-    result = generate(**request)
+    result = generate(**occlusion_args)
     assert result.framework_positive_charge == 24
     assert result.occlusion_positive_charge == expected_alpha + expected_beta
     assert result.alpha_chloride_count == expected_alpha
@@ -193,14 +193,14 @@ def test_shifted_chemically_valid_template_is_rejected(tmp_path: Path):
 
 @pytest.mark.parametrize("filename", ["occluded.cif", "occluded.POSCAR", "occluded.data"])
 @pytest.mark.parametrize(
-    "request,extra",
+    "occlusion_args,extra",
     [
         (dict(alpha_cl=1, occlusion_n4="Cs:1"), {"Cs": 1, "Cl": 1}),
         (dict(alpha_cl=2, occlusion_n4="Sr:1"), {"Sr": 1, "Cl": 2}),
     ],
 )
-def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, request, extra):
-    result = generate(**request)
+def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, occlusion_args, extra):
+    result = generate(**occlusion_args)
     path = tmp_path / filename
     kind = result.write(path)
     if kind == "lammps-data":
