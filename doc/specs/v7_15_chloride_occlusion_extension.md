@@ -1,5 +1,10 @@
 # v7.15 sparse chloride-occlusion extension
 
+**Lifecycle:** human-ratified implementation contract for the v7.15 candidate.
+This document governs the bounded implementation semantics but does not
+self-qualify the final implementation; independent post-implementation review
+remains required.
+
 ## Status and scope
 
 This document is the canonical scientific/numerical implementation contract for
@@ -39,6 +44,9 @@ but this global equality is not a substitute for either independent invariant.
 The legacy `alkali_counts` field remains the framework-compensating
 population. The automatic dry-volume interpolation consumes only this
 framework population.
+ The derived `framework_cation_counts` view is likewise framework-only,
+while `cation_counts` (and its explicit alias `total_cation_counts`) reports
+the total physical cation population across both roles.
 
 ## Sparse chloride domain and canonical setting
 

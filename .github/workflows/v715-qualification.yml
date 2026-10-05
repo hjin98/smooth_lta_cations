@@ -34,6 +34,48 @@ jobs:
         run: |
           set -o pipefail
           pytest -q 2>&1 | tee /tmp/v715-full.txt
+      - name: Occluded CLI end-to-end
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import tomllib
+          from pathlib import Path
+          version = tomllib.loads(Path("pyproject.toml").read_text())["project"]["version"]
+          assert version == "7.15.0", version
+          PY
+          mkdir -p /tmp/v715-e2e
+          for ext in cif POSCAR data; do
+            python lta_cation_population_grouped.py \
+              tests/real_lta_primitive.cif "/tmp/v715-e2e/occluded.$ext" \
+              --n4 Na:2 --n6 Na:16 --n8 Na:6 \
+              --alpha-cl 1 --occlusion-n4 Cs:1 --seed 1715 \
+              --report "/tmp/v715-e2e/report.$ext.txt"
+          done
+          python - <<'PY' | tee /tmp/v715-e2e.txt
+          from collections import Counter
+          from pathlib import Path
+          from pymatgen.core import Structure
+          from pymatgen.io.lammps.data import LammpsData
+
+          root = Path("/tmp/v715-e2e")
+          for name in ("occluded.cif", "occluded.POSCAR", "occluded.data"):
+              path = root / name
+              if path.suffix == ".data":
+                  structure = LammpsData.from_file(str(path), atom_style="atomic").structure
+                  text = path.read_text()
+                  section = text.split("Atoms", 1)[1]
+                  rows = [line.split() for line in section.splitlines() if line.strip() and line.lstrip()[0].isdigit()]
+                  assert rows and all(len(row) == 5 for row in rows)
+              else:
+                  structure = Structure.from_file(str(path))
+              counts = Counter(site.specie.symbol for site in structure)
+              assert counts == Counter({"O": 96, "Si": 24, "Al": 24, "Na": 24, "Cs": 1, "Cl": 1}), (name, counts)
+              report = (root / ("report." + name.split(".", 1)[1] + ".txt")).read_text()
+              assert "Framework charge invariant: PASS" in report
+              assert "Occlusion charge invariant: PASS" in report
+          print("v7.15 occluded CLI CIF/POSCAR/LAMMPS round trip: PASS")
+          PY
       - name: v7.14.2 dry differential compatibility
         shell: bash
         run: |
@@ -65,6 +107,9 @@ jobs:
             echo
             echo "=== full ==="
             cat /tmp/v715-full.txt 2>/dev/null || true
+            echo
+            echo "=== occluded CLI end-to-end ==="
+            cat /tmp/v715-e2e.txt 2>/dev/null || true
             echo
             echo "=== v7.14.2 differential ==="
             cat /tmp/v715-differential.txt 2>/dev/null || true

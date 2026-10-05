@@ -1,8 +1,6 @@
 # Smooth grouped-site LTA cation generator
 
-This package generates dry Group I/II-cation-substituted LTA structures from a symmetry-reduced CIF containing framework atoms and cation-template positions. Nearby split or off-center template coordinates are grouped as positional variants of one physical ring site.
-
-Version 7.14.2 is a documentation/provenance closure patch over the independently qualified v7.14.1 **MS0-MS7** implementation. It does not change the accepted Al24Si24O96 chemistry, charge-equivalent `/24` volume model, empirical endpoint values, placement algorithms, or serialization behavior. The patch reconciles current authority routing, completes source/software citations, publishes the chemistry and volume authorities as generated PDFs, and records the successful native qualification evidence.
+This package generates Group-I/II-cation-substituted Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and grouped cation-template positions. Version 7.15.0 adds a bounded random-mode sparse chloride-occlusion initialization path while preserving the qualified v7.14.2 dry behavior when occlusion is absent. The existing MS0-MS7 maximum-symmetry certificate remains cation-only and explicitly rejects occluded cases.
 
 ## Entry points
 
@@ -48,6 +46,7 @@ Module specifications:
 - `doc/specs/lta_cation_performance_optimization_spec.md` and `.pdf`
 - `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current chemistry/charge-neutrality authority for the v7.14.x line; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
+- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - human-ratified bounded scientific/numerical contract for sparse chloride-occlusion initialization.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
@@ -61,6 +60,7 @@ The current source hierarchy is intentionally explicit:
 
 - **Scientific chemistry/charge authority:** `doc/specs/v7_13_group_i_ii_cation_extension.md`.
 - **Scientific/numerical volume authority:** `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`.
+- **Sparse chloride-occlusion authority:** `doc/specs/v7_15_chloride_occlusion_extension.md`.
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.
@@ -71,7 +71,7 @@ This separation keeps current scientific meaning reconstructible without relying
 
 ## Supported framework scope
 
-The current v7.14 scientific contract is intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
+The current v7.15 scientific contract remains intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
 
 Some small synthetic non-24-Al CIFs remain under `tests/` solely as internal algorithm fixtures. They are not supported scientific generator inputs and tests that use them explicitly disable the production scope guard.
 
@@ -151,7 +151,7 @@ The output format is inferred case-insensitively:
 *.data      LAMMPS data with atom_style atomic
 ```
 
-Before serialization, atoms are stably grouped into one contiguous block per element using `Si Al O`, followed by the supported Group I/II cations in deterministic order. LAMMPS output has no per-atom charge column. Formal charge neutrality is enforced by composition, but force-field charges are outside this generator.
+Before serialization, atoms are stably grouped into one contiguous block per element using `Si Al O`, followed by the supported Group I/II cations in deterministic order and `Cl` last when present. LAMMPS output has no per-atom charge column. Formal charge neutrality is enforced by composition, but force-field charges are outside this generator.
 
 ## Random grouped-site population
 

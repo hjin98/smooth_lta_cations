@@ -14,7 +14,7 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the ratified sparse chloride extension is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 
@@ -40,7 +40,7 @@ Used pymatgen objects include `Lattice`, `Structure`, `SymmOp`, `Poscar`, and `L
 SUPPORTED_CATIONS = (H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra)
 ALLOWED_ALKALI = SUPPORTED_CATIONS  # backward-compatible alias
 RING_CLASSES   = (4, 6, 8)
-OUTPUT_SPECIES_ORDER = (Si, Al, O, H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra)
+OUTPUT_SPECIES_ORDER = (Si, Al, O, H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra, Cl)
 ```
 
 The dry framework model supports only fully occupied Al, Si, and O framework atoms with Group I (+1) and Group II (+2) compensation. Production generation is restricted to Al24Si24O96.
@@ -109,6 +109,7 @@ PlacedIon(
     ring_class: str,
     site_id: str,
     variant_id: int,
+    role: str = "framework",
 )
 ```
 
@@ -602,7 +603,7 @@ Maximum-symmetry mode accepts `--max-direct-occupation-count N` with default `10
 Random population now supports the bounded role-aware occlusion contract in
 `v7_15_chloride_occlusion_extension.md`. `PlacedIon.role` is
 `framework` by default for compatibility or `occlusion_counterion`.
-`PopulationResult.alkali_counts` and the legacy `cation_counts` alias remain framework-only; `total_cation_counts` is the derived view that includes both roles. Occluded chlorides are authoritative cage records and
+`PopulationResult.alkali_counts` and `framework_cation_counts` remain framework-only. `cation_counts` is the derived total physical cation view across both roles; `total_cation_counts` is an explicit alias for the same total view. Occluded chlorides are authoritative cage records and
 are appended to the single assembled structure only after the independent
 charge checks and collision guard pass.
 
