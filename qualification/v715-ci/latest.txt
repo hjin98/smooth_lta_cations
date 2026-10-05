@@ -1,5 +1,5 @@
-head_sha=2b9dfc19330d190c07eff62704c797be22c0deb4
-run_id=37390540857
+head_sha=7e3000c3b94e80b115b629cd3ff435e2ab3e4f43
+run_id=37390859880
 
 === focused ===
 ....................................                                     [100%]
@@ -11,7 +11,7 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-36 passed, 3 warnings in 21.22s
+36 passed, 3 warnings in 20.06s
 
 === full ===
 ........................................................................ [ 49%]
@@ -27,7 +27,10 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-146 passed, 5 warnings in 62.29s (0:01:02)
+146 passed, 5 warnings in 61.69s (0:01:01)
+
+=== occluded CLI end-to-end ===
+v7.15 occluded CLI CIF/POSCAR/LAMMPS round trip: PASS
 
 === v7.14.2 differential ===
 v7.14.2 differential dry serialization: PASS
