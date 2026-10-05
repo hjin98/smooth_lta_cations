@@ -94,7 +94,7 @@ def test_mixed_framework_beta_cl_and_same_element_role_partition():
     same_element = generate(alpha_cl=1, occlusion_n4="Na:1")
     assert same_element.alkali_counts["Na"] == 24
     assert same_element.occlusion_counterion_counts["Na"] == 1
-    assert same_element.cation_counts["Na"] == 25
+    assert same_element.cation_counts["Na"] == 24\n    assert same_element.total_cation_counts["Na"] == 25
     assert sum(i.element == "Na" and i.role == "framework" for i in same_element.placed_ions) == 24
     assert sum(i.element == "Na" and i.role == "occlusion_counterion" for i in same_element.placed_ions) == 1
 

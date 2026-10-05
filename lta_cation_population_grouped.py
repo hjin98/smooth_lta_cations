@@ -475,6 +475,11 @@ class PopulationResult:
 
     @property
     def cation_counts(self) -> Dict[str, int]:
+        """Backward-compatible alias for framework-compensating counts."""
+        return dict(self.alkali_counts)
+
+    @property
+    def total_cation_counts(self) -> Dict[str, int]:
         """Total physical cation counts across framework and occlusion roles."""
         return {
             el: int(self.alkali_counts.get(el, 0))
