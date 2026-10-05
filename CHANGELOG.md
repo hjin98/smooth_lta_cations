@@ -280,3 +280,26 @@ Validation performed:
 - A 23-cation request for a 24-Al framework was rejected.
 - The high-level smoothing wrapper retained the interpolated volume and included the population report.
 - Cell-size scaling was checked for 12-, 24-, and 96-cation reference cases.
+
+## v7.15.0 - sparse chloride-occlusion initialization
+
+- Added sparse alpha/beta Cl cage guests for the canonical Al24Si24O96
+  Fm-3c primitive fixture, bounded to 0-2 guests per cage family.
+- Added explicit `framework` and `occlusion_counterion` cation roles and
+  independent +24 framework and excess-charge-equals-Cl invariants.
+- Isolated excess placement from the legacy framework RNG sequence and enforced
+  combined physical-site capacities.
+- Preserved the v7.14 dry-volume equation on framework-role counts only.
+- Added deterministic cage selection after final cation smoothing and a
+  minimum-image 1.5 Angstrom default catastrophic-overlap guard.
+- Appended Cl to the existing serialization species order while retaining
+  LAMMPS `atom_style atomic` with no charge column.
+- Added fail-closed canonical-template identity/orbit validation.
+- Explicitly reject occlusion with maximum-symmetry certification,
+  symmetry-unique batches larger than one, ratio allocation, auto-rebalance,
+  and candidate output.
+- Added v7.15 chemistry, volume, setting, serialization, and public-guard
+  regression tests.
+- Added the v7.15 scientific/numerical specification and reconciled current
+  architecture/interface authorities. Beta-cage Cl remains a training
+  hypothesis, not an asserted equilibrium site.

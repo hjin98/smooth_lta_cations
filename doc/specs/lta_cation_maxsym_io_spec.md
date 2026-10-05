@@ -436,3 +436,11 @@ MS4 does not move ions after optimization. Whole-orbit density repair, orbit exc
 # MS7 reporting and search-control revision
 
 `generate_maximum_symmetry_lta_batch_from_specs()` accepts `max_direct_occupation_count`. Reports include framework-action strategy, provenance/geometric action counts, variant-completion strategy, generator/transform counts, occupation-search strategy, and raw direct-occupation count. These diagnostics supplement rather than replace the post-write stabilizer certificate.
+
+## v7.15 public-interface boundary
+
+The maximum-symmetry serialization/certification path does not accept chloride
+occlusion in v7.15. User-facing dispatch rejects any active alpha/beta Cl or
+occlusion-counterion request before MS optimization, output, or certificate
+generation. Existing certificates remain cation-only and are not renamed or
+weakened to imply complete-structure symmetry with cage guests.

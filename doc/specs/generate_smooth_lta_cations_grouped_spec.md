@@ -386,3 +386,19 @@ The maximum-symmetry branch forwards `--max-direct-occupation-count N` to the ce
 1. S. P. Ong *et al.*, "Python Materials Genomics (pymatgen): A robust, open-source Python library for materials analysis," *Computational Materials Science* **68**, 314-319 (2013). DOI: 10.1016/j.commatsci.2012.10.028.
 2. A. P. Thompson *et al.*, "LAMMPS - a flexible simulation tool for particle-based materials modeling at the atomic, meso, and continuum scales," *Computer Physics Communications* **271**, 108171 (2022). DOI: 10.1016/j.cpc.2021.108171.
 3. The empirical LTA endpoint sources and shared finite-group/symmetry references are owned by `v7_14_group_i_ii_volume_reference_extension.md` and the architecture manual, respectively.
+
+## v7.15 occlusion smoothing order
+
+With occlusion enabled, smoothing remains a cation-density heuristic. The
+generator places framework cations, then excess-role cations, performs the
+existing cation smoothing/greedy moves, and only then selects chloride cage
+centers and applies the final periodic collision guard. Chloride is never added
+to the Gaussian density estimator.
+
+Greedy reconstruction preserves all role/occlusion metadata through
+`dataclasses.replace`; a moved cation retains its role. The final chloride
+records are regenerated from the final cation geometry before complete
+structure assembly.
+
+Occlusion is rejected at this public CLI boundary with maximum-symmetry mode,
+`--unique-batch-size > 1`, ratio allocations, or auto-rebalance.

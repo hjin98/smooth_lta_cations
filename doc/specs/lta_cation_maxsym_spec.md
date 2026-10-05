@@ -674,3 +674,11 @@ MS3 extends subgroup feasibility by requiring a symmetry-consistent positional v
 # 18. MS7 hybrid occupation search
 
 The optimizer computes the exact raw occupation count and may use direct exhaustive enumeration when it is no larger than `max_direct_occupation_count`. Direct and subgroup-orbit paths share canonicalization, stabilizer reconstruction, and optimality-certificate validation. The certificate reports the selected strategy and raw count.
+
+## v7.15 chloride boundary
+
+MS0-MS7 certification remains scoped to grouped cation occupation and exact
+cation-coordinate symmetry. A nonzero chloride-occlusion request is rejected
+before maximum-symmetry optimization. Appending cage guests after certification
+would not prove maximum symmetry of the complete structure and is therefore not
+permitted in v7.15.

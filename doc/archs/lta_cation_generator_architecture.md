@@ -1609,3 +1609,26 @@ The package combines standard external methods with project-specific design:
 16. J. J. Pluth and J. V. Smith, "Crystal structure of dehydrated strontium-exchanged zeolite A. Absence of near-zero-coordinate strontium(2+) ion. Presence of aluminum complex," *Journal of the American Chemical Society* **104**, 6977-6982 (1982). DOI: 10.1021/ja00389a015.
 17. Y. Kim, V. Subramanian, R. L. Firor, and K. Seff, "Four Crystal Structures of Ba_xNa_(12-2x)-A (1 <= x <= 6) Relating to the Instability of Barium-Exchanged Zeolite A Toward Dehydration," *ACS Symposium Series* **135**, 137-153 (1980). DOI: 10.1021/bk-1980-0135.ch007.
 18. C. R. Harris, K. J. Millman, S. J. van der Walt, R. Gommers, P. Virtanen, D. Cournapeau, E. Wieser, J. Taylor, S. Berg, N. J. Smith, R. Kern, M. Picus, S. Hoyer, M. H. van Kerkwijk, M. Brett, A. Haldane, J. Fernandez del Rio, M. Wiebe, P. Peterson, P. Gerard-Marchant, K. Sheppard, T. Reddy, W. Weckesser, H. Abbasi, C. Gohlke, and T. E. Oliphant, "Array programming with NumPy," *Nature* **585**, 357-362 (2020). DOI: 10.1038/s41586-020-2649-2.
+
+## v7.15 architecture delta: sparse chloride occlusion
+
+The v7.15 random path adds a provenance layer above the existing grouped-site
+machinery rather than a second placement architecture. Framework and excess
+cation roles share one physical-site inventory; framework occupation is
+realized first with the legacy RNG and excess occupation is realized second
+with an isolated deterministic stream.
+
+The final physical structure has one authoritative assembly owner:
+framework atoms + all grouped-site cations + validated chloride cage guests.
+Cage selection is downstream of random cation smoothing. The density subsystem
+therefore remains cation-only.
+
+Occlusion setting validation is fail-closed to the canonical
+`tests/real_lta_primitive.cif` identity and the expected alpha/beta cage-center
+orbits. Arbitrary origin/setting remapping is intentionally absent.
+
+MS0-MS7 and the symmetry-unique random signature remain cation-state models.
+v7.15 consequently rejects nonzero occlusion before maximum-symmetry
+optimization/certification and before multi-member unique batching. Extending
+the group action to cage states is a future architecture change, not an
+implicit property of v7.15.

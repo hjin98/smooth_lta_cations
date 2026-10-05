@@ -596,3 +596,23 @@ Internal helpers `_fcc_primitive_volume_from_conventional_a`, `_annotate_lammps_
 # MS7 CLI revision
 
 Maximum-symmetry mode accepts `--max-direct-occupation-count N` with default `100000`; zero disables direct raw-occupation enumeration. Existing random and unique-batch modes ignore this option.
+
+## v7.15 sparse chloride-occlusion extension
+
+Random population now supports the bounded role-aware occlusion contract in
+`v7_15_chloride_occlusion_extension.md`. `PlacedIon.role` is
+`framework` by default for compatibility or `occlusion_counterion`.
+`PopulationResult.alkali_counts` remains framework-only while derived total
+views include both roles. Occluded chlorides are authoritative cage records and
+are appended to the single assembled structure only after the independent
+charge checks and collision guard pass.
+
+Framework placement uses the legacy RNG stream first. Excess-role placement
+uses a deterministic secondary stream and only still-empty grouped sites.
+Combined ring-family occupancy may not exceed physical capacity. The dry-volume
+interpolation receives framework-role counts only.
+
+Occlusion mode is fail-closed to the bound canonical primitive template and its
+validated alpha/beta center orbits. One requested cage in a two-cage family is
+selected by maximum minimum periodic distance to final cations, with canonical
+cage-ID tie breaking. Cl is serialized after all supported Group-I/II cations.

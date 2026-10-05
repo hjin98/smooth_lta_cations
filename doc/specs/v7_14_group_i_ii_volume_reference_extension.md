@@ -305,3 +305,17 @@ These limitations constrain physical interpretation but do not alter the defined
 # 11. Historical note
 
 v7.14 replaced the temporary v7.13 input-template-volume fallback with the current evidence-bound endpoint table and charge-equivalent interpolation. The filename is retained for release lineage and compatibility; the semantics above are the current v7.14.x authority.
+
+## v7.15 occlusion compatibility boundary
+
+The accepted v7.14 dry-volume model is unchanged. In v7.15 its population
+argument is explicitly the **framework-compensating** role only:
+
+```
+V_ref = (1/24) sum_i z_i N_i^fw V_i^(24)
+```
+
+Neither `occlusion_counterion` cations nor Cl cage guests participate in the
+automatic interpolation. This preserves the qualified dry reference as an
+initialization policy; it is not evidence that salt loading causes zero
+physical volume change.

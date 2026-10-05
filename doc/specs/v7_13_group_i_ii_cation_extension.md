@@ -147,3 +147,13 @@ Preferred semantic names are `SUPPORTED_CATIONS`, `PopulationResult.cation_count
 # 11. Historical note
 
 v7.13 introduced the Group-I/II cation extension. That release temporarily used an input-template-volume fallback for species without the legacy Li/Na/K endpoints. v7.14 replaced that volume behavior with the current evidence-bound charge-equivalent model. This history is retained only to explain compatibility; it is not part of the present volume contract.
+
+## v7.15 role-partition reconciliation
+
+The v7.13 Group-I/II charge table remains authoritative for formal cation
+valences. v7.15 adds a second construction role without redefining that table.
+Framework-compensating counts must independently satisfy +24 for Al24Si24O96;
+`occlusion_counterion` counts must independently provide one positive charge
+equivalent per initialized Cl-. The legacy `alkali_counts` compatibility field
+continues to mean framework-compensating counts. See
+`v7_15_chloride_occlusion_extension.md` for the bounded occlusion contract.

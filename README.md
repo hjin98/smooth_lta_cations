@@ -273,3 +273,26 @@ Code comments and documentation cite the external methods that informed the impl
 - pymatgen for structure representation and CIF/VASP/LAMMPS structure I/O;
 
 The grouped-site stabilizer optimizer, strict/completed variant-domain policies, selected-orbit realization, round-trip certification, Gaussian clustering score, legacy greedy relocation, and MS5 complete-orbit repair policies are package-specific designs built from those standard foundations. The architecture manual contains the complete algorithmic bibliography and distinguishes external methods from package-specific constructions.
+
+## v7.15 sparse chloride occlusion
+
+v7.15 adds a bounded random-generation path for sparse chloride guests in the
+canonical Al24Si24O96 primitive LTA fixture. Framework-compensating cations and
+additional occlusion-counterion-role cations remain distinct provenance
+populations even though both use the grouped 4R/6R/8R inventory. Independent
+charge checks require framework charge +24 and excess positive charge equal to
+the number of Cl- guests.
+
+New random-mode controls are `--alpha-cl`, `--beta-cl`,
+`--occlusion-n4`, `--occlusion-n6`, `--occlusion-n8`, and
+`--occlusion-min-distance` (default 1.5 Angstrom). Occlusion requires exact
+allocations and is rejected with ratio allocation, auto-rebalance,
+maximum-symmetry mode, symmetry-unique batch size greater than one, and
+candidate-variant output.
+
+The automatic volume remains the qualified dry framework-compensating
+reference; excess counterions and Cl do not change it. Alpha-cage Cl is a sparse
+initialization informed by salt-occlusion literature. Beta-cage Cl is a
+deliberately sampled trapped/configurational training hypothesis, not a
+demonstrated equilibrium LTA chloride site. See
+`doc/specs/v7_15_chloride_occlusion_extension.md`.
