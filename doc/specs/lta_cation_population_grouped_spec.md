@@ -18,7 +18,7 @@ header-includes:
 
 # 1. Purpose
 
-`lta_cation_population_grouped.py` is the core module for grouped-site Group I/II cation population of an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, allocation resolution, charge and volume validation, random placement, grouped-site symmetry deduplication, reports, and structure serialization.
+`lta_cation_population_grouped.py` is the core module for grouped-site Group-I/II cation population and bounded v7.15 sparse chloride-guest assembly from an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, role-aware allocation/charge validation, dry volume validation, random placement, canonical-template cage selection/collision checks, grouped-site dry symmetry deduplication, reports, and structure serialization.
 
 The module does **not** perform energetic optimization, structural relaxation, or equilibrium sampling. Its CLI delegates the certified maximum-symmetry workflow to `lta_cation_maxsym_io.py`; the subgroup, optimizer, and symmetry-coupled smoothing algorithms remain outside this legacy population module.
 

@@ -22,6 +22,7 @@ from lta_cation_population_grouped import (
     build_p1_structure,
     generate_lta_cation_structure_from_specs,
     interpolated_dry_target_volume,
+    OUTPUT_SPECIES_ORDER,
     read_cif_minimal,
     total_cation_charge,
     validate_occlusion_template_setting,
@@ -100,6 +101,7 @@ def test_mixed_framework_beta_cl_and_same_element_role_partition():
     assert same_element.total_cation_counts["Na"] == 25
     assert sum(i.element == "Na" and i.role == "framework" for i in same_element.placed_ions) == 24
     assert sum(i.element == "Na" and i.role == "occlusion_counterion" for i in same_element.placed_ions) == 1
+    assert OUTPUT_SPECIES_ORDER[-1] == "Cl"
 
 
 @pytest.mark.parametrize(
@@ -284,6 +286,11 @@ def run_cli(script: str, *args: str):
             "generate_smooth_lta_cations_grouped.py",
             ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--auto-rebalance"),
             "auto-rebalance",
+        ),
+        (
+            "generate_smooth_lta_cations_grouped.py",
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--beta-cl", "1.5"),
+            "invalid int value",
         ),
         (
             "lta_cation_population_grouped.py",

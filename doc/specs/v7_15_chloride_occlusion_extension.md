@@ -1,3 +1,17 @@
+---
+toc: true
+toc-depth: 3
+geometry: margin=0.85in
+fontsize: 10pt
+header-includes:
+  - |
+    \usepackage{booktabs}
+    \usepackage{longtable}
+    \usepackage{microtype}
+  - |
+    \setlength{\emergencystretch}{3em}
+---
+
 # v7.15 sparse chloride-occlusion extension
 
 **Lifecycle:** human-ratified implementation contract for the v7.15 candidate.
@@ -44,7 +58,7 @@ but this global equality is not a substitute for either independent invariant.
 The legacy `alkali_counts` field remains the framework-compensating
 population. The automatic dry-volume interpolation consumes only this
 framework population.
- The derived `framework_cation_counts` view is likewise framework-only,
+The derived `framework_cation_counts` view is likewise framework-only,
 while `cation_counts` (and its explicit alias `total_cation_counts`) reports
 the total physical cation population across both roles.
 

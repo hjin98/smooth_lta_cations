@@ -1,6 +1,6 @@
 ---
-title: "Current Group-I/II Chemistry and Charge-Neutrality Contract (v7.14.x)"
-date: "2026-10-04"
+title: "Current Group-I/II Framework-Compensation Chemistry Contract (v7.15)"
+date: "2026-10-05"
 toc: true
 toc-depth: 3
 geometry: margin=0.85in
@@ -16,12 +16,13 @@ header-includes:
 
 # 1. Status and authority
 
-This document is the **accepted-current chemistry and charge-neutrality authority** for the v7.14.x grouped-site LTA cation generator. The historical `v7_13` filename records the release in which the Group-I/II extension was introduced; it does **not** limit the authority to v7.13.
+This document is the **accepted-current chemistry and framework-charge authority** for the framework-compensating cation population of the v7.15 grouped-site LTA generator. The historical `v7_13` filename records the release in which the Group-I/II extension was introduced; it does **not** limit the authority to v7.13.
 
 For current releases:
 
-- this document owns the supported cation set, formal charges, exact population semantics, and charge-neutrality invariant;
+- this document owns the supported cation set, formal charges, exact framework-compensating population semantics, and independent +24 framework-charge invariant;
 - `v7_14_group_i_ii_volume_reference_extension.md` owns the dry-volume reference model and empirical endpoint bindings;
+- `v7_15_chloride_occlusion_extension.md` owns the separate occlusion-counterion/Cl charge invariant and sparse cage-guest semantics;
 - module specifications own their public software behavior and import these chemistry/volume semantics rather than redefining them;
 - the architecture manual explains how the modules compose these authorities.
 
@@ -29,7 +30,7 @@ Earlier Li/Na/K-only statements are historical where they conflict with this con
 
 # 2. Background and terminology
 
-The supported framework is a conventional LTA aluminosilicate cell containing 24 framework Al, 24 framework Si, and 96 framework O atoms. Replacing a framework Si(IV) site by Al(III) introduces one net negative framework charge. The generator therefore balances the 24 framework-Al charge units with extra-framework cations.
+The supported framework is a conventional LTA aluminosilicate cell containing 24 framework Al, 24 framework Si, and 96 framework O atoms. Replacing a framework Si(IV) site by Al(III) introduces one net negative framework charge. The generator therefore balances the 24 framework-Al charge units with the `framework` cation population. v7.15 may additionally introduce a separately neutralized `occlusion_counterion` population when sparse Cl guests are requested; that second invariant is owned by `v7_15_chloride_occlusion_extension.md`.
 
 For cation species $i$:
 

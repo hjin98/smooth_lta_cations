@@ -93,6 +93,41 @@ jobs:
             echo "v7.14.2 differential dry serialization: PASS"
             sha256sum "$base"/dry.* "$cur"/dry.*
           } | tee /tmp/v715-differential.txt
+      - name: Regenerate and render documentation PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended poppler-utils imagemagick
+          mkdir -p qualification/v715-doc-renders /tmp/v715-doc-pages
+          docs=(
+            doc/archs/lta_cation_generator_architecture.md
+            doc/specs/generate_smooth_lta_cations_grouped_spec.md
+            doc/specs/lta_cation_maxsym_io_spec.md
+            doc/specs/lta_cation_maxsym_spec.md
+            doc/specs/lta_cation_population_grouped_spec.md
+            doc/specs/v7_13_group_i_ii_cation_extension.md
+            doc/specs/v7_14_group_i_ii_volume_reference_extension.md
+            doc/specs/v7_15_chloride_occlusion_extension.md
+          )
+          : > /tmp/v715-docs.txt
+          for md in "${docs[@]}"; do
+            pdf="${md%.md}.pdf"
+            pandoc "$md" -o "$pdf" --pdf-engine xelatex --resource-path "$(dirname "$md")"
+            pages="$(pdfinfo "$pdf" | awk '/^Pages:/ {print $2}')"
+            test -n "$pages"
+            pdftotext -layout "$pdf" - >/dev/null
+            stem="$(basename "${md%.md}")"
+            page_dir="/tmp/v715-doc-pages/$stem"
+            mkdir -p "$page_dir"
+            pdftoppm -png -r 90 "$pdf" "$page_dir/page" >/dev/null 2>&1
+            montage "$page_dir"/page-*.png -thumbnail 300x -tile 4x -geometry +8+8 "qualification/v715-doc-renders/$stem.png"
+            sha256sum "$pdf"
+            echo "$pdf pages=$pages"
+          done | tee /tmp/v715-docs.txt
+          pdftotext doc/specs/v7_15_chloride_occlusion_extension.pdf - | grep -F "training hypothesis"
+          pdftotext doc/specs/v7_15_chloride_occlusion_extension.pdf - | grep -F "10.1002/aic.10784"
+          echo "v7.15 documentation PDF regeneration/render: PASS" | tee -a /tmp/v715-docs.txt
       - name: Record qualification output
         if: always()
         shell: bash
@@ -113,9 +148,20 @@ jobs:
             echo
             echo "=== v7.14.2 differential ==="
             cat /tmp/v715-differential.txt 2>/dev/null || true
+            echo
+            echo "=== documentation PDFs ==="
+            cat /tmp/v715-docs.txt 2>/dev/null || true
           } > qualification/v715-ci/latest.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add qualification/v715-ci/latest.txt
-          git diff --cached --quiet || git commit -m "Record v7.15 qualification output [skip ci]"
+          git add qualification/v715-ci/latest.txt qualification/v715-doc-renders \
+            doc/archs/lta_cation_generator_architecture.pdf \
+            doc/specs/generate_smooth_lta_cations_grouped_spec.pdf \
+            doc/specs/lta_cation_maxsym_io_spec.pdf \
+            doc/specs/lta_cation_maxsym_spec.pdf \
+            doc/specs/lta_cation_population_grouped_spec.pdf \
+            doc/specs/v7_13_group_i_ii_cation_extension.pdf \
+            doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf \
+            doc/specs/v7_15_chloride_occlusion_extension.pdf
+          git diff --cached --quiet || git commit -m "Record v7.15 qualification and regenerated PDFs [skip ci]"
           git push

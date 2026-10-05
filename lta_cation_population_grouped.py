@@ -2415,7 +2415,7 @@ def make_population_report(result: PopulationResult) -> str:
         el for el in SUPPORTED_CATIONS if int(result.alkali_counts.get(el, 0)) > 0
     ]
     lines.append(
-        "Cation composition: "
+        "Framework-compensating cation composition: "
         + (
             ", ".join(f"{el}:{result.alkali_counts.get(el, 0)}" for el in nonzero_cations)
             if nonzero_cations
@@ -2429,7 +2429,7 @@ def make_population_report(result: PopulationResult) -> str:
             for el in nonzero_cations
         }
         lines.append(
-            "Global cation number fractions: "
+            "Framework-compensating cation number fractions: "
             + ", ".join(f"x_{el}={fractions[el]:.8f}" for el in nonzero_cations)
         )
     positive_charge = total_cation_charge(result.alkali_counts)

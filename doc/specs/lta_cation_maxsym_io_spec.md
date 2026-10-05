@@ -15,7 +15,7 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** framework-compensating Group-I/II chemistry is owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 dry-volume model is owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; `doc/specs/v7_15_chloride_occlusion_extension.md` owns the explicit rule that nonzero occlusion is rejected before this maximum-symmetry machinery is invoked. This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 

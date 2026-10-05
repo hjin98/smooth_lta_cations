@@ -14,16 +14,16 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** framework-compensating Group-I/II chemistry is owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 dry-volume model is owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; sparse chloride/occlusion-counterion semantics are owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 
 `generate_smooth_lta_cations_grouped.py` is the user-facing density-smoothing orchestrator. It supports two isolated workflows:
 
-- legacy random generation with regeneration or single-ion greedy relocation;
+- random generation with regeneration or single-ion greedy relocation, optionally followed by v7.15 sparse chloride finalization;
 - certified maximum-symmetry generation followed by MS5 complete-orbit repair.
 
-The random workflow retains its historical behavior. The maximum-symmetry workflow delegates optimization and serialization to MS0--MS5 and never calls the single-ion repair path.
+With zero occlusion the random workflow retains its historical behavior. When occlusion is requested, the cation-density heuristic remains cation-only and Cl is selected/validated only after final cation smoothing. The maximum-symmetry workflow delegates optimization and serialization to MS0--MS5 and rejects occlusion before certification.
 
 # 2. Dependencies
 
