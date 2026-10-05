@@ -1,63 +1,8 @@
-head_sha=80776bf83f67bf0ba6eb7c98b39311f41af59b49
-run_id=37377125558
+head_sha=e74bd03af07232d5fb5e0cc1ab734e3604a99ea7
+run_id=37390158518
 
 === focused ===
-...................F..F...........                                       [100%]
-=================================== FAILURES ===================================
-_ test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.data] _
-
-tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_serialization_roundtrip_f2')
-filename = 'occluded.data'
-occlusion_args = {'alpha_cl': 1, 'occlusion_n4': 'Cs:1'}
-extra = {'Cs': 1, 'Cl': 1}
-
-    @pytest.mark.parametrize("filename", ["occluded.cif", "occluded.POSCAR", "occluded.data"])
-    @pytest.mark.parametrize(
-        "occlusion_args,extra",
-        [
-            (dict(alpha_cl=1, occlusion_n4="Cs:1"), {"Cs": 1, "Cl": 1}),
-            (dict(alpha_cl=2, occlusion_n4="Sr:1"), {"Sr": 1, "Cl": 2}),
-        ],
-    )
-    def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, occlusion_args, extra):
-        result = generate(**occlusion_args)
-        path = tmp_path / filename
-        kind = result.write(path)
-        if kind == "lammps-data":
-            reloaded = LammpsData.from_file(str(path), atom_style="atomic").structure
-            text = path.read_text()
-            atoms_match = re.search(r"(?m)^Atoms(?:\\s*#\\s*atomic)?\\s*$", text)
->           assert atoms_match is not None
-E           assert None is not None
-
-tests/test_v715_chloride_occlusion.py:213: AssertionError
-_ test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.data] _
-
-tmp_path = PosixPath('/tmp/pytest-of-runner/pytest-0/test_serialization_roundtrip_f5')
-filename = 'occluded.data'
-occlusion_args = {'alpha_cl': 2, 'occlusion_n4': 'Sr:1'}
-extra = {'Sr': 1, 'Cl': 2}
-
-    @pytest.mark.parametrize("filename", ["occluded.cif", "occluded.POSCAR", "occluded.data"])
-    @pytest.mark.parametrize(
-        "occlusion_args,extra",
-        [
-            (dict(alpha_cl=1, occlusion_n4="Cs:1"), {"Cs": 1, "Cl": 1}),
-            (dict(alpha_cl=2, occlusion_n4="Sr:1"), {"Sr": 1, "Cl": 2}),
-        ],
-    )
-    def test_serialization_roundtrip_full_composition(tmp_path: Path, filename, occlusion_args, extra):
-        result = generate(**occlusion_args)
-        path = tmp_path / filename
-        kind = result.write(path)
-        if kind == "lammps-data":
-            reloaded = LammpsData.from_file(str(path), atom_style="atomic").structure
-            text = path.read_text()
-            atoms_match = re.search(r"(?m)^Atoms(?:\\s*#\\s*atomic)?\\s*$", text)
->           assert atoms_match is not None
-E           assert None is not None
-
-tests/test_v715_chloride_occlusion.py:213: AssertionError
+..................................                                       [100%]
 =============================== warnings summary ===============================
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif]
@@ -66,11 +11,28 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-=========================== short test summary info ============================
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.data] - assert None is not None
-FAILED tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.data] - assert None is not None
-2 failed, 32 passed, 3 warnings in 18.42s
+34 passed, 3 warnings in 16.41s
 
 === full ===
+........................................................................ [ 50%]
+........................................................................ [100%]
+=============================== warnings summary ===============================
+tests/test_group1_group2_cations.py::test_supported_real_24al_serialization_preserves_composition_and_volume[supported.cif]
+tests/test_ms4_integration_serialization.py::test_supported_real_lta_maxsym_cif_round_trip
+tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif]
+tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif]
+tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cation_smoothing
+  /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/pymatgen/io/cif.py:1817: UserWarning: Issues encountered while parsing CIF: 18 fractional coordinates rounded to ideal values to avoid issues with finite precision.
+    return parser.parse_structures(primitive=primitive)[0]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+144 passed, 5 warnings in 56.92s
 
 === v7.14.2 differential ===
+v7.14.2 differential dry serialization: PASS
+4a596c784c27efe123b552bd3b4752b73dd05fc49bc6bf700a176ba637b784f1  /tmp/v7142/dry.POSCAR
+2102cc56e6bb2715d5ae1988701e2c29b35f2a27c6c57f1689ce869550f21d88  /tmp/v7142/dry.cif
+f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v7142/dry.data
+4a596c784c27efe123b552bd3b4752b73dd05fc49bc6bf700a176ba637b784f1  /tmp/v715/dry.POSCAR
+2102cc56e6bb2715d5ae1988701e2c29b35f2a27c6c57f1689ce869550f21d88  /tmp/v715/dry.cif
+f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v715/dry.data
