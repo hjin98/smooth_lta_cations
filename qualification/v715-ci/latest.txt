@@ -1,39 +1,42 @@
-head_sha=2c35213d6556a9595dad67060fb782beb6faa662
-run_id=37391820103
+head_sha=8eb6fac1b7a9f0d354164239f10147d920f54833
+run_id=37392966652
 
 === focused ===
-.....................................                                    [100%]
+........................................                                 [100%]
 =============================== warnings summary ===============================
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cation_smoothing
+tests/test_v715_chloride_occlusion.py::test_explicit_zero_occlusion_spec_remains_dry_inactive
   /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/pymatgen/io/cif.py:1817: UserWarning: Issues encountered while parsing CIF: 18 fractional coordinates rounded to ideal values to avoid issues with finite precision.
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-37 passed, 3 warnings in 12.41s
+40 passed, 4 warnings in 27.89s
 
 === full ===
 ........................................................................ [ 48%]
-........................................................................ [ 97%]
-...                                                                      [100%]
+........................................................................ [ 96%]
+......                                                                   [100%]
 =============================== warnings summary ===============================
 tests/test_group1_group2_cations.py::test_supported_real_24al_serialization_preserves_composition_and_volume[supported.cif]
 tests/test_ms4_integration_serialization.py::test_supported_real_lta_maxsym_cif_round_trip
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args0-extra0-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_serialization_roundtrip_full_composition[occlusion_args1-extra1-occluded.cif]
 tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cation_smoothing
+tests/test_v715_chloride_occlusion.py::test_explicit_zero_occlusion_spec_remains_dry_inactive
   /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/pymatgen/io/cif.py:1817: UserWarning: Issues encountered while parsing CIF: 18 fractional coordinates rounded to ideal values to avoid issues with finite precision.
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-147 passed, 5 warnings in 30.27s
+150 passed, 6 warnings in 69.79s (0:01:09)
 
 === occluded CLI end-to-end ===
 v7.15 occluded CLI CIF/POSCAR/LAMMPS round trip: PASS
 
 === v7.14.2 differential ===
 v7.14.2 differential dry serialization: PASS
+v7.14.2 differential dry in-memory realization: PASS
 v7.14.2 differential dry report quantities: PASS
 4a596c784c27efe123b552bd3b4752b73dd05fc49bc6bf700a176ba637b784f1  /tmp/v7142/dry.POSCAR
 2102cc56e6bb2715d5ae1988701e2c29b35f2a27c6c57f1689ce869550f21d88  /tmp/v7142/dry.cif
@@ -46,20 +49,20 @@ f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v715/dry.
 v7.15 package build: PASS (lta_cation_generator-7.15.0-py3-none-any.whl)
 
 === documentation PDFs ===
-7987bf453c6c4585475e18dca1c8dc084f17d8bce2012cfe9996b8b348bbda7f  doc/archs/lta_cation_generator_architecture.pdf
+040012f9b5035a47de679d154b2eb93b4d992d25d155630c5338b7d551a28cea  doc/archs/lta_cation_generator_architecture.pdf
 doc/archs/lta_cation_generator_architecture.pdf pages=33
-c99795929b23473c740cd53c982b2679312237f61bca680ca835c788824f6911  doc/specs/generate_smooth_lta_cations_grouped_spec.pdf
+ccc2ecf6d9f0f94a2fc2daa37a9a0b5c70cd9475de48be36d1f617832392f44c  doc/specs/generate_smooth_lta_cations_grouped_spec.pdf
 doc/specs/generate_smooth_lta_cations_grouped_spec.pdf pages=8
-beb07be42dec07911bd9c3be428b4ff7abe518186ecedc92eb022997d3694672  doc/specs/lta_cation_maxsym_io_spec.pdf
+83265924f83c2a5a5fb93c975fb8e512ce6421434b5a2fc8c52883c69243f0d1  doc/specs/lta_cation_maxsym_io_spec.pdf
 doc/specs/lta_cation_maxsym_io_spec.pdf pages=8
-26f1143d9fb9bae136a964722ca54851992de0b249f7b44d34cf6532d856ce23  doc/specs/lta_cation_maxsym_spec.pdf
+c3645842d0bd58b12e856fd612a4e43810f2425b97aadc8a4265180aa3ee9284  doc/specs/lta_cation_maxsym_spec.pdf
 doc/specs/lta_cation_maxsym_spec.pdf pages=12
-18d4a2980bb21d7d8b8a33f180fc270c9d4b7c77afa3becc8bada5a810a9bbdc  doc/specs/lta_cation_population_grouped_spec.pdf
+7889995ac4dad1b8e2610864521a8732f8392b11eaef1f6985e1a2e71df60667  doc/specs/lta_cation_population_grouped_spec.pdf
 doc/specs/lta_cation_population_grouped_spec.pdf pages=12
-c9746fe88a8e2f39c08160db6dc435caf95a9d976a714c67ca037a8de95ec4d5  doc/specs/v7_13_group_i_ii_cation_extension.pdf
+b70115e6aa9b8a721e4447c47b2231a57d0bd532ff2d54f1f2d72d7828adde13  doc/specs/v7_13_group_i_ii_cation_extension.pdf
 doc/specs/v7_13_group_i_ii_cation_extension.pdf pages=4
-8b8ac78b10ff1223f59b9c40faf4de5f09b482638be5f1ac4c266608d260d3a0  doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf
+e5e182c17e8e898dcf5b0ee7d252e8b744a2ef94d0645371253e395d71077a34  doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf
 doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf pages=7
-7b70c827badb7e89ef44caa1bb5b50cd84615ff3d6ea81bea856d0ca171eb738  doc/specs/v7_15_chloride_occlusion_extension.pdf
+4b3edc016bc05b895cd0b864e835e2a2f0e562932474ada2b460bc5cfc528e4b  doc/specs/v7_15_chloride_occlusion_extension.pdf
 doc/specs/v7_15_chloride_occlusion_extension.pdf pages=3
 v7.15 documentation PDF regeneration/render: PASS
