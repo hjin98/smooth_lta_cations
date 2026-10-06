@@ -25,6 +25,8 @@
 - Preserved `alkali_counts` / `framework_cation_counts` as framework-only while exposing `cation_counts` / `total_cation_counts` as the total physical cation view.
 - Added public-owner negative oracles for both random entry points and real occluded CIF/POSCAR/LAMMPS CLI round-trip qualification.
 - Recorded explicit human ratification of the reviewed v7.15 workplan; independent post-implementation review remains required.
+- Completed independent SSDP 6.6.0 post-implementation review with PASS disposition for executable candidate `8eb6fac1b7a9f0d354164239f10147d920f54833`, source-bound to GitHub Actions run `37392966652`.
+- Archived the completed v7.15 workplan, replaced the floating qualification `latest.txt` record with immutable candidate/run-bound evidence under `qualification/v715/`, and retired the one-shot qualification workflow plus temporary documentation render mosaics after closure. Current scientific/numerical authorities are unchanged.
 
 ## v7.14.2 - authority, provenance, and document-source closure
 

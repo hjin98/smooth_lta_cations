@@ -50,10 +50,14 @@ Module specifications:
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
-Qualification evidence:
+Qualification and implementation-history evidence:
 
 - `V7_14_2_QUALIFICATION.md` - retained qualification evidence for the dry v7.14.2 base.
-- `qualification/v715-ci/latest.txt` - automated focused/full/CLI/differential/PDF-generation evidence for the current v7.15 implementation candidate; it is evidence, not scientific acceptance.
+- `qualification/v715/qualification-8eb6fac-run-37392966652.txt` - immutable raw focused/full/CLI/differential/package/PDF qualification record for executable candidate `8eb6fac1b7a9f0d354164239f10147d920f54833` and GitHub Actions run `37392966652`.
+- `qualification/v715/POST-IMPLEMENTATION-REVIEW.md` - independent SSDP 6.6.0 post-implementation PASS assessment of evidence head `b7101a29261b48a18c5358c62c766099c9232995`; it is review/evidence, not scientific authority.
+- `workplans/archive/V7.15-CHLORIDE-OCCLUSION.md` - completed historical implementation workplan. Current scientific/numerical meaning remains owned by the accepted specifications above.
+
+The one-shot v7.15 qualification workflow and temporary documentation render mosaics were retired after source-bound qualification. Git history preserves the exact workflow implementation; the candidate/run-bound records above preserve the material observations and assessment.
 
 ## Authority map
 
@@ -65,7 +69,7 @@ The current source hierarchy is intentionally explicit:
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.
-- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md`; these records evidence the authorities but do not redefine them.
+- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md` and `qualification/v715/`; these records evidence the authorities but do not redefine them.
 
 This separation keeps current scientific meaning reconstructible without relying on repair chronology or hidden review context.
 
