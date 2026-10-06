@@ -1042,6 +1042,18 @@ def _validate_chloride_count(name: str, value: int) -> int:
     return value
 
 
+
+def occlusion_specs_have_nonzero_counts(*specs: Optional[str]) -> bool:
+    """Return whether any exact occlusion allocation requests a nonzero count."""
+    for spec in specs:
+        if spec is None or not str(spec).strip():
+            continue
+        parsed = parse_species_spec(spec, as_ratio=False)
+        if any(int(parsed[element]) > 0 for element in SUPPORTED_CATIONS):
+            return True
+    return False
+
+
 def _empty_allocations() -> Dict[str, Dict[str, int]]:
     return {ring: {el: 0 for el in SUPPORTED_CATIONS} for ring in RING_CLASSES}
 
@@ -2181,7 +2193,9 @@ def generate_lta_cation_structure_from_specs(
     occlusion_requested = bool(
         alpha_cl
         or beta_cl
-        or any(spec is not None and str(spec).strip() for spec in (occlusion_n4, occlusion_n6, occlusion_n8))
+        or occlusion_specs_have_nonzero_counts(
+            occlusion_n4, occlusion_n6, occlusion_n8
+        )
     )
     if occlusion_requested and any(spec is not None for spec in (ratio4, ratio6, ratio8)):
         raise ValueError("Occlusion requires exact --n4/--n6/--n8 allocations; ratio allocations are unsupported")
@@ -2695,9 +2709,8 @@ def main() -> None:
     occlusion_requested = bool(
         args.alpha_cl
         or args.beta_cl
-        or any(
-            spec is not None and str(spec).strip()
-            for spec in (args.occlusion_n4, args.occlusion_n6, args.occlusion_n8)
+        or occlusion_specs_have_nonzero_counts(
+            args.occlusion_n4, args.occlusion_n6, args.occlusion_n8
         )
     )
     if occlusion_requested:

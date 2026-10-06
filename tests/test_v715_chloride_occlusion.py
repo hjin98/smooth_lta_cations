@@ -408,3 +408,45 @@ def test_smooth_cli_places_chloride_after_cation_smoothing(tmp_path: Path):
     loaded = Structure.from_file(str(output))
     assert composition(loaded)["Cl"] == 1
     assert "final minimum-distance guard" in proc.stdout
+
+
+def test_explicit_zero_occlusion_spec_remains_dry_inactive(tmp_path: Path):
+    dry = generate_lta_cation_structure_from_specs(
+        REAL,
+        **FW,
+        occlusion_n4="Cs:0",
+        auto_rebalance=True,
+        seed=1715,
+    )
+    baseline = generate_lta_cation_structure_from_specs(
+        REAL,
+        **FW,
+        auto_rebalance=True,
+        seed=1715,
+    )
+    assert framework_signature(dry) == framework_signature(baseline)
+    assert dry.occlusion_counterion_counts == baseline.occlusion_counterion_counts
+    assert dry.chloride_count == 0
+    assert dry.reference_volume_ang3 == pytest.approx(baseline.reference_volume_ang3)
+
+    output = tmp_path / "zero-spec.cif"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "lta_cation_population_grouped.py"),
+            str(REAL),
+            str(output),
+            "--n4", "Na:2",
+            "--n6", "Na:16",
+            "--n8", "Na:6",
+            "--occlusion-n4", "Cs:0",
+            "--auto-rebalance",
+            "--seed", "1715",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    assert proc.returncode == 0, proc.stdout + proc.stderr
+    assert output.exists()
+    assert composition(Structure.from_file(str(output)))["Cl"] == 0

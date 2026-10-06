@@ -77,6 +77,7 @@ from lta_cation_population_grouped import (
     format_batch_output_path,
     generate_lta_cation_structure_from_specs,
     make_population_report,
+    occlusion_specs_have_nonzero_counts,
     parse_cutoffs,
     read_cif_minimal,
 )
@@ -438,9 +439,8 @@ def main() -> None:
     occlusion_requested = bool(
         args.alpha_cl
         or args.beta_cl
-        or any(
-            spec is not None and str(spec).strip()
-            for spec in (args.occlusion_n4, args.occlusion_n6, args.occlusion_n8)
+        or occlusion_specs_have_nonzero_counts(
+            args.occlusion_n4, args.occlusion_n6, args.occlusion_n8
         )
     )
     if occlusion_requested:
