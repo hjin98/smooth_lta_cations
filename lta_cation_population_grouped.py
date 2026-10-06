@@ -173,12 +173,13 @@ OUTPUT_SPECIES_ORDER = ("Si", "Al", "O", *SUPPORTED_CATIONS, "Cl")
 # Dry-LTA reference data used by the affine volume model.
 #
 # The reference volume V_i^(24) is the volume of a 24-framework-Al charge
-# equivalent of cation i.  For a charge-neutral composition the generalized
-# interpolation is
+# equivalent of cation i.  For the independently charge-neutral framework-
+# compensating population the generalized interpolation is
 #
-#     V_ref = sum_i(z_i * N_i * V_i^(24)) / 24,
+#     V_ref = sum_i(z_i * N_i^fw * V_i^(24)) / 24,
 #
-# where z_i is the formal cation charge.  This is exactly the historical
+# where z_i is the formal cation charge. Occlusion-counterion cations and Cl
+# guests are excluded. This is exactly the historical
 # Li/Na/K formula when every z_i == 1 and remains correctly normalized for
 # mixtures containing Group-II cations.
 #
@@ -1621,9 +1622,11 @@ def interpolated_dry_target_volume(
     The v7.14 dry-LTA model retains the established affine interpolation but
     generalizes its weights to formal-charge equivalents::
 
-        V_ref = sum_i(z_i * N_i * V_i^(24)) / 24
+        V_ref = sum_i(z_i * N_i^fw * V_i^(24)) / 24
 
-    where ``V_i^(24)`` is the 24-framework-Al pure/effective corner volume.
+    where ``N_i^fw`` denotes framework-compensating counts and ``V_i^(24)``
+    is the 24-framework-Al pure/effective corner volume. Occlusion-counterion
+    cations and chloride guests are intentionally excluded in v7.15.
     For Group-I-only compositions this is exactly the historical formula.
     For Group-II ions, the factor ``z_i=2`` makes the fractional contributions
     sum correctly for the supported 24-charge-equivalent domain.  H, Be, Fr,
