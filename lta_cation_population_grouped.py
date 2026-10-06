@@ -3,23 +3,33 @@
 lta_cation_population_grouped.py
 
 Expand an LTA template CIF to a full P1 framework, group split/off-center
-cation-template coordinates into physical sites, populate Group I/II cations
-on those physical sites, optionally generate symmetry-inequivalent batches,
-enforce framework charge neutrality, choose a literature-backed/placeholder dry-LTA
-reference, and write CIF, VASP POSCAR/VASP, or LAMMPS data output according to
-the requested filename.
+cation-template coordinates into physical sites, populate Group-I/II cations
+on those physical sites, optionally add bounded sparse chloride cage guests
+with separately charge-balanced occlusion-counterion cations, optionally
+generate dry symmetry-inequivalent batches, enforce the role-partitioned charge
+invariants, choose the established dry-LTA reference from framework-compensating
+counts only, and write CIF, VASP POSCAR/VASP, or LAMMPS data output.
 
 Charge-neutrality model
 -----------------------
 The supported production framework is Al24Si24O96 (Si:Al = 1:1). Every
 framework Al contributes one net negative charge relative to Si. Supported
 Group I cations carry formal charge +1 and supported Group II cations carry
-formal charge +2, so every supported output cell must satisfy
+formal charge +2. The framework-compensating population must independently
+satisfy
 
-    sum_i z_i N_i = 24.
+    Q_fw = sum_i z_i N_i^fw = 24.
+
+For sparse chloride occlusion, with N_Cl alpha/beta cage guests, the additional
+occlusion-counterion population must independently satisfy
+
+    Q_occ = sum_i z_i N_i^occ = N_Cl,
+
+so the complete cation population carries +24 + N_Cl formal charge. Global
+neutrality does not replace the independent +24 framework invariant.
 
 Non-24-Al LTA cells, other Si:Al ratios, and alternative cell normalizations
-are outside v7.14 scope and are deferred to a future scientific/numerical
+are outside v7.15 scope and are deferred to a future scientific/numerical
 extension.
 
 Dry-volume model
@@ -27,7 +37,7 @@ Dry-volume model
 The established affine volume model is generalized to mixed formal valence by
 using charge-equivalent composition weights:
 
-    V_ref = sum_i(z_i * N_i * V_i^(24)) / 24.
+    V_ref = sum_i(z_i * N_i^fw * V_i^(24)) / 24.
 
 Here V_i^(24) is the dry-LTA pure/effective corner volume normalized to 24
 framework-Al charge equivalents. This reduces exactly to the historical
@@ -67,11 +77,13 @@ The main output format is inferred case-insensitively from the filename:
 
 Before any format is written, atoms are stably grouped into one contiguous
 block per chemical element using the order Si, Al, O followed by the supported
-Group I/II cations. This prevents repeated species blocks in POSCAR files. CIF
+Group-I/II cations and Cl last when present. This prevents repeated species
+blocks in POSCAR files. CIF
 atom rows and LAMMPS atom records are grouped the same way for consistency.
 
 The LAMMPS writer intentionally emits no per-atom charge column. Formal charge
-neutrality is enforced chemically through the cation counts and formal valence,
+neutrality is enforced chemically through the role-partitioned cation counts,
+chloride count, and formal valence,
 but force-field partial charges are outside this generator's model.
 
 Writer/software references:
@@ -1482,7 +1494,7 @@ def validate_framework_model(framework_atoms: Iterable[AtomRow]) -> None:
 def validate_supported_framework_scope(framework_atoms: Iterable[AtomRow]) -> None:
     """Require the currently supported Al24Si24O96 LTA framework.
 
-    v7.14 intentionally supports only the 24-framework-Al, 24-framework-Si
+    v7.15 intentionally supports only the 24-framework-Al, 24-framework-Si
     LTA reference cell (Si:Al = 1:1).  The empirical ``V_i^(24)`` constants
     and the fixed denominator 24 are defined for this domain.  Generalization
     to a different framework size, Si:Al ratio, or cell normalization requires
@@ -1492,7 +1504,7 @@ def validate_supported_framework_scope(framework_atoms: Iterable[AtomRow]) -> No
     observed = {element: int(counts.get(element, 0)) for element in ("Al", "Si", "O")}
     if observed != SUPPORTED_FRAMEWORK_COUNTS:
         raise ValueError(
-            "Unsupported LTA framework for the v7.14 chemistry/volume model: "
+            "Unsupported LTA framework for the v7.15 chemistry/volume model: "
             f"observed Al={observed['Al']}, Si={observed['Si']}, O={observed['O']}; "
             "the supported scope is exactly Al24Si24O96 (Si:Al = 1:1). "
             "Non-24-Al LTA cells and other Si:Al ratios are deferred to a future "

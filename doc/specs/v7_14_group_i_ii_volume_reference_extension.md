@@ -281,7 +281,7 @@ This is a package-provenance statement, not an exhaustive assertion that suitabl
 
 # 9. Scientific limitations
 
-The v7.14.x model is an affine empirical volume model for generating starting structures. It does not claim:
+The dry model introduced in v7.14 and retained unchanged for framework-compensating counts in v7.15 is an affine empirical volume model for generating starting structures. It does not claim:
 
 - excess/mixing volumes are zero in real materials;
 - all endpoint measurements share identical temperature or hydration history;
@@ -304,7 +304,7 @@ These limitations constrain physical interpretation but do not alter the defined
 
 # 11. Historical note
 
-v7.14 replaced the temporary v7.13 input-template-volume fallback with the current evidence-bound endpoint table and charge-equivalent interpolation. The filename is retained for release lineage and compatibility; the semantics above are the current v7.14.x authority.
+v7.14 replaced the temporary v7.13 input-template-volume fallback with the current evidence-bound endpoint table and charge-equivalent interpolation. The filename is retained for release lineage and compatibility; the semantics above are the current v7.15 dry-volume authority.
 
 ## v7.15 occlusion compatibility boundary
 

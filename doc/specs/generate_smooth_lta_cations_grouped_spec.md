@@ -215,6 +215,12 @@ population module without changing their semantics:
 --ratio4 SPEC
 --ratio6 SPEC
 --ratio8 SPEC
+--alpha-cl INT
+--beta-cl INT
+--occlusion-n4 SPEC
+--occlusion-n6 SPEC
+--occlusion-n8 SPEC
+--occlusion-min-distance ANGSTROM
 --site-map SPEC
 --template-elements SPEC
 --dedup-digits N
@@ -333,7 +339,8 @@ The orchestrator propagates all population and density errors. It also raises wh
 - `--unique-batch-size < 1`;
 - the completed-candidate limit is smaller than the batch size;
 - no structure is generated;
-- a requested unique smooth batch cannot be filled within the bounded limit.
+- a requested unique smooth batch cannot be filled within the bounded limit;
+- an occlusion request is combined with maximum-symmetry mode, a unique batch larger than one, ratio allocation, or auto-rebalance.
 
 # 14. Known limitations
 

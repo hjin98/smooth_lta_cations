@@ -14,10 +14,10 @@ header-includes:
 
 # v7.15 sparse chloride-occlusion extension
 
-**Lifecycle:** human-ratified implementation contract for the v7.15 candidate.
-This document governs the bounded implementation semantics but does not
-self-qualify the final implementation; independent post-implementation review
-remains required.
+**Lifecycle:** accepted-current scientific/numerical contract for v7.15 after
+explicit human ratification. This authority governs the bounded sparse
+occlusion semantics. It does not self-qualify the D4 implementation;
+independent post-implementation review remains required.
 
 ## Status and scope
 

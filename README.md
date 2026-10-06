@@ -44,15 +44,16 @@ Module specifications:
 - `doc/specs/lta_cation_symmetry_smoothing_spec.md` and `.pdf`
 - `doc/specs/lta_cation_exact_search_acceleration_spec.md` and `.pdf`
 - `doc/specs/lta_cation_performance_optimization_spec.md` and `.pdf`
-- `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current chemistry/charge-neutrality authority for the v7.14.x line; the historical filename records its introduction in v7.13.
+- `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current framework-compensation chemistry/charge authority for v7.15; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
-- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - human-ratified bounded scientific/numerical contract for sparse chloride-occlusion initialization.
+- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
 Qualification evidence:
 
-- `V7_14_2_QUALIFICATION.md` - native post-repair and documentation/source-chain qualification for this release.
+- `V7_14_2_QUALIFICATION.md` - retained qualification evidence for the dry v7.14.2 base.
+- `qualification/v715-ci/latest.txt` - automated focused/full/CLI/differential/PDF-generation evidence for the current v7.15 implementation candidate; it is evidence, not scientific acceptance.
 
 ## Authority map
 
@@ -77,13 +78,13 @@ Some small synthetic non-24-Al CIFs remain under `tests/` solely as internal alg
 
 ## Supported cations and charge neutrality
 
-Supported Group I cations are `H, Li, Na, K, Rb, Cs, Fr` with formal charge +1. Supported Group II cations are `Be, Mg, Ca, Sr, Ba, Ra` with formal charge +2. For the dry Al-Si-O framework, each framework Al contributes one negative charge, so every requested population must satisfy
+Supported Group I cations are `H, Li, Na, K, Rb, Cs, Fr` with formal charge +1. Supported Group II cations are `Be, Mg, Ca, Sr, Ba, Ra` with formal charge +2. Each framework Al contributes one negative charge, so the **framework-compensating** population must independently satisfy
 
 ```text
-sum_i z_i N_i = N_Al
+sum_i z_i N_i^fw = N_Al
 ```
 
-For the supported Al24Si24O96 cell this invariant is exactly `sum_i z_i N_i = 24`. It may be balanced by 24 Na+, 12 Ca2+, or a mixed population such as 8 Na+ + 8 Ca2+. The allocation count still cannot exceed the available physical sites in each ring family.
+For the supported Al24Si24O96 cell this invariant is exactly `sum_i z_i N_i^fw = 24`. It may be balanced by 24 Na+, 12 Ca2+, or a mixed population such as 8 Na+ + 8 Ca2+. When Cl is requested, the separate occlusion-counterion population must also satisfy `sum_i z_i N_i^occ = N_Cl`; the global `24 + N_Cl` equality is not used as a substitute for the framework check. Framework and occlusion roles share the same physical ring-site capacities.
 
 ## Maximum-symmetry generation
 

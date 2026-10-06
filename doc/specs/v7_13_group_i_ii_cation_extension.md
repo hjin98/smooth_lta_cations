@@ -68,15 +68,20 @@ Si:Al = 1:1
 framework negative charge = 24
 ```
 
-Non-24-Al cells, other Si:Al ratios, arbitrary framework normalizations, and a generalized arbitrary-$N_{\rm Al}$ volume model are outside the v7.14.x production domain. Small reduced cells may exist as private algorithmic test fixtures, but they are not supported scientific generator inputs.
+Non-24-Al cells, other Si:Al ratios, arbitrary framework normalizations, and a generalized arbitrary-$N_{\rm Al}$ volume model are outside the v7.15 production domain. Small reduced cells may exist as private algorithmic test fixtures, but they are not supported scientific generator inputs.
 
-# 5. Exact population and charge-neutrality invariant
+# 5. Exact framework-compensating population and charge-neutrality invariant
 
-A production composition is admissible only when
+The framework-compensating population of every production composition is admissible only when
 
-$$
-\sum_i z_iN_i = 24.
-$$
+$
+\sum_i z_iN_i^{\rm fw} = 24.
+$
+
+When sparse chloride is enabled, the additional relation
+$\sum_i z_iN_i^{\rm occ}=N_{\rm Cl}$ is independently required by
+`v7_15_chloride_occlusion_extension.md`; the two checks are never collapsed
+into one global-neutrality test.
 
 Equivalent examples include:
 
@@ -96,7 +101,7 @@ Cation populations are discrete software inputs. Public/direct numerical interfa
 - Boolean values are rejected;
 - textual CLI count specifications are parsed as integer counts and reject noninteger syntax.
 
-Zero is an admissible per-species count, but the assembled composition must still satisfy the exact neutrality and site-capacity constraints.
+Zero is an admissible per-species framework count, but the framework-compensating population must still satisfy the exact +24 invariant and site-capacity constraints. An occluded structure must additionally satisfy the separately owned excess-charge/Cl invariant.
 
 # 6. Site-capacity and ratio semantics
 
@@ -105,7 +110,7 @@ Physical-site capacity is independent of formal charge. Each occupied grouped si
 For every ring family:
 
 - explicit counts are exact numbers of cations;
-- ratio inputs are occupancy fractions of that ring-family physical-site capacity;
+- framework ratio inputs are occupancy fractions of that ring-family physical-site capacity; v7.15 occlusion mode requires exact counts and rejects ratio allocation;
 - ratios are converted to integer occupancies using the module's documented rounding behavior;
 - exact charge neutrality is checked after the integer population is resolved.
 
@@ -124,7 +129,7 @@ The maximum-symmetry state alphabet is `empty` followed by `SUPPORTED_CATIONS` i
 
 # 8. Serialization semantics
 
-Serialized output groups atoms as `Si, Al, O`, followed by `SUPPORTED_CATIONS` in deterministic order.
+Serialized output groups atoms as `Si, Al, O`, followed by `SUPPORTED_CATIONS` in deterministic order and `Cl` last when present.
 
 LAMMPS data output uses `atom_style atomic`. It contains no per-atom force-field charge column. The formal charge table in this contract is used for chemical composition validation; it does not prescribe force-field partial charges.
 

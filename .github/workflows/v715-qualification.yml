@@ -89,10 +89,59 @@ jobs:
             python lta_cation_population_grouped.py               tests/real_lta_primitive.cif "$cur/dry.$ext"               --n4 Na:2 --n6 Na:16 --n8 Na:6 --seed 1715               > "$cur/report.$ext.txt"
             cmp "$base/dry.$ext" "$cur/dry.$ext"
           done
+          python - "$base/report.cif.txt" "$cur/report.cif.txt" <<'PY'
+          import re
+          import sys
+          from pathlib import Path
+          base_text = Path(sys.argv[1]).read_text()
+          cur_text = Path(sys.argv[2]).read_text()
+          def value(text, label):
+              m = re.search(rf"^\s*{re.escape(label)}:\s*([0-9.eE+-]+)", text, re.M)
+              assert m, label
+              return float(m.group(1))
+          for label in (
+              "input lattice volume",
+              "reference volume",
+              "applied volume factor",
+              "target/output volume",
+              "isotropic lattice-vector scale",
+              "written structure volume",
+          ):
+              assert value(base_text, label) == value(cur_text, label), label
+          assert "Al:24" in base_text and "Al:24" in cur_text
+          assert "Na:24" in base_text and "Na:24" in cur_text
+          assert "N_Al=24" in base_text
+          assert "Framework charge invariant: PASS (+24 = +24)" in cur_text
+          print("v7.14.2 differential dry report quantities: PASS")
+          PY
           {
             echo "v7.14.2 differential dry serialization: PASS"
+            echo "v7.14.2 differential dry report quantities: PASS"
             sha256sum "$base"/dry.* "$cur"/dry.*
           } | tee /tmp/v715-differential.txt
+      - name: Build package artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install build
+          python -m build
+          python - <<'PY' | tee /tmp/v715-package.txt
+          import zipfile
+          from pathlib import Path
+          wheel = next(Path("dist").glob("*.whl"))
+          with zipfile.ZipFile(wheel) as zf:
+              metadata_name = next(n for n in zf.namelist() if n.endswith(".dist-info/METADATA"))
+              metadata = zf.read(metadata_name).decode()
+              assert "Version: 7.15.0" in metadata
+              names = set(zf.namelist())
+              for module in (
+                  "lta_cation_population_grouped.py",
+                  "generate_smooth_lta_cations_grouped.py",
+                  "lta_cation_maxsym.py",
+              ):
+                  assert module in names, module
+          print(f"v7.15 package build: PASS ({wheel.name})")
+          PY
       - name: Regenerate and render documentation PDFs
         shell: bash
         run: |
@@ -148,6 +197,9 @@ jobs:
             echo
             echo "=== v7.14.2 differential ==="
             cat /tmp/v715-differential.txt 2>/dev/null || true
+            echo
+            echo "=== package build ==="
+            cat /tmp/v715-package.txt 2>/dev/null || true
             echo
             echo "=== documentation PDFs ==="
             cat /tmp/v715-docs.txt 2>/dev/null || true

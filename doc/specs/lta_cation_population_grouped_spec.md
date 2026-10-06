@@ -115,19 +115,29 @@ PlacedIon(
 
 One selected ion and its physical-site provenance.
 
-## 4.6 `PopulationResult`
+## 4.6 Cage and chloride records
+
+`CageSite` is the immutable authoritative definition of a supported alpha/beta
+cage center. `OccludedChloride` records the selected cage ID/type and
+fractional coordinate. v7.15 binds exactly two alpha and two beta centers for
+the canonical supported primitive setting.
+
+## 4.7 `PopulationResult`
 
 Contains:
 
 - final `Structure`;
 - expanded framework atoms;
 - grouped physical sites;
-- placed ions;
-- resolved allocations;
+- role-tagged placed cations;
+- framework allocations and separately stored occlusion allocations;
 - ignored template atoms;
 - seed and grouping cutoffs;
-- framework and alkali counts;
-- required compensating cation count;
+- framework counts and legacy framework-only `alkali_counts`;
+- derived framework-only and total cation-count views;
+- occlusion-counterion counts and selected chloride cage records;
+- independent framework/occlusion charge views;
+- final chloride collision-distance metadata;
 - input, reference, target, and written volume metadata.
 
 Methods:
@@ -140,7 +150,7 @@ write_report(filename) -> None
 
 `write()` returns the detected format name.
 
-## 4.7 `SiteSymmetryGroup`
+## 4.8 `SiteSymmetryGroup`
 
 ```python
 SiteSymmetryGroup(
@@ -154,7 +164,7 @@ SiteSymmetryGroup(
 
 `permutations[g][i]` is the destination index of old site `i`. The current object stores only grouped-site permutations. It omits affine operations and coordinate variants.
 
-## 4.8 `UniqueBatchResult`
+## 4.9 `UniqueBatchResult`
 
 ```python
 UniqueBatchResult(
@@ -456,16 +466,16 @@ Candidate member seeds are drawn from a master RNG. A candidate is accepted only
 # 13. Structure construction and serialization
 
 ```python
-build_p1_structure(lattice, framework_atoms, placed_ions) -> Structure
+build_p1_structure(lattice, framework_atoms, placed_ions, chlorides=()) -> Structure
 ```
 
-Framework atoms are written first. Placed ions are sorted by ring family, element, site ID, and variant ID.
+Framework atoms are assembled first, followed by all grouped-site cations and then selected chloride cage guests. Placed cations are sorted by ring family, element, site ID, and variant ID before the chloride records are appended.
 
 ```python
 group_structure_by_element_for_output(structure) -> Structure
 ```
 
-Creates a serialization-only copy with contiguous element blocks. Supported elements use `OUTPUT_SPECIES_ORDER` (`Si, Al, O` followed by all supported Group I/II cations); other elements follow in first-seen order.
+Creates a serialization-only copy with contiguous element blocks. Supported elements use `OUTPUT_SPECIES_ORDER` (`Si, Al, O`, all supported Group-I/II cations, then `Cl`); other elements follow in first-seen order.
 
 ```python
 detect_output_format(filename) -> str
@@ -490,7 +500,8 @@ python lta_cation_population_grouped.py INPUT_CIF OUTPUT_FILE [options]
 
 Main option groups:
 
-- population: `--n4`, `--n6`, `--n8`, `--ratio4`, `--ratio6`, `--ratio8`;
+- framework population: `--n4`, `--n6`, `--n8`, `--ratio4`, `--ratio6`, `--ratio8`;
+- sparse occlusion: `--alpha-cl`, `--beta-cl`, `--occlusion-n4`, `--occlusion-n6`, `--occlusion-n8`, `--occlusion-min-distance`;
 - template: `--site-map`, `--template-elements`, `--dedup-digits`;
 - grouping: `--variant-group-cutoff`, `--variant-group-cutoff4`, `--variant-group-cutoff6`, `--variant-group-cutoff8`, `--no-group-by-label`;
 - chemistry: `--auto-rebalance`, `--volume-factor`;
@@ -499,7 +510,12 @@ Main option groups:
 - outputs: `--report`, `--write-candidate`.
 
 `--write-candidate-cif` is retained as a hidden compatibility alias for
-`--write-candidate`. The destination format is still inferred from the supplied
+`--write-candidate`.
+
+In v7.15, any nonzero occlusion request is rejected with ratio allocation,
+auto-rebalance, maximum-symmetry mode, symmetry-unique batch size greater than
+one, or candidate-variant output. These guards execute at the public dispatch
+boundary before downstream certificates or diagnostic artifacts are created. The destination format is still inferred from the supplied
 filename; the alias name does not force CIF output.
 
 Version 7.9 adds `--population-mode random | maximum-symmetry`, with `random` as the backward-compatible default. Maximum-symmetry mode delegates to `lta_cation_maxsym_io.py` and adds symmetry backend, realization, variant-library, bounded tie, search-budget, physical-filter, precision, and post-write verification options. Legacy `--seed`, `--unique-batch-*`, and `--write-candidate` options are rejected in maximum-symmetry mode.
