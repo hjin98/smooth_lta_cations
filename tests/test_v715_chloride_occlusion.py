@@ -297,6 +297,16 @@ def run_cli(script: str, *args: str):
             ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1.5"),
             "invalid int value",
         ),
+        (
+            "lta_cation_population_grouped.py",
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1"),
+            "supported sparse range",
+        ),
+        (
+            "generate_smooth_lta_cations_grouped.py",
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1"),
+            "supported sparse range",
+        ),
     ],
 )
 def test_public_cli_guards(script, args, needle, tmp_path: Path):
@@ -450,3 +460,27 @@ def test_explicit_zero_occlusion_spec_remains_dry_inactive(tmp_path: Path):
     assert proc.returncode == 0, proc.stdout + proc.stderr
     assert output.exists()
     assert composition(Structure.from_file(str(output)))["Cl"] == 0
+
+    smooth_output = tmp_path / "zero-spec-smooth.cif"
+    smooth_proc = subprocess.run(
+        [
+            sys.executable,
+            str(ROOT / "generate_smooth_lta_cations_grouped.py"),
+            str(REAL),
+            str(smooth_output),
+            "--n4", "Na:2",
+            "--n6", "Na:16",
+            "--n8", "Na:6",
+            "--occlusion-n4", "Cs:0",
+            "--auto-rebalance",
+            "--seed", "1715",
+            "--max-attempts", "1",
+            "--mode", "regenerate",
+        ],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    assert smooth_proc.returncode == 0, smooth_proc.stdout + smooth_proc.stderr
+    assert smooth_output.exists()
+    assert composition(Structure.from_file(str(smooth_output)))["Cl"] == 0

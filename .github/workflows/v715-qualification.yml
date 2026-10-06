@@ -89,6 +89,51 @@ jobs:
             python lta_cation_population_grouped.py               tests/real_lta_primitive.cif "$cur/dry.$ext"               --n4 Na:2 --n6 Na:16 --n8 Na:6 --seed 1715               > "$cur/report.$ext.txt"
             cmp "$base/dry.$ext" "$cur/dry.$ext"
           done
+          python - "$base" <<'PY'
+          import importlib.util
+          import sys
+          from pathlib import Path
+          import numpy as np
+
+          base = Path(sys.argv[1])
+
+          def load_module(name, path):
+              spec = importlib.util.spec_from_file_location(name, path)
+              module = importlib.util.module_from_spec(spec)
+              sys.modules[name] = module
+              spec.loader.exec_module(module)
+              return module
+
+          old = load_module("v7142_population", base / "lta_cation_population_grouped.py")
+          new = load_module("v715_population", Path("lta_cation_population_grouped.py"))
+          kwargs = dict(n4="Na:2", n6="Na:16", n8="Na:6", seed=1715)
+          old_result = old.generate_lta_cation_structure_from_specs(
+              base / "tests/real_lta_primitive.cif", **kwargs
+          )
+          new_result = new.generate_lta_cation_structure_from_specs(
+              Path("tests/real_lta_primitive.cif"), **kwargs
+          )
+
+          def realization(result):
+              return [
+                  (
+                      ion.element,
+                      ion.ring_class,
+                      ion.site_id,
+                      ion.variant_id,
+                      tuple(float(x) for x in np.asarray(ion.frac)),
+                  )
+                  for ion in result.placed_ions
+              ]
+
+          assert old_result.allocations == new_result.allocations
+          assert realization(old_result) == realization(new_result)
+          assert old_result.framework_counts == new_result.framework_counts
+          assert old_result.alkali_counts == new_result.alkali_counts
+          assert old_result.reference_volume_ang3 == new_result.reference_volume_ang3
+          assert old_result.target_volume_ang3 == new_result.target_volume_ang3
+          print("v7.14.2 differential dry in-memory realization: PASS")
+          PY
           python - "$base/report.cif.txt" "$cur/report.cif.txt" <<'PY'
           import re
           import sys
@@ -116,6 +161,7 @@ jobs:
           PY
           {
             echo "v7.14.2 differential dry serialization: PASS"
+            echo "v7.14.2 differential dry in-memory realization: PASS"
             echo "v7.14.2 differential dry report quantities: PASS"
             sha256sum "$base"/dry.* "$cur"/dry.*
           } | tee /tmp/v715-differential.txt
