@@ -1,7 +1,7 @@
 ---
 title: "Grouped-Site LTA Cation Generator: Architecture Manual"
-author: "Reverse-engineered and reconciled through package v7.14.2 (MS0-MS7)"
-date: "2026-10-04"
+author: "Reverse-engineered and reconciled through package v7.15.0 (MS0-MS7 plus bounded sparse chloride occlusion)"
+date: "2026-10-05"
 toc: true
 toc-depth: 3
 geometry: margin=0.85in
@@ -15,11 +15,11 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** supported Group-I/II framework-compensation species, exact integer populations, formal charges, and the +24 framework invariant are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the human-ratified sparse chloride/occlusion-counterion extension is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
 
 # 1. Purpose and status
 
-This package generates dry Group I/II-cation-substituted LTA structures from a symmetry-reduced CIF containing framework atoms and cation-template coordinates. It treats nearby split or off-center template coordinates as positional variants of one physical ring site.
+This package generates Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and cation-template coordinates. It supports the qualified dry Group-I/II cation path and, in random mode only, the bounded v7.15 sparse chloride-occlusion initialization extension. Nearby split or off-center template coordinates are treated as positional variants of one physical ring site.
 
 The current implementation provides:
 
@@ -27,8 +27,9 @@ The current implementation provides:
 - grouping of positional variants into physical 4-ring, 6-ring, and 8-ring sites;
 - exact or ratio-based Group I/II cation population constraints;
 - random population of physical sites;
-- formal charge-neutrality validation;
-- composition-dependent dry-LTA volume interpolation and isotropic rescaling;
+- independent framework-compensation and sparse chloride/counterion charge validation in v7.15 random mode;
+- deterministic alpha/beta cage-center chloride initialization with fail-closed template identity and collision checking;
+- composition-dependent dry-LTA volume interpolation and isotropic rescaling using framework-compensating cations only;
 - symmetry-inequivalent random batching on grouped-site occupations;
 - maximum-order grouped-site occupation optimization with exact integer constraints and an optimality certificate;
 - exact off-center variant realization with geometric coordinate-stabilizer and secondary occupation-stabilizer certificates;
@@ -37,15 +38,15 @@ The current implementation provides:
 - periodic cation-density analysis and greedy de-clustering;
 - CIF, VASP POSCAR, and LAMMPS data output.
 
-Version 7.14 implements the complete MS0-MS7 path: immutable template loading, complete affine parent-group construction, variant-library policies, integer group tables, exhaustive subgroup enumeration, subgroup orbits, exact occupation coloring, selected-orbit off-center realization, geometric coordinate stabilizers, maximum-order certificates, proof-preserving forced-variant and catalog acceleration, provenance-derived framework actions, generator-orbit variant completion, bit-mask subgroup search, hybrid direct occupation enumeration, chemistry/volume-aware structure assembly, serialization and read-back stabilizer verification, detailed subgroup diagnostics, and symmetry-coupled density smoothing over complete required-subgroup orbits.
+The v7.14 line established the complete MS0-MS7 cation-symmetry path, which v7.15 preserves unchanged for non-occluded structures: immutable template loading, complete affine parent-group construction, variant-library policies, integer group tables, exhaustive subgroup enumeration, subgroup orbits, exact occupation coloring, selected-orbit off-center realization, geometric coordinate stabilizers, maximum-order certificates, proof-preserving forced-variant and catalog acceleration, provenance-derived framework actions, generator-orbit variant completion, bit-mask subgroup search, hybrid direct occupation enumeration, chemistry/volume-aware structure assembly, serialization and read-back stabilizer verification, detailed subgroup diagnostics, and symmetry-coupled density smoothing over complete required-subgroup orbits.
 
 # 2. Package structure
 
-**`lta_cation_population_grouped.py` - implemented.** CIF parsing, template expansion, site grouping, allocation, random population, chemistry and volume checks, symmetry-unique batching, reports, writers, and the user-facing MS4 mode switch. Maximum-symmetry work is delegated to the dedicated MS0-MS7 modules.
+**`lta_cation_population_grouped.py` - implemented.** CIF parsing, template expansion, site grouping, role-aware random population, independent framework/occlusion charge checks, canonical sparse cage placement and collision validation, dry-volume checks, symmetry-unique dry batching, reports, writers, and the user-facing MS4 mode switch. Maximum-symmetry work is delegated to the dedicated MS0-MS7 modules.
 
 **`lta_cation_density_grouped.py` - implemented and optimized in MS7.** Periodic cation-density metrics, clustering thresholds, reusable report scoring, CSV export, and optional density-grid output.
 
-**`generate_smooth_lta_cations_grouped.py` - implemented through MS5.** Legacy random regeneration/single-ion repair plus a separate maximum-symmetry path using complete-orbit smoothing and mandatory post-write stabilizer verification.
+**`generate_smooth_lta_cations_grouped.py` - implemented through MS5 plus v7.15 random occlusion.** Legacy random regeneration/single-ion repair preserves cation-role metadata and finalizes chloride only after cation smoothing; the separate maximum-symmetry path uses complete-orbit smoothing and rejects occlusion before certification.
 
 **`lta_cation_template.py` - implemented in MS0.** Immutable deterministic template model with expansion provenance, grouped-site anchors, fingerprints, and stable identifiers.
 
@@ -1609,3 +1610,26 @@ The package combines standard external methods with project-specific design:
 16. J. J. Pluth and J. V. Smith, "Crystal structure of dehydrated strontium-exchanged zeolite A. Absence of near-zero-coordinate strontium(2+) ion. Presence of aluminum complex," *Journal of the American Chemical Society* **104**, 6977-6982 (1982). DOI: 10.1021/ja00389a015.
 17. Y. Kim, V. Subramanian, R. L. Firor, and K. Seff, "Four Crystal Structures of Ba_xNa_(12-2x)-A (1 <= x <= 6) Relating to the Instability of Barium-Exchanged Zeolite A Toward Dehydration," *ACS Symposium Series* **135**, 137-153 (1980). DOI: 10.1021/bk-1980-0135.ch007.
 18. C. R. Harris, K. J. Millman, S. J. van der Walt, R. Gommers, P. Virtanen, D. Cournapeau, E. Wieser, J. Taylor, S. Berg, N. J. Smith, R. Kern, M. Picus, S. Hoyer, M. H. van Kerkwijk, M. Brett, A. Haldane, J. Fernandez del Rio, M. Wiebe, P. Peterson, P. Gerard-Marchant, K. Sheppard, T. Reddy, W. Weckesser, H. Abbasi, C. Gohlke, and T. E. Oliphant, "Array programming with NumPy," *Nature* **585**, 357-362 (2020). DOI: 10.1038/s41586-020-2649-2.
+
+## v7.15 architecture delta: sparse chloride occlusion
+
+The v7.15 random path adds a provenance layer above the existing grouped-site
+machinery rather than a second placement architecture. Framework and excess
+cation roles share one physical-site inventory; framework occupation is
+realized first with the legacy RNG and excess occupation is realized second
+with an isolated deterministic stream.
+
+The final physical structure has one authoritative assembly owner:
+framework atoms + all grouped-site cations + validated chloride cage guests.
+Cage selection is downstream of random cation smoothing. The density subsystem
+therefore remains cation-only.
+
+Occlusion setting validation is fail-closed to the canonical
+`tests/real_lta_primitive.cif` identity and the expected alpha/beta cage-center
+orbits. Arbitrary origin/setting remapping is intentionally absent.
+
+MS0-MS7 and the symmetry-unique random signature remain cation-state models.
+v7.15 consequently rejects nonzero occlusion before maximum-symmetry
+optimization/certification and before multi-member unique batching. Extending
+the group action to cage states is a future architecture change, not an
+implicit property of v7.15.

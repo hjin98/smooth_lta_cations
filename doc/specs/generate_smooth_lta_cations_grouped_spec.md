@@ -14,16 +14,16 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** framework-compensating Group-I/II chemistry is owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 dry-volume model is owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; sparse chloride/occlusion-counterion semantics are owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 
 `generate_smooth_lta_cations_grouped.py` is the user-facing density-smoothing orchestrator. It supports two isolated workflows:
 
-- legacy random generation with regeneration or single-ion greedy relocation;
+- random generation with regeneration or single-ion greedy relocation, optionally followed by v7.15 sparse chloride finalization;
 - certified maximum-symmetry generation followed by MS5 complete-orbit repair.
 
-The random workflow retains its historical behavior. The maximum-symmetry workflow delegates optimization and serialization to MS0--MS5 and never calls the single-ion repair path.
+With zero occlusion the random workflow retains its historical behavior. When occlusion is requested, the cation-density heuristic remains cation-only and Cl is selected/validated only after final cation smoothing. The maximum-symmetry workflow delegates optimization and serialization to MS0--MS5 and rejects occlusion before certification.
 
 # 2. Dependencies
 
@@ -215,6 +215,12 @@ population module without changing their semantics:
 --ratio4 SPEC
 --ratio6 SPEC
 --ratio8 SPEC
+--alpha-cl INT
+--beta-cl INT
+--occlusion-n4 SPEC
+--occlusion-n6 SPEC
+--occlusion-n8 SPEC
+--occlusion-min-distance ANGSTROM
 --site-map SPEC
 --template-elements SPEC
 --dedup-digits N
@@ -333,7 +339,8 @@ The orchestrator propagates all population and density errors. It also raises wh
 - `--unique-batch-size < 1`;
 - the completed-candidate limit is smaller than the batch size;
 - no structure is generated;
-- a requested unique smooth batch cannot be filled within the bounded limit.
+- a requested unique smooth batch cannot be filled within the bounded limit;
+- an occlusion request is combined with maximum-symmetry mode, a unique batch larger than one, ratio allocation, or auto-rebalance.
 
 # 14. Known limitations
 
@@ -386,3 +393,19 @@ The maximum-symmetry branch forwards `--max-direct-occupation-count N` to the ce
 1. S. P. Ong *et al.*, "Python Materials Genomics (pymatgen): A robust, open-source Python library for materials analysis," *Computational Materials Science* **68**, 314-319 (2013). DOI: 10.1016/j.commatsci.2012.10.028.
 2. A. P. Thompson *et al.*, "LAMMPS - a flexible simulation tool for particle-based materials modeling at the atomic, meso, and continuum scales," *Computer Physics Communications* **271**, 108171 (2022). DOI: 10.1016/j.cpc.2021.108171.
 3. The empirical LTA endpoint sources and shared finite-group/symmetry references are owned by `v7_14_group_i_ii_volume_reference_extension.md` and the architecture manual, respectively.
+
+## v7.15 occlusion smoothing order
+
+With occlusion enabled, smoothing remains a cation-density heuristic. The
+generator places framework cations, then excess-role cations, performs the
+existing cation smoothing/greedy moves, and only then selects chloride cage
+centers and applies the final periodic collision guard. Chloride is never added
+to the Gaussian density estimator.
+
+Greedy reconstruction preserves all role/occlusion metadata through
+`dataclasses.replace`; a moved cation retains its role. The final chloride
+records are regenerated from the final cation geometry before complete
+structure assembly.
+
+Occlusion is rejected at this public CLI boundary with maximum-symmetry mode,
+`--unique-batch-size > 1`, ratio allocations, or auto-rebalance.

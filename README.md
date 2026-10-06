@@ -1,8 +1,6 @@
 # Smooth grouped-site LTA cation generator
 
-This package generates dry Group I/II-cation-substituted LTA structures from a symmetry-reduced CIF containing framework atoms and cation-template positions. Nearby split or off-center template coordinates are grouped as positional variants of one physical ring site.
-
-Version 7.14.2 is a documentation/provenance closure patch over the independently qualified v7.14.1 **MS0-MS7** implementation. It does not change the accepted Al24Si24O96 chemistry, charge-equivalent `/24` volume model, empirical endpoint values, placement algorithms, or serialization behavior. The patch reconciles current authority routing, completes source/software citations, publishes the chemistry and volume authorities as generated PDFs, and records the successful native qualification evidence.
+This package generates Group-I/II-cation-substituted Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and grouped cation-template positions. Version 7.15.0 adds a bounded random-mode sparse chloride-occlusion initialization path while preserving the qualified v7.14.2 dry behavior when occlusion is absent. The existing MS0-MS7 maximum-symmetry certificate remains cation-only and explicitly rejects occluded cases.
 
 ## Entry points
 
@@ -46,14 +44,21 @@ Module specifications:
 - `doc/specs/lta_cation_symmetry_smoothing_spec.md` and `.pdf`
 - `doc/specs/lta_cation_exact_search_acceleration_spec.md` and `.pdf`
 - `doc/specs/lta_cation_performance_optimization_spec.md` and `.pdf`
-- `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current chemistry/charge-neutrality authority for the v7.14.x line; the historical filename records its introduction in v7.13.
+- `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current framework-compensation chemistry/charge authority for v7.15; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
+- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
-Qualification evidence:
+Qualification and implementation-history evidence:
 
-- `V7_14_2_QUALIFICATION.md` - native post-repair and documentation/source-chain qualification for this release.
+- `V7_14_2_QUALIFICATION.md` - retained qualification evidence for the dry v7.14.2 base.
+- `qualification/v715/qualification-8eb6fac-run-37392966652.txt` - immutable raw focused/full/CLI/differential/package/PDF qualification record for executable candidate `8eb6fac1b7a9f0d354164239f10147d920f54833` and GitHub Actions run `37392966652`.
+- `qualification/v715/POST-IMPLEMENTATION-REVIEW.md` - independent SSDP 6.6.0 post-implementation PASS assessment of evidence head `b7101a29261b48a18c5358c62c766099c9232995`; it is review/evidence, not scientific authority.
+- `qualification/v715/CLOSEOUT.md` - terminal merge-readiness record for the completed v7.15 cycle, including the required non-squash lineage-preservation constraint.
+- `workplans/archive/V7.15-CHLORIDE-OCCLUSION.md` - completed historical implementation workplan. Current scientific/numerical meaning remains owned by the accepted specifications above.
+
+The one-shot v7.15 qualification workflow and temporary documentation render mosaics were retired after source-bound qualification. Git history preserves the exact workflow implementation; the candidate/run-bound records above preserve the material observations and assessment.
 
 ## Authority map
 
@@ -61,29 +66,30 @@ The current source hierarchy is intentionally explicit:
 
 - **Scientific chemistry/charge authority:** `doc/specs/v7_13_group_i_ii_cation_extension.md`.
 - **Scientific/numerical volume authority:** `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`.
+- **Sparse chloride-occlusion authority:** `doc/specs/v7_15_chloride_occlusion_extension.md`.
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.
-- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md`; these records evidence the authorities but do not redefine them.
+- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md` and `qualification/v715/`; these records evidence the authorities but do not redefine them.
 
 This separation keeps current scientific meaning reconstructible without relying on repair chronology or hidden review context.
 
 
 ## Supported framework scope
 
-The current v7.14 scientific contract is intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
+The current v7.15 scientific contract remains intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
 
 Some small synthetic non-24-Al CIFs remain under `tests/` solely as internal algorithm fixtures. They are not supported scientific generator inputs and tests that use them explicitly disable the production scope guard.
 
 ## Supported cations and charge neutrality
 
-Supported Group I cations are `H, Li, Na, K, Rb, Cs, Fr` with formal charge +1. Supported Group II cations are `Be, Mg, Ca, Sr, Ba, Ra` with formal charge +2. For the dry Al-Si-O framework, each framework Al contributes one negative charge, so every requested population must satisfy
+Supported Group I cations are `H, Li, Na, K, Rb, Cs, Fr` with formal charge +1. Supported Group II cations are `Be, Mg, Ca, Sr, Ba, Ra` with formal charge +2. Each framework Al contributes one negative charge, so the **framework-compensating** population must independently satisfy
 
 ```text
-sum_i z_i N_i = N_Al
+sum_i z_i N_i^fw = N_Al
 ```
 
-For the supported Al24Si24O96 cell this invariant is exactly `sum_i z_i N_i = 24`. It may be balanced by 24 Na+, 12 Ca2+, or a mixed population such as 8 Na+ + 8 Ca2+. The allocation count still cannot exceed the available physical sites in each ring family.
+For the supported Al24Si24O96 cell this invariant is exactly `sum_i z_i N_i^fw = 24`. It may be balanced by 24 Na+, 12 Ca2+, or a mixed population such as 8 Na+ + 8 Ca2+. When Cl is requested, the separate occlusion-counterion population must also satisfy `sum_i z_i N_i^occ = N_Cl`; the global `24 + N_Cl` equality is not used as a substitute for the framework check. Framework and occlusion roles share the same physical ring-site capacities.
 
 ## Maximum-symmetry generation
 
@@ -151,7 +157,7 @@ The output format is inferred case-insensitively:
 *.data      LAMMPS data with atom_style atomic
 ```
 
-Before serialization, atoms are stably grouped into one contiguous block per element using `Si Al O`, followed by the supported Group I/II cations in deterministic order. LAMMPS output has no per-atom charge column. Formal charge neutrality is enforced by composition, but force-field charges are outside this generator.
+Before serialization, atoms are stably grouped into one contiguous block per element using `Si Al O`, followed by the supported Group I/II cations in deterministic order and `Cl` last when present. LAMMPS output has no per-atom charge column. Formal charge neutrality is enforced by composition, but force-field charges are outside this generator.
 
 ## Random grouped-site population
 
@@ -161,13 +167,13 @@ python lta_cation_population_grouped.py input.cif output.cif     --n4 Li:4,Na:0,
 
 Ratio inputs are supported through `--ratio4`, `--ratio6`, and `--ratio8`. Ratios are rounded independently within each physical-site family.
 
-The supported dry framework requires
+The supported framework-compensating cation population requires
 
 ```text
-sum_i z_i N_i = 24,
+sum_i z_i N_i^fw = 24,
 ```
 
-with `z_i=1` for Group I and `z_i=2` for Group II. The expanded framework must be Al24Si24O96; other framework counts are rejected by the user-facing generator.
+with `z_i=1` for Group I and `z_i=2` for Group II. In v7.15 occluded cells this remains an independent framework invariant; any additional `occlusion_counterion` population separately balances the requested chloride guests. The expanded framework must be Al24Si24O96; other framework counts are rejected by the user-facing generator.
 
 ## Symmetry-unique random batching
 
@@ -211,10 +217,10 @@ By default MS5 preserves the member's complete verified coordinate stabilizer. A
 The established affine dry-volume model is retained and generalized to mixed-valence compositions using **charge-equivalent fractions**:
 
 ```text
-V_ref = sum_i(z_i * N_i * V_i^(24)) / 24
+V_ref = sum_i(z_i * N_i^fw * V_i^(24)) / 24
 ```
 
-Here `z_i` is the formal cation charge, `N_i` is the number of ions, and `V_i^(24)` is the pure/effective dry-LTA corner volume for the supported 24-framework-Al reference cell. Because every supported generated structure satisfies `sum_i z_i N_i = 24`, the charge-equivalent weights `w_i=z_iN_i/24` sum exactly to one. For Li/Na/K-only cells this reduces exactly to the historical `sum(N_i V_i)/24` formula. The `/24` denominator is part of the present 24-Al model and must not be generalized to `/N_Al` without a new scientific definition of how the reference volumes scale.
+Here `z_i` is the formal cation charge, `N_i^fw` is the number of framework-compensating ions, and `V_i^(24)` is the pure/effective dry-LTA corner volume for the supported 24-framework-Al reference cell. Because the framework population independently satisfies `sum_i z_i N_i^fw = 24`, the dry-model charge-equivalent weights `w_i=z_iN_i^fw/24` sum exactly to one. Occlusion-counterion cations and Cl guests are excluded from this automatic reference. For dry Li/Na/K-only framework populations this reduces exactly to the historical `sum(N_i^fw V_i)/24` formula. The `/24` denominator is part of the present 24-Al model and must not be generalized to `/N_Al` without a new scientific definition of how the reference volumes scale.
 
 The v7.14 reference survey and bindings are:
 
@@ -273,3 +279,26 @@ Code comments and documentation cite the external methods that informed the impl
 - pymatgen for structure representation and CIF/VASP/LAMMPS structure I/O;
 
 The grouped-site stabilizer optimizer, strict/completed variant-domain policies, selected-orbit realization, round-trip certification, Gaussian clustering score, legacy greedy relocation, and MS5 complete-orbit repair policies are package-specific designs built from those standard foundations. The architecture manual contains the complete algorithmic bibliography and distinguishes external methods from package-specific constructions.
+
+## v7.15 sparse chloride occlusion
+
+v7.15 adds a bounded random-generation path for sparse chloride guests in the
+canonical Al24Si24O96 primitive LTA fixture. Framework-compensating cations and
+additional occlusion-counterion-role cations remain distinct provenance
+populations even though both use the grouped 4R/6R/8R inventory. Independent
+charge checks require framework charge +24 and excess positive charge equal to
+the number of Cl- guests.
+
+New random-mode controls are `--alpha-cl`, `--beta-cl`,
+`--occlusion-n4`, `--occlusion-n6`, `--occlusion-n8`, and
+`--occlusion-min-distance` (default 1.5 Angstrom). Occlusion requires exact
+allocations and is rejected with ratio allocation, auto-rebalance,
+maximum-symmetry mode, symmetry-unique batch size greater than one, and
+candidate-variant output.
+
+The automatic volume remains the qualified dry framework-compensating
+reference; excess counterions and Cl do not change it. Alpha-cage Cl is a sparse
+initialization informed by salt-occlusion literature. Beta-cage Cl is a
+deliberately sampled trapped/configurational training hypothesis, not a
+demonstrated equilibrium LTA chloride site. See
+`doc/specs/v7_15_chloride_occlusion_extension.md`.

@@ -1,6 +1,6 @@
 ---
-title: "Current Group-I/II Chemistry and Charge-Neutrality Contract (v7.14.x)"
-date: "2026-10-04"
+title: "Current Group-I/II Framework-Compensation Chemistry Contract (v7.15)"
+date: "2026-10-05"
 toc: true
 toc-depth: 3
 geometry: margin=0.85in
@@ -16,12 +16,13 @@ header-includes:
 
 # 1. Status and authority
 
-This document is the **accepted-current chemistry and charge-neutrality authority** for the v7.14.x grouped-site LTA cation generator. The historical `v7_13` filename records the release in which the Group-I/II extension was introduced; it does **not** limit the authority to v7.13.
+This document is the **accepted-current chemistry and framework-charge authority** for the framework-compensating cation population of the v7.15 grouped-site LTA generator. The historical `v7_13` filename records the release in which the Group-I/II extension was introduced; it does **not** limit the authority to v7.13.
 
 For current releases:
 
-- this document owns the supported cation set, formal charges, exact population semantics, and charge-neutrality invariant;
+- this document owns the supported cation set, formal charges, exact framework-compensating population semantics, and independent +24 framework-charge invariant;
 - `v7_14_group_i_ii_volume_reference_extension.md` owns the dry-volume reference model and empirical endpoint bindings;
+- `v7_15_chloride_occlusion_extension.md` owns the separate occlusion-counterion/Cl charge invariant and sparse cage-guest semantics;
 - module specifications own their public software behavior and import these chemistry/volume semantics rather than redefining them;
 - the architecture manual explains how the modules compose these authorities.
 
@@ -29,7 +30,7 @@ Earlier Li/Na/K-only statements are historical where they conflict with this con
 
 # 2. Background and terminology
 
-The supported framework is a conventional LTA aluminosilicate cell containing 24 framework Al, 24 framework Si, and 96 framework O atoms. Replacing a framework Si(IV) site by Al(III) introduces one net negative framework charge. The generator therefore balances the 24 framework-Al charge units with extra-framework cations.
+The supported framework is a conventional LTA aluminosilicate cell containing 24 framework Al, 24 framework Si, and 96 framework O atoms. Replacing a framework Si(IV) site by Al(III) introduces one net negative framework charge. The generator therefore balances the 24 framework-Al charge units with the `framework` cation population. v7.15 may additionally introduce a separately neutralized `occlusion_counterion` population when sparse Cl guests are requested; that second invariant is owned by `v7_15_chloride_occlusion_extension.md`.
 
 For cation species $i$:
 
@@ -67,15 +68,20 @@ Si:Al = 1:1
 framework negative charge = 24
 ```
 
-Non-24-Al cells, other Si:Al ratios, arbitrary framework normalizations, and a generalized arbitrary-$N_{\rm Al}$ volume model are outside the v7.14.x production domain. Small reduced cells may exist as private algorithmic test fixtures, but they are not supported scientific generator inputs.
+Non-24-Al cells, other Si:Al ratios, arbitrary framework normalizations, and a generalized arbitrary-$N_{\rm Al}$ volume model are outside the v7.15 production domain. Small reduced cells may exist as private algorithmic test fixtures, but they are not supported scientific generator inputs.
 
-# 5. Exact population and charge-neutrality invariant
+# 5. Exact framework-compensating population and charge-neutrality invariant
 
-A production composition is admissible only when
+The framework-compensating population of every production composition is admissible only when
 
-$$
-\sum_i z_iN_i = 24.
-$$
+$
+\sum_i z_iN_i^{\rm fw} = 24.
+$
+
+When sparse chloride is enabled, the additional relation
+$\sum_i z_iN_i^{\rm occ}=N_{\rm Cl}$ is independently required by
+`v7_15_chloride_occlusion_extension.md`; the two checks are never collapsed
+into one global-neutrality test.
 
 Equivalent examples include:
 
@@ -95,7 +101,7 @@ Cation populations are discrete software inputs. Public/direct numerical interfa
 - Boolean values are rejected;
 - textual CLI count specifications are parsed as integer counts and reject noninteger syntax.
 
-Zero is an admissible per-species count, but the assembled composition must still satisfy the exact neutrality and site-capacity constraints.
+Zero is an admissible per-species framework count, but the framework-compensating population must still satisfy the exact +24 invariant and site-capacity constraints. An occluded structure must additionally satisfy the separately owned excess-charge/Cl invariant.
 
 # 6. Site-capacity and ratio semantics
 
@@ -104,7 +110,7 @@ Physical-site capacity is independent of formal charge. Each occupied grouped si
 For every ring family:
 
 - explicit counts are exact numbers of cations;
-- ratio inputs are occupancy fractions of that ring-family physical-site capacity;
+- framework ratio inputs are occupancy fractions of that ring-family physical-site capacity; v7.15 occlusion mode requires exact counts and rejects ratio allocation;
 - ratios are converted to integer occupancies using the module's documented rounding behavior;
 - exact charge neutrality is checked after the integer population is resolved.
 
@@ -123,7 +129,7 @@ The maximum-symmetry state alphabet is `empty` followed by `SUPPORTED_CATIONS` i
 
 # 8. Serialization semantics
 
-Serialized output groups atoms as `Si, Al, O`, followed by `SUPPORTED_CATIONS` in deterministic order.
+Serialized output groups atoms as `Si, Al, O`, followed by `SUPPORTED_CATIONS` in deterministic order and `Cl` last when present.
 
 LAMMPS data output uses `atom_style atomic`. It contains no per-atom force-field charge column. The formal charge table in this contract is used for chemical composition validation; it does not prescribe force-field partial charges.
 
@@ -147,3 +153,13 @@ Preferred semantic names are `SUPPORTED_CATIONS`, `PopulationResult.cation_count
 # 11. Historical note
 
 v7.13 introduced the Group-I/II cation extension. That release temporarily used an input-template-volume fallback for species without the legacy Li/Na/K endpoints. v7.14 replaced that volume behavior with the current evidence-bound charge-equivalent model. This history is retained only to explain compatibility; it is not part of the present volume contract.
+
+## v7.15 role-partition reconciliation
+
+The v7.13 Group-I/II charge table remains authoritative for formal cation
+valences. v7.15 adds a second construction role without redefining that table.
+Framework-compensating counts must independently satisfy +24 for Al24Si24O96;
+`occlusion_counterion` counts must independently provide one positive charge
+equivalent per initialized Cl-. The legacy `alkali_counts` compatibility field
+continues to mean framework-compensating counts. See
+`v7_15_chloride_occlusion_extension.md` for the bounded occlusion contract.

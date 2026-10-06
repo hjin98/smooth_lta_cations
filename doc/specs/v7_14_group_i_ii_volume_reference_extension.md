@@ -1,6 +1,6 @@
 ---
-title: "Current Group-I/II Dry-Volume Reference Model (v7.14.x)"
-date: "2026-10-04"
+title: "Current Group-I/II Dry-Volume Reference Model (v7.15)"
+date: "2026-10-05"
 toc: true
 toc-depth: 3
 geometry: margin=0.78in
@@ -16,7 +16,7 @@ header-includes:
 
 # 1. Status and authority
 
-This document is the **accepted-current scientific/numerical authority** for the v7.14.x dry-LTA composition-volume model. It owns:
+This document is the **accepted-current scientific/numerical authority** for the dry framework-compensating composition-volume model retained by v7.15. It owns:
 
 - the supported framework normalization for the empirical volume model;
 - charge-equivalent interpolation;
@@ -26,13 +26,13 @@ This document is the **accepted-current scientific/numerical authority** for the
 - source-to-model transformations and their limitations;
 - `volume_factor` semantics.
 
-The chemistry, supported species, exact population typing, and formal-charge table are owned by `v7_13_group_i_ii_cation_extension.md`. Module specifications and code concretize these two current authorities.
+The chemistry, supported species, exact framework-compensating population typing, and formal-charge table are owned by `v7_13_group_i_ii_cation_extension.md`. The sparse chloride extension and the explicit exclusion of occlusion-counterion/Cl populations from this automatic volume model are owned by `v7_15_chloride_occlusion_extension.md`. Module specifications and code concretize these authorities.
 
 # 2. Background and terminology
 
 For the supported Al24Si24O96 LTA cell, let:
 
-- $N_i$ be the exact integer number of cations of species $i$;
+- $N_i=N_i^{\rm fw}$ be the exact integer number of **framework-compensating** cations of species $i$;
 - $z_i$ be its formal positive charge (+1 for Group I, +2 for Group II);
 - $V_i^{(24)}$ be the dry-LTA **reference corner volume** assigned to species $i$, normalized to one 24-Al reference cell;
 - $w_i=z_iN_i/24$ be the species' charge-equivalent fraction;
@@ -47,10 +47,10 @@ The model is defined only for the current production normalization:
 ```text
 Al24Si24O96
 Si:Al = 1:1
-sum_i z_i N_i = 24
+sum_i z_i N_i^fw = 24
 ```
 
-The empirical $V_i^{(24)}$ values are 24-Al reference-cell volumes. Non-24-Al LTA cells, other Si:Al ratios, and alternative cell normalizations are outside v7.14.x scope.
+The empirical $V_i^{(24)}$ values are 24-Al reference-cell volumes. Non-24-Al LTA cells, other Si:Al ratios, and alternative cell normalizations are outside v7.15 scope.
 
 A future extension must explicitly define both the endpoint normalization and the mapping from normalized composition volume to generated-cell volume. Support must not be inferred merely by replacing the fixed denominator 24 with an arbitrary $N_{\rm Al}$.
 
@@ -281,7 +281,7 @@ This is a package-provenance statement, not an exhaustive assertion that suitabl
 
 # 9. Scientific limitations
 
-The v7.14.x model is an affine empirical volume model for generating starting structures. It does not claim:
+The dry model introduced in v7.14 and retained unchanged for framework-compensating counts in v7.15 is an affine empirical volume model for generating starting structures. It does not claim:
 
 - excess/mixing volumes are zero in real materials;
 - all endpoint measurements share identical temperature or hydration history;
@@ -304,4 +304,18 @@ These limitations constrain physical interpretation but do not alter the defined
 
 # 11. Historical note
 
-v7.14 replaced the temporary v7.13 input-template-volume fallback with the current evidence-bound endpoint table and charge-equivalent interpolation. The filename is retained for release lineage and compatibility; the semantics above are the current v7.14.x authority.
+v7.14 replaced the temporary v7.13 input-template-volume fallback with the current evidence-bound endpoint table and charge-equivalent interpolation. The filename is retained for release lineage and compatibility; the semantics above are the current v7.15 dry-volume authority.
+
+## v7.15 occlusion compatibility boundary
+
+The accepted v7.14 dry-volume model is unchanged. In v7.15 its population
+argument is explicitly the **framework-compensating** role only:
+
+```
+V_ref = (1/24) sum_i z_i N_i^fw V_i^(24)
+```
+
+Neither `occlusion_counterion` cations nor Cl cage guests participate in the
+automatic interpolation. This preserves the qualified dry reference as an
+initialization policy; it is not evidence that salt loading causes zero
+physical volume change.

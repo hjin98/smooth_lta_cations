@@ -14,11 +14,11 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the ratified sparse chloride extension is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 
-`lta_cation_population_grouped.py` is the core module for grouped-site Group I/II cation population of an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, allocation resolution, charge and volume validation, random placement, grouped-site symmetry deduplication, reports, and structure serialization.
+`lta_cation_population_grouped.py` is the core module for grouped-site Group-I/II cation population and bounded v7.15 sparse chloride-guest assembly from an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, role-aware allocation/charge validation, dry volume validation, random placement, canonical-template cage selection/collision checks, grouped-site dry symmetry deduplication, reports, and structure serialization.
 
 The module does **not** perform energetic optimization, structural relaxation, or equilibrium sampling. Its CLI delegates the certified maximum-symmetry workflow to `lta_cation_maxsym_io.py`; the subgroup, optimizer, and symmetry-coupled smoothing algorithms remain outside this legacy population module.
 
@@ -40,7 +40,7 @@ Used pymatgen objects include `Lattice`, `Structure`, `SymmOp`, `Poscar`, and `L
 SUPPORTED_CATIONS = (H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra)
 ALLOWED_ALKALI = SUPPORTED_CATIONS  # backward-compatible alias
 RING_CLASSES   = (4, 6, 8)
-OUTPUT_SPECIES_ORDER = (Si, Al, O, H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra)
+OUTPUT_SPECIES_ORDER = (Si, Al, O, H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra, Cl)
 ```
 
 The dry framework model supports only fully occupied Al, Si, and O framework atoms with Group I (+1) and Group II (+2) compensation. Production generation is restricted to Al24Si24O96.
@@ -109,24 +109,35 @@ PlacedIon(
     ring_class: str,
     site_id: str,
     variant_id: int,
+    role: str = "framework",
 )
 ```
 
 One selected ion and its physical-site provenance.
 
-## 4.6 `PopulationResult`
+## 4.6 Cage and chloride records
+
+`CageSite` is the immutable authoritative definition of a supported alpha/beta
+cage center. `OccludedChloride` records the selected cage ID/type and
+fractional coordinate. v7.15 binds exactly two alpha and two beta centers for
+the canonical supported primitive setting.
+
+## 4.7 `PopulationResult`
 
 Contains:
 
 - final `Structure`;
 - expanded framework atoms;
 - grouped physical sites;
-- placed ions;
-- resolved allocations;
+- role-tagged placed cations;
+- framework allocations and separately stored occlusion allocations;
 - ignored template atoms;
 - seed and grouping cutoffs;
-- framework and alkali counts;
-- required compensating cation count;
+- framework counts and legacy framework-only `alkali_counts`;
+- derived framework-only and total cation-count views;
+- occlusion-counterion counts and selected chloride cage records;
+- independent framework/occlusion charge views;
+- final chloride collision-distance metadata;
 - input, reference, target, and written volume metadata.
 
 Methods:
@@ -139,7 +150,7 @@ write_report(filename) -> None
 
 `write()` returns the detected format name.
 
-## 4.7 `SiteSymmetryGroup`
+## 4.8 `SiteSymmetryGroup`
 
 ```python
 SiteSymmetryGroup(
@@ -153,7 +164,7 @@ SiteSymmetryGroup(
 
 `permutations[g][i]` is the destination index of old site `i`. The current object stores only grouped-site permutations. It omits affine operations and coordinate variants.
 
-## 4.8 `UniqueBatchResult`
+## 4.9 `UniqueBatchResult`
 
 ```python
 UniqueBatchResult(
@@ -331,10 +342,10 @@ interpolated_dry_target_volume(
 Returns `(reference_volume, target_volume)` in $\text{Angstrom}^3$. v7.14 generalizes the established affine interpolation to formal-charge equivalents:
 
 $$
-V_{\rm ref}=\frac{1}{24}\sum_i z_iN_iV_i^{(24)}.
+V_{\rm ref}=\frac{1}{24}\sum_i z_iN_i^{\rm fw}V_i^{(24)}.
 $$
 
-For the supported Al24Si24O96 cell, exact charge neutrality gives `sum_i z_i N_i = 24`, so the charge-equivalent weights sum to one. For Group-I-only compositions this is exactly the historical count-over-24 formula. `V_i^(24)` values are literature-derived measured or affine-extrapolated dry-LTA corners where a species-specific reference is bound. `H`, `Be`, `Fr`, and `Ra` use the standard Na-A corner as explicit placeholders because v7.14 binds no species-specific dry-LTA volume reference for them; this does not claim exhaustive absence from the literature. The input template volume is not used as a missing-species fallback. See `v7_14_group_i_ii_volume_reference_extension.md` for the source table and caveats.
+For the supported Al24Si24O96 cell, the framework-compensating population independently satisfies `sum_i z_i N_i^fw = 24`, so the dry-model charge-equivalent weights sum to one. Occlusion-counterion cations and Cl guests are excluded from this interpolation. For Group-I-only dry framework compositions this is exactly the historical count-over-24 formula. `V_i^(24)` values are literature-derived measured or affine-extrapolated dry-LTA corners where a species-specific reference is bound. `H`, `Be`, `Fr`, and `Ra` use the standard Na-A corner as explicit placeholders because v7.14 binds no species-specific dry-LTA volume reference for them; this does not claim exhaustive absence from the literature. The input template volume is not used as a missing-species fallback. See `v7_14_group_i_ii_volume_reference_extension.md` for the source table and caveats.
 
 The function rejects nonpositive/nonfinite volume factors and unsupported occupied species.
 
@@ -455,16 +466,16 @@ Candidate member seeds are drawn from a master RNG. A candidate is accepted only
 # 13. Structure construction and serialization
 
 ```python
-build_p1_structure(lattice, framework_atoms, placed_ions) -> Structure
+build_p1_structure(lattice, framework_atoms, placed_ions, chlorides=()) -> Structure
 ```
 
-Framework atoms are written first. Placed ions are sorted by ring family, element, site ID, and variant ID.
+Framework atoms are assembled first, followed by all grouped-site cations and then selected chloride cage guests. Placed cations are sorted by ring family, element, site ID, and variant ID before the chloride records are appended.
 
 ```python
 group_structure_by_element_for_output(structure) -> Structure
 ```
 
-Creates a serialization-only copy with contiguous element blocks. Supported elements use `OUTPUT_SPECIES_ORDER` (`Si, Al, O` followed by all supported Group I/II cations); other elements follow in first-seen order.
+Creates a serialization-only copy with contiguous element blocks. Supported elements use `OUTPUT_SPECIES_ORDER` (`Si, Al, O`, all supported Group-I/II cations, then `Cl`); other elements follow in first-seen order.
 
 ```python
 detect_output_format(filename) -> str
@@ -489,7 +500,8 @@ python lta_cation_population_grouped.py INPUT_CIF OUTPUT_FILE [options]
 
 Main option groups:
 
-- population: `--n4`, `--n6`, `--n8`, `--ratio4`, `--ratio6`, `--ratio8`;
+- framework population: `--n4`, `--n6`, `--n8`, `--ratio4`, `--ratio6`, `--ratio8`;
+- sparse occlusion: `--alpha-cl`, `--beta-cl`, `--occlusion-n4`, `--occlusion-n6`, `--occlusion-n8`, `--occlusion-min-distance`;
 - template: `--site-map`, `--template-elements`, `--dedup-digits`;
 - grouping: `--variant-group-cutoff`, `--variant-group-cutoff4`, `--variant-group-cutoff6`, `--variant-group-cutoff8`, `--no-group-by-label`;
 - chemistry: `--auto-rebalance`, `--volume-factor`;
@@ -498,7 +510,12 @@ Main option groups:
 - outputs: `--report`, `--write-candidate`.
 
 `--write-candidate-cif` is retained as a hidden compatibility alias for
-`--write-candidate`. The destination format is still inferred from the supplied
+`--write-candidate`.
+
+In v7.15, any nonzero occlusion request is rejected with ratio allocation,
+auto-rebalance, maximum-symmetry mode, symmetry-unique batch size greater than
+one, or candidate-variant output. These guards execute at the public dispatch
+boundary before downstream certificates or diagnostic artifacts are created. The destination format is still inferred from the supplied
 filename; the alias name does not force CIF output.
 
 Version 7.9 adds `--population-mode random | maximum-symmetry`, with `random` as the backward-compatible default. Maximum-symmetry mode delegates to `lta_cation_maxsym_io.py` and adds symmetry backend, realization, variant-library, bounded tie, search-budget, physical-filter, precision, and post-write verification options. Legacy `--seed`, `--unique-batch-*`, and `--write-candidate` options are rejected in maximum-symmetry mode.
@@ -596,3 +613,22 @@ Internal helpers `_fcc_primitive_volume_from_conventional_a`, `_annotate_lammps_
 # MS7 CLI revision
 
 Maximum-symmetry mode accepts `--max-direct-occupation-count N` with default `100000`; zero disables direct raw-occupation enumeration. Existing random and unique-batch modes ignore this option.
+
+## v7.15 sparse chloride-occlusion extension
+
+Random population now supports the bounded role-aware occlusion contract in
+`v7_15_chloride_occlusion_extension.md`. `PlacedIon.role` is
+`framework` by default for compatibility or `occlusion_counterion`.
+`PopulationResult.alkali_counts` and `framework_cation_counts` remain framework-only. `cation_counts` is the derived total physical cation view across both roles; `total_cation_counts` is an explicit alias for the same total view. Occluded chlorides are authoritative cage records and
+are appended to the single assembled structure only after the independent
+charge checks and collision guard pass.
+
+Framework placement uses the legacy RNG stream first. Excess-role placement
+uses a deterministic secondary stream and only still-empty grouped sites.
+Combined ring-family occupancy may not exceed physical capacity. The dry-volume
+interpolation receives framework-role counts only.
+
+Occlusion mode is fail-closed to the bound canonical primitive template and its
+validated alpha/beta center orbits. One requested cage in a two-cage family is
+selected by maximum minimum periodic distance to final cations, with canonical
+cage-ID tie breaking. Cl is serialized after all supported Group-I/II cations.

@@ -1,5 +1,33 @@
 # Changelog
 
+## v7.15.0 - sparse chloride-occlusion initialization
+
+- Added sparse alpha/beta Cl cage guests for the canonical Al24Si24O96
+  Fm-3c primitive fixture, bounded to 0-2 guests per cage family.
+- Added explicit `framework` and `occlusion_counterion` cation roles and
+  independent +24 framework and excess-charge-equals-Cl invariants.
+- Isolated excess placement from the legacy framework RNG sequence and enforced
+  combined physical-site capacities.
+- Preserved the v7.14 dry-volume equation on framework-role counts only.
+- Added deterministic cage selection after final cation smoothing and a
+  minimum-image 1.5 Angstrom default catastrophic-overlap guard.
+- Appended Cl to the existing serialization species order while retaining
+  LAMMPS `atom_style atomic` with no charge column.
+- Added fail-closed canonical-template identity/orbit validation.
+- Explicitly reject occlusion with maximum-symmetry certification,
+  symmetry-unique batches larger than one, ratio allocation, auto-rebalance,
+  and candidate output.
+- Added v7.15 chemistry, volume, setting, serialization, and public-guard
+  regression tests.
+- Added the v7.15 scientific/numerical specification and reconciled current
+  architecture/interface authorities. Beta-cage Cl remains a training
+  hypothesis, not an asserted equilibrium site.
+- Preserved `alkali_counts` / `framework_cation_counts` as framework-only while exposing `cation_counts` / `total_cation_counts` as the total physical cation view.
+- Added public-owner negative oracles for both random entry points and real occluded CIF/POSCAR/LAMMPS CLI round-trip qualification.
+- Recorded explicit human ratification of the reviewed v7.15 workplan; the independent post-implementation review was subsequently completed with PASS disposition.
+- Completed independent SSDP 6.6.0 post-implementation review with PASS disposition for executable candidate `8eb6fac1b7a9f0d354164239f10147d920f54833`, source-bound to GitHub Actions run `37392966652`.
+- Archived the completed v7.15 workplan, replaced the floating qualification `latest.txt` record with immutable candidate/run-bound evidence under `qualification/v715/`, and retired the one-shot qualification workflow plus temporary documentation render mosaics after closure. Current scientific/numerical authorities are unchanged.
+
 ## v7.14.2 - authority, provenance, and document-source closure
 
 - Reconciled current documentation under the SSDP authority model without changing scientific/numerical behavior: chemistry/charge semantics remain owned by `v7_13_group_i_ii_cation_extension`, volume semantics remain owned by `v7_14_group_i_ii_volume_reference_extension`, module specifications remain D4 contracts, and qualification records remain evidence rather than authority.
@@ -280,3 +308,4 @@ Validation performed:
 - A 23-cation request for a 24-Al framework was rejected.
 - The high-level smoothing wrapper retained the interpolated volume and included the population report.
 - Cell-size scaling was checked for 12-, 24-, and 96-cation reference cases.
+
