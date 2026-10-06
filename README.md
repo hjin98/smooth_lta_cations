@@ -55,6 +55,7 @@ Qualification and implementation-history evidence:
 - `V7_14_2_QUALIFICATION.md` - retained qualification evidence for the dry v7.14.2 base.
 - `qualification/v715/qualification-8eb6fac-run-37392966652.txt` - immutable raw focused/full/CLI/differential/package/PDF qualification record for executable candidate `8eb6fac1b7a9f0d354164239f10147d920f54833` and GitHub Actions run `37392966652`.
 - `qualification/v715/POST-IMPLEMENTATION-REVIEW.md` - independent SSDP 6.6.0 post-implementation PASS assessment of evidence head `b7101a29261b48a18c5358c62c766099c9232995`; it is review/evidence, not scientific authority.
+- `qualification/v715/CLOSEOUT.md` - terminal merge-readiness record for the completed v7.15 cycle, including the required non-squash lineage-preservation constraint.
 - `workplans/archive/V7.15-CHLORIDE-OCCLUSION.md` - completed historical implementation workplan. Current scientific/numerical meaning remains owned by the accepted specifications above.
 
 The one-shot v7.15 qualification workflow and temporary documentation render mosaics were retired after source-bound qualification. Git history preserves the exact workflow implementation; the candidate/run-bound records above preserve the material observations and assessment.
