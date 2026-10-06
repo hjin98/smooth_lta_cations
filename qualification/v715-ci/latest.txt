@@ -1,5 +1,5 @@
-head_sha=583bb6a2adde86d5a2119451f4f8a46793709b4f
-run_id=37391358326
+head_sha=2c35213d6556a9595dad67060fb782beb6faa662
+run_id=37391820103
 
 === focused ===
 .....................................                                    [100%]
@@ -11,7 +11,7 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-37 passed, 3 warnings in 22.90s
+37 passed, 3 warnings in 12.41s
 
 === full ===
 ........................................................................ [ 48%]
@@ -27,13 +27,14 @@ tests/test_v715_chloride_occlusion.py::test_smooth_cli_places_chloride_after_cat
     return parser.parse_structures(primitive=primitive)[0]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-147 passed, 5 warnings in 65.29s (0:01:05)
+147 passed, 5 warnings in 30.27s
 
 === occluded CLI end-to-end ===
 v7.15 occluded CLI CIF/POSCAR/LAMMPS round trip: PASS
 
 === v7.14.2 differential ===
 v7.14.2 differential dry serialization: PASS
+v7.14.2 differential dry report quantities: PASS
 4a596c784c27efe123b552bd3b4752b73dd05fc49bc6bf700a176ba637b784f1  /tmp/v7142/dry.POSCAR
 2102cc56e6bb2715d5ae1988701e2c29b35f2a27c6c57f1689ce869550f21d88  /tmp/v7142/dry.cif
 f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v7142/dry.data
@@ -41,21 +42,24 @@ f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v7142/dry
 2102cc56e6bb2715d5ae1988701e2c29b35f2a27c6c57f1689ce869550f21d88  /tmp/v715/dry.cif
 f2c607afbcd6345efc563bd80366415dc50c6084f8364f5cde53324a7104687a  /tmp/v715/dry.data
 
+=== package build ===
+v7.15 package build: PASS (lta_cation_generator-7.15.0-py3-none-any.whl)
+
 === documentation PDFs ===
-7dc7db0c5ead5765748654b037cb10e629d9fe5f86e9231f3a5e550722cfa7d3  doc/archs/lta_cation_generator_architecture.pdf
+7987bf453c6c4585475e18dca1c8dc084f17d8bce2012cfe9996b8b348bbda7f  doc/archs/lta_cation_generator_architecture.pdf
 doc/archs/lta_cation_generator_architecture.pdf pages=33
-ee2e03c520db737d5168eeec0c3a692c6a1344c17e20cb0e01a0e49a42d53d51  doc/specs/generate_smooth_lta_cations_grouped_spec.pdf
+c99795929b23473c740cd53c982b2679312237f61bca680ca835c788824f6911  doc/specs/generate_smooth_lta_cations_grouped_spec.pdf
 doc/specs/generate_smooth_lta_cations_grouped_spec.pdf pages=8
-b6f617bed9546aad2b6eaf33ee31d5584fc8094a695052515809fb4bf8ac771a  doc/specs/lta_cation_maxsym_io_spec.pdf
+beb07be42dec07911bd9c3be428b4ff7abe518186ecedc92eb022997d3694672  doc/specs/lta_cation_maxsym_io_spec.pdf
 doc/specs/lta_cation_maxsym_io_spec.pdf pages=8
-83cf6bd7db1d4cc9288ab4126cd1f8426d26f92dd0e5b60da9cf5c5420083f0b  doc/specs/lta_cation_maxsym_spec.pdf
+26f1143d9fb9bae136a964722ca54851992de0b249f7b44d34cf6532d856ce23  doc/specs/lta_cation_maxsym_spec.pdf
 doc/specs/lta_cation_maxsym_spec.pdf pages=12
-921272bbe176404b1a0a9cb2a247d018bbedd9042a677e737139237b61ad9ba5  doc/specs/lta_cation_population_grouped_spec.pdf
+18d4a2980bb21d7d8b8a33f180fc270c9d4b7c77afa3becc8bada5a810a9bbdc  doc/specs/lta_cation_population_grouped_spec.pdf
 doc/specs/lta_cation_population_grouped_spec.pdf pages=12
-62dbd1d7721283744ee840c50c352d2ea64c2bee1d54c62a96a5008e83f2f943  doc/specs/v7_13_group_i_ii_cation_extension.pdf
+c9746fe88a8e2f39c08160db6dc435caf95a9d976a714c67ca037a8de95ec4d5  doc/specs/v7_13_group_i_ii_cation_extension.pdf
 doc/specs/v7_13_group_i_ii_cation_extension.pdf pages=4
-159e1142b55eafe967fd2bba351088ab18ff6b11a4c20ce414c126dbf7dc698f  doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf
+8b8ac78b10ff1223f59b9c40faf4de5f09b482638be5f1ac4c266608d260d3a0  doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf
 doc/specs/v7_14_group_i_ii_volume_reference_extension.pdf pages=7
-be651965cc39197a3871c6e0877fd3e8c8abdd663ae5ea923fb177f3b53e6f6c  doc/specs/v7_15_chloride_occlusion_extension.pdf
+7b70c827badb7e89ef44caa1bb5b50cd84615ff3d6ea81bea856d0ca171eb738  doc/specs/v7_15_chloride_occlusion_extension.pdf
 doc/specs/v7_15_chloride_occlusion_extension.pdf pages=3
 v7.15 documentation PDF regeneration/render: PASS
