@@ -5,19 +5,22 @@ generate_smooth_lta_cations_grouped.py
 High-level grouped-site generator:
   1. Expand an LTA template CIF.
   2. Group split/off-center template coordinates into physical sites.
-  3. Randomly populate physical sites with supported Group I/II cations.
-  4. Require sum(z_i*N_i) = N_Al for charge neutrality (+1 Group I, +2 Group II).
-  5. Isotropically rescale the lattice using the charge-equivalent Group I/II
-     dry-LTA affine interpolation, with Na-A placeholder corners only where no
-     usable dry crystallographic volume datum exists, optionally multiplied by
+  3. Randomly populate the framework-compensating Group-I/II cations.
+  4. When sparse occlusion is requested, place separately accounted
+     occlusion-counterion cations on remaining grouped sites.
+  5. Require the framework charge invariant sum(z_i*N_i^fw)=N_Al and,
+     independently, the occlusion invariant sum(z_i*N_i^occ)=N_Cl.
+  6. Isotropically rescale the lattice using only framework-compensating counts
+     in the established dry-LTA affine interpolation, optionally multiplied by
      --volume-factor.
-  6. Analyze cation clustering.
-  7. If clustered, regenerate or greedily move ions to empty physical sites of
-     the same ring family, selecting one variant uniformly.
-  8. Repeat until accepted or until the attempt limit is reached.
-  9. Optionally reject final structures equivalent to earlier batch members under
-     the input CIF symmetry operations.
- 10. Write CIF, VASP POSCAR-format, or LAMMPS data according to the output filename.
+  7. Analyze and, if requested, repair cation clustering. Chloride is excluded
+     from the density heuristic.
+  8. After the final cation geometry is fixed, select alpha/beta cage-center Cl
+     guests and apply the hard periodic collision guard.
+  9. Dry symmetry-unique batching remains available only when occlusion is absent;
+     maximum-symmetry mode rejects nonzero occlusion before certification.
+ 10. Write the complete framework + cations + chloride structure as CIF, VASP
+     POSCAR-format, or LAMMPS data according to the output filename.
 
 Dry-volume reference sources:
 Carey et al., Chem. Mater. 26, 1561-1566 (2014), DOI 10.1021/cm403312q

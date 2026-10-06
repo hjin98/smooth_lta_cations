@@ -162,13 +162,13 @@ python lta_cation_population_grouped.py input.cif output.cif     --n4 Li:4,Na:0,
 
 Ratio inputs are supported through `--ratio4`, `--ratio6`, and `--ratio8`. Ratios are rounded independently within each physical-site family.
 
-The supported dry framework requires
+The supported framework-compensating cation population requires
 
 ```text
-sum_i z_i N_i = 24,
+sum_i z_i N_i^fw = 24,
 ```
 
-with `z_i=1` for Group I and `z_i=2` for Group II. The expanded framework must be Al24Si24O96; other framework counts are rejected by the user-facing generator.
+with `z_i=1` for Group I and `z_i=2` for Group II. In v7.15 occluded cells this remains an independent framework invariant; any additional `occlusion_counterion` population separately balances the requested chloride guests. The expanded framework must be Al24Si24O96; other framework counts are rejected by the user-facing generator.
 
 ## Symmetry-unique random batching
 
@@ -212,10 +212,10 @@ By default MS5 preserves the member's complete verified coordinate stabilizer. A
 The established affine dry-volume model is retained and generalized to mixed-valence compositions using **charge-equivalent fractions**:
 
 ```text
-V_ref = sum_i(z_i * N_i * V_i^(24)) / 24
+V_ref = sum_i(z_i * N_i^fw * V_i^(24)) / 24
 ```
 
-Here `z_i` is the formal cation charge, `N_i` is the number of ions, and `V_i^(24)` is the pure/effective dry-LTA corner volume for the supported 24-framework-Al reference cell. Because every supported generated structure satisfies `sum_i z_i N_i = 24`, the charge-equivalent weights `w_i=z_iN_i/24` sum exactly to one. For Li/Na/K-only cells this reduces exactly to the historical `sum(N_i V_i)/24` formula. The `/24` denominator is part of the present 24-Al model and must not be generalized to `/N_Al` without a new scientific definition of how the reference volumes scale.
+Here `z_i` is the formal cation charge, `N_i^fw` is the number of framework-compensating ions, and `V_i^(24)` is the pure/effective dry-LTA corner volume for the supported 24-framework-Al reference cell. Because the framework population independently satisfies `sum_i z_i N_i^fw = 24`, the dry-model charge-equivalent weights `w_i=z_iN_i^fw/24` sum exactly to one. Occlusion-counterion cations and Cl guests are excluded from this automatic reference. For dry Li/Na/K-only framework populations this reduces exactly to the historical `sum(N_i^fw V_i)/24` formula. The `/24` denominator is part of the present 24-Al model and must not be generalized to `/N_Al` without a new scientific definition of how the reference volumes scale.
 
 The v7.14 reference survey and bindings are:
 

@@ -342,10 +342,10 @@ interpolated_dry_target_volume(
 Returns `(reference_volume, target_volume)` in $\text{Angstrom}^3$. v7.14 generalizes the established affine interpolation to formal-charge equivalents:
 
 $$
-V_{\rm ref}=\frac{1}{24}\sum_i z_iN_iV_i^{(24)}.
+V_{\rm ref}=\frac{1}{24}\sum_i z_iN_i^{\rm fw}V_i^{(24)}.
 $$
 
-For the supported Al24Si24O96 cell, exact charge neutrality gives `sum_i z_i N_i = 24`, so the charge-equivalent weights sum to one. For Group-I-only compositions this is exactly the historical count-over-24 formula. `V_i^(24)` values are literature-derived measured or affine-extrapolated dry-LTA corners where a species-specific reference is bound. `H`, `Be`, `Fr`, and `Ra` use the standard Na-A corner as explicit placeholders because v7.14 binds no species-specific dry-LTA volume reference for them; this does not claim exhaustive absence from the literature. The input template volume is not used as a missing-species fallback. See `v7_14_group_i_ii_volume_reference_extension.md` for the source table and caveats.
+For the supported Al24Si24O96 cell, the framework-compensating population independently satisfies `sum_i z_i N_i^fw = 24`, so the dry-model charge-equivalent weights sum to one. Occlusion-counterion cations and Cl guests are excluded from this interpolation. For Group-I-only dry framework compositions this is exactly the historical count-over-24 formula. `V_i^(24)` values are literature-derived measured or affine-extrapolated dry-LTA corners where a species-specific reference is bound. `H`, `Be`, `Fr`, and `Ra` use the standard Na-A corner as explicit placeholders because v7.14 binds no species-specific dry-LTA volume reference for them; this does not claim exhaustive absence from the literature. The input template volume is not used as a missing-species fallback. See `v7_14_group_i_ii_volume_reference_extension.md` for the source table and caveats.
 
 The function rejects nonpositive/nonfinite volume factors and unsupported occupied species.
 
