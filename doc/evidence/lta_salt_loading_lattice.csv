@@ -1,0 +1,29 @@
+row,material,cation_form,salt,loading,T_K,a_A,a_esd_A,cell,method,grade,source_tag,note
+1,hydrated zeolite A (NIST RM 8851; 54% RH),Na,none,0,,24.589,0.002,Fm-3c,synchrotron XRD Le Bail,B,Q1,esd = 1 sd over 13 specimens; T ambient (not stated); SG printed Fd-3c in source (typo)
+2,dehydrated zeolite A (RM 8851; 200 C 24 h),Na,none,0,,24.560,0.006,Fm-3c,neutron powder Rietveld,B,Q1,esd = 1 sd over 11 specimens; T ambient (not stated)
+3,dehydrated zeolite A,Na,none,0,,24.555,0.002,Fm-3c,single-crystal XRD,C,Q4,via Q1 Table 17 and IZA-SC CIF record
+4,hydrated zeolite A,Na,none,0,,24.550,0.003,Fm-3c,single-crystal XRD (synchrotron),A,R25,room temperature (not given in K)
+5,hydrated zeolite A,Na,none,0,,24.61,0.01,Fm-3c,,C,Q1,Gramlich & Meier 1971 as quoted in Q1 Table 17 (2.461(1) nm)
+6,dehydrated Na12-A,Na,none,0,,12.263,,Pm-3m (by size),single-crystal XRD,A,Q6,COD record; no esd or T
+7,dehydrated K11.1-A,K,none,0,,12.317,,Pm-3m,single-crystal XRD,A,Q5,COD 1530597; no esd or T; used as dry K-A reference
+8,dehydrated K11-A,K,none,0,,12.309,,Pm-3m,single-crystal XRD,A,Q5,COD 1536625 (read via mirror); formula field O42 vs calculated O48; no esd or T
+9,dehydrated K-A (Si/Al-ordered refinement),K,none,0,,24.6,,Fm-3c,single-crystal XRD,A,Q5,COD 1541544; value truncated on record
+10,dehydrated Ag5.6K6.4-A,Ag/K,none,0,294,12.255,0.001,Pm-3m,single-crystal XRD,A,Q9,21 C
+11,anhydrous Tl12-A,Tl,none,0,294,12.153,0.004,Pm-3m,single-crystal XRD,A,Q7,
+12,dehydrated Ag-A,Ag,none,0,300,24.6636,0.0002,Fm-3c,synchrotron PXRD Rietveld,B,Q2,NTE: 24.6801 at 100 K
+13,hydrated Ag-A,Ag,none,0,300,24.5970,0.0002,Fm-3c,synchrotron PXRD Rietveld,B,Q2,24.5592 at 100 K
+14,dehydrated Ca6-A,Ca,none,0,,12.278,,Pm-3m,single-crystal XRD,A,Firor & Seff 1978,COD 4124433; context only
+15,dehydrated Sr-A (Al-deficient),Sr,none,0,,24.68,,Fm-3c,single-crystal XRD,A,Pluth & Smith 1982,COD 4124454; context only
+16,dehydrated Ba1Na10-A,Ba/Na,none,0,,12.262,0.003,Pm-3m,single-crystal XRD,A,Q26,context only; Q26 defined in lta_coordination_numbers.md
+17,dehydrated Ba3.5Na5-A,Ba/Na,none,0,,12.267,0.007,Pm-3m,single-crystal XRD,A,Q26,context only; Q26 defined in lta_coordination_numbers.md
+18,partially dehydrated Ba6-A,Ba,none,0,,12.189,0.002,Pm-3m,single-crystal XRD,A,Q26,context only; Q26 defined in lta_coordination_numbers.md
+19,dehydrated Cs7.3Ag4.7-A,Cs/Ag,none,0,,12.282,0.001,Pm-3m,single-crystal XRD,A,Kim & Seff 1984,context only
+20,ITQ-29 (pure-silica LTA),none,none,0,300,11.853,0.002,Pm-3m,PXRD Rietveld,B,Q2,11.872 at 100 K
+21,K9(K4Br)0.75Ag4Br4-LTA,K/Ag,KBr (methanol solution route),4 Br per pseudo-cell,294,12.186,0.001,Pm-3m,single-crystal XRD,A,R28,halide-loaded analogue; hydration state not stated; f_a vs row 7 = 0.9894 (row 7 T not stated)
+22,K2.35Ag1.1(Ag4Cl4)0.45(C3H3O3)1.1(K3Cl)3.45(K3(OH)2)0.55(H2O)>=3-LTA,K/Ag,KCl (solution route),5.25 Cl per pseudo-cell,294,12.292,0.001,Pm-3m,single-crystal XRD,A,R27,hydrated and contains organics; no matched dry reference
+23,Ta0.123(TaCl6Tl3)0.246Tl9.84[Si13.4Al10.6O48]-LTA,Tl,TaCl5 vapour (473 K),1.5 Cl per pseudo-cell,,12.099,0.001,Pm-3m,single-crystal XRD,A,Q8,framework dealuminated; f_a vs row 11 = 0.9956 (row 23 T not stated); context only
+24,(WCl)0.6(Tl7Cl6)0.5Tl8.5-LTA,Tl,WCl6 vapour (453 K),3.6 Cl per pseudo-cell,,12.061,0.001,Pm-3m,single-crystal XRD,A,R30,"verified by review 3; f_a vs row 11 = 0.9924; W/Tl system, context only"
+25,zeolite 4A + LiCl-KCl eutectic (in situ),Na,LiCl-KCl eutectic,30 wt% salt (salt-mass basis; 13.2 Cl per pseudo-cell if all occluded),650-800,unavailable,,Pm-3m/Fm-3c,in-situ synchrotron XRD (DSC/XRD),B,R18,"contraction from ~450 K; new LTA phase with significantly smaller a from ~650 K; numbers only in figures; original phase is itself partly loaded above ~450 K, so a_new/a_orig is only an upper bound on f_a"
+26,zeolite 4A + UCl3-LiCl-KCl (in situ),Na,UCl3-LiCl-KCl eutectic,30.14 wt% salt,450-800,unavailable,,,in-situ synchrotron XRD,B,R19,significant contraction from 450 K; numbers only in Fig. 3
+27,zeolite 4A + LiCl-KCl: bound,Na,LiCl-KCl eutectic,near capacity (inferred),650-800,f_a >= 0.972,,ratio,derived from R18 Fig. 3 2-theta window 17.3-17.8 deg (lambda 1.1273 A),E,R18,"f_a >= sin(8.65 deg)/sin(8.90 deg); window from axis labels only; assumes all relevant peaks (orig. at ~450 K max, new up to 800 K) inside it; mixes T"
+28,zeolite 4A + LiCl-KCl: working value,Na,LiCl-KCl eutectic,~10-11 Cl per pseudo-cell,650-800,f_a = 0.99 +/- 0.01 (f_V = 0.97 +/- 0.03),,ratio,"estimate from K/Br halide-loaded analogue (rows 21/7, 21/8: 0.989-0.990); Tl pairs context only",E,-,provisional; basis data are rows 21/7 and 21/8 at 294 K with 4 Br per pseudo-cell; the T and loading columns give the intended application (assumed transferable); replace with digitised R18 data or DFT/MLFF relaxation
