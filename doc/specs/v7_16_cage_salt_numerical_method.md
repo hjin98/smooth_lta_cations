@@ -14,471 +14,572 @@ header-includes:
 
 # v7.16 cage-salt construction: numerical method (D2)
 
-**Lifecycle: PROPOSED (D2 draft, not accepted).**
+**Lifecycle: PROPOSED (D2 draft r1, not accepted).**
 - **Drafted:** 2026-10-17 by an AI agent (Claude Code session
   https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi), under workplan
   `LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1.
 - **Parent:** the accepted-current D1
   `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7, human-ratified
   2026-10-17), cited as **D1 §n**.
-- **Status of choices:** every parameter value below is an agent-proposed
-  D2 default (§10) until this document is accepted.
-- **Acceptance gate:** independent falsification review. The method can
-  change which structures are produced and when a request fails, so human
-  acknowledgement is also requested (§12).
+- **r1 folds in independent D2 review 1 (§13).** That review raised two
+  SERIOUS CHALLENGES and 15 findings.
+- **Status of choices:** every parameter value is an agent-proposed D2
+  default (§10) until this document is accepted.
+- **Acceptance gate:** independent review, then human acknowledgement of the
+  output-changing choices (§12).
 
 ## 1. Scope and what D2 must preserve
 
-D2 turns the D1 §16 hand-off into a method. These D1 invariants hold
-throughout, and nothing below may weaken them:
-- **Inventory.** Inventory and charge invariants are exact (D1 §4). Each
+These D1 invariants hold throughout:
+- **Inventory.** Inventory and charge invariants are exact (D1 §4), and each
   `cage_salt` ion stays in its own cage (S-10).
-- **Hard minima.** The D1 §6 minima d_ij ≥ r_cut(i, j) hold on the written
-  coordinates, with no tolerance below r_cut. The 1.5 Å catastrophic guard
-  also holds.
-- **Coordination.** Anchoring holds, together with the per-ion coordination
-  rule max(1, ⌈a·C_M(c)⌉) ≤ N_i(Cl) ≤ U_M (D1 §7, S-11, a = 0.4). Under the
-  S-12 fallback, the mean rule (A) with a = 0.7 applies instead.
-- **Cage charge.** |q_c| ≤ q_max(c) = z_max(c)·e (D1 §4).
-- **Ring relocation.** Ring-family limits apply (D1 §8, D-12).
+- **Hard minima.** d_ij ≥ r_cut(i, j) holds on the written coordinates (D1
+  §6), and so does the 1.5 Å guard.
+- **Coordination.** Anchoring holds, together with
+  max(1, ⌈a·C_M(c)⌉) ≤ N_i(Cl) ≤ U_M (D1 §7, S-11, a = 0.4). Under the S-12
+  fallback, rule A with a = 0.7 applies instead.
+- **Cage charge.** |q_c| ≤ q_max(c) (D1 §4).
+- **Ring relocation.** D-12 limits apply (D1 §8): a ring cation moves only to
+  a site or variant that *resolves* its conflict; otherwise it stays.
 - **Order and streams.** The construction order and stream isolation of D1
-  §11 apply. Steps 1-3 (legacy framework stream, v7.15 counterion stream,
-  smoothing) are untouched.
+  §11 apply.
 - **Fail-closed.** No structure is written unless every check passes.
-- **No sampling claim.** No uniform, equilibrium or Boltzmann sampling is
-  claimed (D1 §2, D-9).
+- **No sampling claim.** No sampling law is claimed (D-9).
 
-**Out of scope.** Architecture (modules, data structures, CLI, schema) is D3.
-D2 fixes only the numerical identities those layers must honour (§11).
+**D2 readings of D1, recorded for the D1 owner.** These change no meaning.
+- **(R-1) Cage membership applies to `cage_salt` ions only.** D1 §4 requires
+  every "role, cage and species count" to equal its input. Ring roles have
+  per-family inputs, not per-cage inputs, so for them the exact check is per
+  ring family, physical site and species.
+  - The reason this matters (review SC-1): on the canonical template, every 8R
+    site and variant is equidistant from α₀ and α₁, at 6.267 Å. A
+    nearest-centre test on ring cations would be decided by float noise.
+- **(R-2) Window weights w(j, c) are fixed per physical site** by ring-window
+  topology on the canonical, gated template (§4.3). They are never derived
+  from distances to individual variants.
 
 ## 2. Definitions
 
 - **Cell and metric.**
-  - L is the 3×3 lattice matrix of the realized, scaled cell (rows are
-    lattice vectors, Å).
-  - Fractional and Cartesian coordinates are related by r = f L.
-  - The minimum-image distance is d(r₁, r₂) = ‖(f − round(f)) L‖, with
-    f = (r₁ − r₂) L⁻¹.
-  - Because max r_min1 = 5.01 Å is less than half the smallest
-    perpendicular cell width (about 7.1 Å), a single image suffices for every
-    pair query below (verified in D1 review 1).
+  - L is the lattice matrix of the cell in use (rows are lattice vectors, Å),
+    and r = f L.
+  - d(r₁, r₂) = ‖(f − round(f)) L‖ with f = (r₁ − r₂) L⁻¹ is the
+    minimum-image distance. It is single-image exact when
+    max r_min1 + 0.1 Å < ½ min_k(perpendicular width k).
+  - That precondition holds on the canonical cell (7.09 Å against 5.11 Å).
+    It is checked at run time, and a violation fails closed. A small
+    `--volume-factor` (below about 0.35) would violate it.
 - **Ions and sets.**
-  - S is the set of `cage_salt` ions.
-  - R is the set of ring cations (roles `framework` and
-    `occlusion_counterion`).
-  - F_O is the set of framework O atoms, and F the set of all framework
-    atoms.
-  - Each ion i has a formal charge z_i and a species.
-- **Pair tables.** From the D1-bound E-pair CSV:
-  - r_cut(i, j) and r_min1(i, j) are read exactly as D1 §6 and §7 define;
-  - the Cl–Cl and Cl–O "around M" rows use the D1 §6 cell-wide weights x_M.
-  - ρ_cut(i, j) = r_cut(i, j) + δ_b is the build target, with build margin
-    δ_b > 0 (§10). Verification uses r_cut itself.
-- **Cage centres.**
+  - S: `cage_salt` ions.
+  - R: ring cations (`framework` and `occlusion_counterion`).
+  - F_O: framework O atoms; F: all framework atoms.
+- **Pair tables.**
+  - r_cut and r_min1 come from the D1-bound E-pair CSV, with the D1 §6 rows
+    and weights x_M.
+  - The build target is ρ_cut = r_cut + δ_b.
+- **Cage centres and membership.**
   - c ∈ {α₀, α₁, β₀, β₁}, at the D1 §3 canonical fractional positions.
-  - home(i) is the cage assigned to ion i by input.
-  - margin(i) = min_{c' ≠ home(i)} d(i, c') − d(i, home(i)) is its
-    membership margin.
+  - home(i) is the cage of i ∈ S.
+  - margin(i) = min_{c' ≠ home(i)} d(i, c') − d(i, home(i)).
 - **Coordination count.**
-  - For ions i and j of opposite charge, j is a first neighbour of i iff
+  - j is a first neighbour of i iff they have opposite charge and
     d(i, j) < r_min1(i, j).
-  - N_i is the number of first neighbours of i, counted over all ions in the
-    cell in any role and any cage.
-- **Floor and cap.**
-  - L_i is the per-ion coordination floor, and U_i = U_M for species M (D1
-    §7).
-  - For α `cage_salt` cations: L_i = max(1, ⌈a·C_M(c) − 10⁻⁹⌉). The −10⁻⁹
-    guard stops float error from raising an exact integer.
-  - For β `cage_salt` cations and for every Cl: L_i = 1 (anchoring), and
-    there is no cap.
+  - N_i counts first neighbours over all ions, in any role and any cage.
+- **Floors and caps.**
+  - For α `cage_salt` cations: L_i = max(1, ⌈a·C_M(c) − 10⁻⁹⌉) and
+    U_i = U_M.
+  - For β `cage_salt` cations and all Cl: L_i = 1 and there is no cap.
+- **Writer tolerance band.** τ_w = 10⁻⁵ Å (§7).
 
-## 3. Pipeline (concretizes D1 §11)
+## 3. Pipeline (concretizes D1 §11; scaling order fixed after review finding 9)
 
-| Step | Operation | Stream | D2 section |
+| Step | Operation | Cell | Stream |
 |---|---|---|---|
-| 1 | framework ring placement | legacy `random.Random(seed)` | unchanged |
-| 2 | `occlusion_counterion` placement | v7.15 secondary stream | unchanged |
-| 3 | cation density smoothing (smoothing entry point only) | existing | unchanged |
-| 4 | charge rebalancing | R_q = `v7.16-charge-rebalance:{seed}` | §5 |
-| 5 | V_target = f_V(n̄)·V_ref and cell scaling | none (deterministic) | §4.1 |
-| 6 | V_eff, n_melt and floors L_i | none (deterministic) | §4.2 |
-| 7 | cage-salt build with D-12 relocation | R_s = `v7.16-cage-salt:{seed}` | §6 |
-| 8 | exact verification on the coordinates to be written | none | §7 |
-| 9 | write | none | D3 |
+| 1 | framework ring placement | V_ref cell (volume factor 1) | legacy `random.Random(seed)` |
+| 2 | `occlusion_counterion` placement | V_ref cell | v7.15 secondary (`random.Random`, SHA-256 `v7.15-occlusion:{seed}`) |
+| 3 | cation density smoothing (smoothing entry point only) | V_ref cell | existing |
+| 4 | charge rebalancing (§5) | topology only | R_q |
+| 5 | isotropic scaling to V_target = f·V_ref (§4.1) | → final cell | none |
+| 6 | V_eff, n_melt, floors (§4.2) | final cell | none |
+| 7 | cage-salt build with D-12 relocation (§6) | final cell | R_s,k for start k |
+| 8 | exact verification (§7) | final cell | none |
+| 9 | write | final cell | none |
 
-- **Order of steps 4 and 5.** Step 5 depends only on the inputs, so it may be
-  applied while the population is built, as v7.14/v7.15 already do. It must
-  precede steps 6-8.
-- **Derived streams.** Each derived stream is a NumPy `Generator(PCG64)`
-  seeded with the first 8 bytes of SHA-256 of its tag string. This follows
-  the v7.15 `v7.15-occlusion:{seed}` pattern. With seed = None, each stream
-  is seeded from OS entropy and the run is not reproducible, as in v7.15.
-- **Smoothing entry point.** That entry point tries several attempt seeds
-  and selects one population. Steps 4-8 run once, on the selected population,
-  using that population's attempt seed. This mirrors v7.15
-  `finalize_occluded_chlorides`.
+- **Smoothing on the V_ref cell.** In cage-salt mode, smoothing always runs
+  on the V_ref cell, which is the v7.14 dry reference at volume factor 1. The
+  salt-dependent f_V, or an explicit override, is applied only at step 5.
+  - Consequence: steps 1-3 are byte-identical to the same population request
+    with the cage-salt model disabled and volume factor 1.
+  - This differs from v7.15, which scales before smoothing. Legacy and dry
+    paths keep their existing behaviour.
+- **Smoothing entry point.** Steps 4-9 run once, on the population the
+  attempt loop selected, using that attempt's integer seed. That seed is
+  drawn from `master_rng` and logged, so smoothing-entry-point runs are
+  reproducible from the logged seed even when the user gives no seed.
+- **Derived streams.**
+  - seed_int(tag) = int.from_bytes(SHA-256(tag)[:8], "big").
+  - R_q = `numpy.random.Generator(PCG64(seed_int("v7.16-charge-rebalance:{seed}")))`.
+  - R_s,k = the same construction with tag `v7.16-cage-salt:{seed}:start{k}`.
+    Each restart has its own substream, so start k does not depend on how
+    many draws earlier starts consumed.
+  - A direct library call with seed = None is not reproducible, as in v7.15.
 
 ## 4. Deterministic quantities
 
 ### 4.1 Volume
 
-- n̄ = N_Cl/2 and f_V(n̄) = 1 − 0.03·min(n̄/10.5, 1) (D1 §9).
-- An explicit `--volume-factor` replaces f_V.
-- V_target = f·V_ref, and isotropic scaling follows v7.14.
+- n̄ = N_Cl/2 and f_V(n̄) = 1 − 0.03·min(n̄/10.5, 1).
+- An explicit `--volume-factor` replaces f_V (D1 §9).
+- The cell is scaled isotropically by s = f^{1/3}, and fractional
+  coordinates are unchanged.
 
-### 4.2 Effective volume V_eff,α(c; d) and n_melt
+### 4.2 Effective volume (revised after review finding 5)
 
-**Estimator.** Deterministic midpoint quadrature on the fractional grid:
+**Estimator.** Midpoint quadrature on a *fixed* fractional grid of size
+G = 192, the same for every cell scale:
 
 ```
-f_{ijk} = ((i + 1/2)/G, (j + 1/2)/G, (k + 1/2)/G),   i, j, k = 0..G-1
-V_eff(c; d) = (V_cell / G^3) * #{ f_ijk : nearest_centre(f_ijk) = c  and  min_{o in F_O} d(f_ijk, o) > d }
+f_ijk = ((i + 1/2)/G, (j + 1/2)/G, (k + 1/2)/G)
+V_eff(c; d) = (V_cell / G^3) * sum_ijk  w_ijk(c) * [ min_{o in F_O} d(f_ijk, o) > d ]
 ```
 
-- **Grid.** G is the smallest integer with max_k |a_k|/G ≤ h, where |a_k| are
-  the lattice-vector lengths and h = 0.10 Å.
-- **Offset.** The half-step offset keeps grid points off the partition
-  bisector planes of the canonical centres. On the fixture, review 3 found
-  that an aligned grid biases V by −1.2 %.
-- **Ties.** A grid point equidistant from two centres within 10⁻⁹ Å is
-  assigned to the cage first in the order α₀, α₁, β₀, β₁.
+- **Tie sharing.** w_ijk(c) = 1/m if c is one of the m cage centres
+  equidistant (within 10⁻⁹ Å) from f_ijk at the minimum distance, and 0
+  otherwise. Ties are shared, never assigned by order.
+- **Why G is commensurate.** G is a multiple of 8, matching the
+  (¼, ¼, ¼) centre lattice. Symmetric cages then get identical volumes. A
+  non-commensurate G aliases: G = 174 gave ±1 % at d = 0.
+- **Scale consistency.** The grid is fixed in fractional coordinates, so
+  V_eff(scaled cell; d) = s³·V_eff(V_ref cell; d/s) holds exactly. n_melt
+  therefore has no grid jitter as the loading changes f_V.
+- **Accuracy (measured; agent, 2026-10-17, fixture at V_ref).**
+  - At d = 0 each cell must be exactly V/4 = 925.823 Å³; the estimator gives
+    925.82 Å³ for all four cages.
+  - At d = 1.62 Å it gives α₀ = α₁ = 809.05 Å³, against a 2×10⁷-point
+    Monte Carlo reference of 808.6 ± 0.34 Å³ (review 1), i.e. +0.06 %.
+  - The requirement is |error| ≤ 0.5 %. It is checked by these two oracles at
+    qualification, not by grid refinement, because the error is not monotone
+    in G.
+- **Cost.** About 8 s for G = 192 with a KD-tree over periodic images. It is
+  computed once per structure, or cached per V_ref cell and scaled through
+  the identity.
+- **Derived quantities.** d_wall(c), x_Li(c), v_pair, n_melt(c), the range,
+  φ(c), C_M(c) and L_i follow exactly as D1 §7 defines them. They are fixed
+  before step 7.
 
-**Error.** The indicator-function quadrature error scales with the surface
-area times h. The required accuracy is |V(G) − V(2G)|/V ≤ 0.5 % on the
-canonical fixture, checked at qualification (§9).
-- A 0.5 % volume error moves a·C by at most 0.5 %. That can flip
-  ⌈a·C⌉ only when a·C is within 0.5 % of an integer.
-- Such cases are deterministic, so they are reproducible, and they are
-  reported with their margin (§8).
+### 4.3 Window classes and charge (revised after review findings 2-3)
 
-**Dependent quantities.**
-- d_wall(c), x_Li(c), v_pair, n_melt(c), the reported range (± 0.3 Å),
-  φ(c), C_M(c) and L_i follow exactly as defined in D1 §7.
-- They are computed once per structure, after step 5 and before step 7.
-- They depend only on the inventory and the scaled cell, so the build cannot
-  change them.
+**Window table (fixed per physical site, from the canonical template's
+site anchors).** This is a property of the gated template, so it is stored
+as a table keyed by site_id and checked at load.
 
-### 4.3 Cage charge observable
+| Family | Rule | Weights | Classes on the template |
+|---|---|---|---|
+| 4R | the nearest cage centre (an α) | w = 1 | 4R@α₀ (12 sites), 4R@α₁ (12) |
+| 6R | the nearest β and the nearest α | ½ / ½ | 6R@(β_k, α_l), 4 sites each |
+| 8R | the two α sharing the window | ½ / ½ | 8R@(α₀, α₁), 6 sites |
 
-q_c^exc, q_c^fw, the weights w(j, c) and z_max(c) are as defined in D1 §4.
-They are computed in exact rational arithmetic, as halves of integers, so
-the comparisons |q_c| ≤ q_max(c) involve no floating-point rounding.
+**Charge and threshold.**
+- q_c^exc and q_c^fw are as in D1 §4, held as exact fractions. q_c^fw
+  subtracts a same-type mean, so q_c is a multiple of ¼.
+- q_max(c) = z_max(c)·e. z_max(c) is the largest formal charge among the
+  cations that contribute to c: its `cage_salt` cations and every ring cation
+  with w(j, c) > 0. It is evaluated *on the configuration under test*, so a
+  counterion moving into a window can raise it.
+- **Excess-only check.** In the up-front check (§5), framework cations are
+  excluded, both from q and from z_max.
+- **No contributing cation.** If no cation contributes to c, z_max(c) = 1.
+  This is a D2 default filling an undefined case; it is the smallest
+  supported charge, so it is conservative.
 
-## 5. Charge rebalancing (step 4): exact, not heuristic
+## 5. Charge rebalancing (step 4): exact
 
-**Classes.** Ring sites fall into *window classes* by their weight pattern
-w(·, c). On the canonical template these are:
-- 4R@α₀ and 4R@α₁;
-- 6R@(β_k, α_l), four classes;
-- 8R@(α₀, α₁).
-
-Every site in a class contributes identically to every q_c.
-
-**Exact class-count search.** A counterion's ring family and species are
-fixed by input. The decision is therefore an integer vector: for each
-family, species and class, how many counterions sit there.
+**Decision variables.**
+- Counterions are aggregated into groups (family, charge z ∈ {1, 2}).
+  Species of equal charge are interchangeable for q_c and z_max.
+- The decision is the integer vector n[g, class]: how many counterions of
+  group g occupy each class of g's family.
 - The capacity of a class is its number of sites that are empty after step 3
-  or already hold an `occlusion_counterion`.
-- The search space is the product over families of the compositions of each
-  species count into that family's classes: at most a few times 10⁴ vectors.
-- It is enumerated exhaustively.
+  or hold an `occlusion_counterion`.
 
-Among feasible vectors with every |q_c| ≤ q_max(c), choose lexicographically
-the one that minimises:
-1. the number of counterions that change class from their step-3 placement;
+**Search size (corrected).** The number of candidate vectors is
+Π_g C(n_g + k_g − 1, k_g − 1), with k = 2, 4 and 1 classes for 4R, 6R and 8R.
+- Over all admissible inputs (Q_exc ≤ 26, capacities 24/16/6), the worst
+  case is 163,072 vectors. Agent enumeration found it at
+  (4R: 3 singly and 1 doubly charged; 6R: 11 singly and 5 doubly charged).
+- Each vector costs O(1) to evaluate, so exhaustive enumeration is exact and
+  costs well under a second.
+
+**Objective.** Among vectors meeting every capacity and every
+|q_c| ≤ q_max(c), choose lexicographically by:
+1. the number of counterions whose class differs from step 3;
 2. Σ_c q_c²;
-3. the lexicographically smallest vector in a fixed canonical order.
+3. the lexicographically smallest vector in canonical order. Groups are
+   ordered by family (4, 6, 8), then charge; classes are ordered 4R@α₀,
+   4R@α₁, 6R@(β₀,α₀), 6R@(β₀,α₁), 6R@(β₁,α₀), 6R@(β₁,α₁), 8R.
 
-If no vector is feasible, this is a *seed-level failure*: the run reports the
-best achievable max_c(|q_c| − q_max(c)) and the blocking framework sites.
+**Infeasible.** If no vector is feasible, this is a seed-level failure. The
+run reports min over vectors of max_c(|q_c| − q_max(c)) and the framework
+sites blocking it.
 
-**Up-front check.** This is the same search with step-3 occupancy ignored
-(every site of each family available) and q_c^fw ≡ 0. It is the deliberately
-stricter input rule of D1 §4, run before any placement.
+**Up-front check.** The same search, with every site of each family
+available and framework cations excluded, is the deliberately stricter input
+rule of D1 §4.
 
-**Realization.**
-- Counterions already in a class that keeps them stay where they are.
-- Each counterion leaving an over-full class moves to a site of a
-  deficient class of the same family. Both the counterion and the target
-  site are chosen with R_q, uniformly among the empty sites of that class.
-- Departing counterions are taken in canonical site-id order.
-- This changes smoothed positions; the moves are reported (D1 §4).
+**Realization (deterministic up to R_q).** Within each group, for each class
+with a surplus:
+- the surplus counterions leave in ascending (site_id, species) order;
+- each is assigned to a class with a deficit, in canonical class order;
+- its target site is drawn uniformly from that class's empty sites with R_q,
+  and its variant uniformly from that site's variants with R_q, as v7.15
+  placement does.
+
+The report keeps only the chosen vector, its objective, and the next 5 best
+vectors.
 
 ## 6. Cage-salt build (step 7)
 
 ### 6.1 Variables and objective
 
-- **Variables.** The Cartesian positions x ∈ ℝ^{3|S|} of the `cage_salt`
-  ions. Ring cations and framework atoms are fixed except through discrete
-  D-12 moves (§6.4).
+- **Variables.** The positions x ∈ ℝ^{3|S|}. Ring and framework atoms are
+  fixed except through §6.4.
 - **Penalty function.** h(u) = max(0, u)².
-- **Smooth count.** s_i(x) = Σ_{j opposite charge} σ((r_min1(i, j) − d_ij)/w),
-  where σ is the logistic function and w = 0.12 Å.
-
-The objective at weight W is:
+- **Smooth count.** s_i = Σ_{j opposite} σ((r_min1(i, j) − d_ij)/w).
 
 ```
 E_W(x) = W * [ sum_{i<j in S} h(rho_cut(i,j) - d_ij)
              + sum_{i in S, k in R} h(rho_cut(i,k) - d_ik)
              + sum_{i in S, o in F_O} h(rho_cut(i,o) - d_io)
              + sum_{i in S, k in F} h(1.5 + delta_b - d_ik)
-             + sum_{i in S} h(eps_m - margin(i)) ]
+             + sum_{i in S} h(eps_m - margin(i))
+             + sum_{i in S, j opposite to i} h(delta_cn - |d_ij - r_min1(i,j)|) ]
          + sum_{i in S, cation} [ h(L_i + mu - s_i) + h(s_i - (U_i - mu)) ]
          + sum_{i in S, Cl}      h(1 + mu - s_i)
 ```
 
-- The hard terms are exact-zero at feasibility and once differentiable.
-- The count terms push the smooth count beyond the discrete threshold by a
-  margin μ, so the discrete count passes.
-- Ring-cation and framework positions enter only as fixed parameters.
+- **Dead-zone term (added after review finding 6).** It pushes every
+  opposite-charge pair at least δ_cn away from its counting boundary r_min1.
+  Smooth and discrete counts then agree away from the boundary.
+- **The count terms remain a heuristic.** For example, a smooth count of
+  2.59 is reachable with one true neighbour and four just outside r_min1.
+  Only the exact verification (§7) decides acceptance.
+- **Smoothness.** E_W is piecewise C¹: h is C¹. It is not differentiable
+  where margin(i) switches the minimizing centre, where the minimum image
+  switches, or at d = 0. L-BFGS-B tolerates these measure-zero sets in
+  practice, and §7 catches any failure.
 
-### 6.2 Initialization (one start)
+### 6.2 Initialization (start k, stream R_s,k)
 
-- **Order.** Ions are inserted in an order drawn from R_s.
-- **Candidates.** For each ion, positions are drawn uniformly in the cell from
-  R_s. A candidate is accepted when:
-  - it lies in home(i), with margin ≥ ε_m;
-  - it is at least ρ_cut from every framework O, every ring cation and
-    every salt ion already placed.
-- **Fallback.** After M_ins = 2000 rejected candidates, the candidate with the
-  smallest maximum violation is kept. Relaxation (§6.3) then removes the
-  overlap.
-- **Purpose.** This is random sequential insertion with a hard core. It is
-  an initial condition, not a sampling law.
+- **Order.** Ions are inserted in an order drawn from R_s,k.
+- **Candidates.** Each position is drawn uniformly in the cell. A candidate
+  is accepted if:
+  - margin ≥ ε_m;
+  - it is at least ρ_cut from every framework O, ring cation and placed salt
+    ion;
+  - it is at least 1.5 + δ_b from every framework atom.
+- **Fallback.** After M_ins = 2000 rejections, the candidate with the
+  smallest sum of squared violations is kept.
 
-### 6.3 Relaxation and coordination shaping (continuation)
+### 6.3 Relaxation and shaping
 
-- **Minimizer.** L-BFGS-B minimises E_W from the start, with
-  W = 10, 100 and 1000 in turn. Each stage starts from the previous result,
-  with at most 6000 iterations per stage.
-- **Gradients** are analytic.
-- **No tolerance trust.** The minimiser's convergence flag is not used.
-  Acceptance is decided only by the exact verification (§7).
+- **Minimizer.** L-BFGS-B (SciPy) minimises E_W at W = 10, 100 and 1000 in
+  turn, each stage starting from the previous one.
+- **Options:** maxiter 6000, maxfun 15000, maxcor 10, ftol 2.2×10⁻⁹,
+  gtol 10⁻⁵, maxls 20.
+- The minimiser's success flag is ignored; §7 decides.
 
-### 6.4 D-12 relocation (discrete, within the start)
+### 6.4 D-12 relocation (corrected after review finding 4)
 
-If verification fails on hard minima involving a ring cation k, one
-relocation round runs. In descending order of violation, each conflicting
-ring cation is offered the candidate sites allowed by D1 §8:
-- empty sites of its own family;
-- other variants of its own physical site (O1a).
-
-A candidate is accepted only if all three hold:
-1. it strictly reduces k's maximum violation against S;
-2. it keeps every |q_c| ≤ q_max(c) (§4.3, recomputed exactly);
-3. it is the best such candidate. Ties are broken by canonical
-   (site_id, variant_id) order, then R_s.
-
-After a round with at least one move, §6.3 is re-run from the current x. At
-most R_reloc = 4 rounds are allowed per start.
+If §7 fails on a hard minimum involving a ring cation k:
+- **Candidates.** k is offered its D1 §8 candidates: empty sites of its
+  family, and the other variants of its own site.
+- **Acceptance.** A candidate is accepted only if it *resolves* every
+  violation between k and S at the current x (all d ≥ ρ_cut, guard
+  satisfied) and keeps every |q_c| ≤ q_max(c).
+- **Choice.** Among accepted candidates, the one with the largest minimum
+  slack against S is taken; ties go to ascending (site_id, variant_id). If
+  none qualifies, k stays.
+- **Order.** Conflicting ring cations are processed in descending order of
+  their maximum violation; ties go by site_id.
+- **Rounds.** After any move, §6.3 is re-run from x. At most R_reloc = 4
+  rounds are allowed per start.
 
 ### 6.5 Restarts and fail-closed
 
-- Starts s = 1..K_max with K_max = 20 are run in order.
-- The first start whose structure passes §7 is returned. This is
-  *first-success*: later starts are never run, so the output does not depend
-  on K_max beyond s.
-- If no start passes, the run fails closed. It writes no structure and
-  reports, per start, the best slack per constraint class and the CN
-  deficits.
+- Starts k = 1..K_max with K_max = 20 are run in order, and the first that
+  passes §7 is returned (first-success). The output of a successful run is
+  therefore independent of K_max.
+- If no start passes, the run fails closed. The report gives, per start, the
+  best slack per constraint class and the CN deficit and excess.
+- **Cost (review estimate).** Typically 10-20 s per start, and a worst case
+  of about 3.7 min with all relocation rounds. A failing request at
+  K_max = 20 can take about 75 min. That is acceptable for an
+  initial-structure generator, and it is reported.
 
 ### 6.6 Fallback rule A (S-12, only if adopted at qualification)
 
-The count terms of §6.1 are replaced by a smooth version of the per-cage,
-per-species mean condition. Here μ is applied to the mean, the pooling of D1
-§7 is used, and anchoring and U_M stay per-ion. Everything else is
-unchanged.
+The cation count terms become a smooth version of the per-cage, per-species
+mean condition:
 
-## 7. Exact verification (step 8)
+```
+sum_{i in M, c} N_i >= sum_{i in M, c} 0.7 * C_M(c)
+```
 
-Verification runs on the *coordinates that will be written*.
-- **Canonicalisation.** Fractional coordinates are rounded to 10 decimals,
-  wrapped into [0, 1), and every writer emits these. Re-checking from a
-  writer's output must reproduce the same result (D4 test).
-- **Pairs.** All pairwise distances are computed by brute force in float64
-  under §2's minimum image, with no neighbour-list approximation. With at
-  most a few hundred atoms this costs O(10⁵) pairs.
+- With pooling for small populations (D1 §7), the sum runs over both α-cages,
+  with each ion carrying its own cage's C. That makes pooling well-defined
+  when C differs between the two cages.
+- Anchoring and U_M stay per ion, and everything else is unchanged.
 
-| # | Check (all must pass) | Tolerance |
+## 7. Exact verification (step 8; revised after review SC-2)
+
+**What is verified.**
+- The canonical coordinates are the fractional coordinates rounded to 10
+  decimals and wrapped into [0, 1), together with the lattice.
+- All writers serialize from these. The existing writers quantize further:
+  CIF and POSCAR to 8 significant figures, and LAMMPS to 8 decimals in its
+  rotated Cartesian frame. That worst-case quantization is below 10⁻⁶ Å per
+  coordinate, so τ_w = 10⁻⁵ Å covers it.
+- Verification is brute-force O(N²) in float64 on the canonical coordinates,
+  with the margins below. Every check therefore keeps its verdict after any
+  writer's quantization.
+
+| # | Check | Margin |
 |---|---|---|
-| V1 | Per-cage, per-role, per-species inventory, by strict nearest centre (margin > 0) | exact |
-| V2 | d_ij ≥ r_cut(i, j) for every pair with at least one `cage_salt` ion, including ring cations and framework O; d ≥ 1.5 Å to every atom | none below r_cut |
-| V3 | Anchoring and L_i ≤ N_i ≤ U_i (or rule A if adopted) | exact integer counts |
-| V4 | Every |q_c| ≤ q_max(c) | exact rational |
+| V1 | `cage_salt` inventory per cage and species, by nearest centre (R-1); ring roles per family, site and species | margin(i) ≥ τ_w |
+| V2 | d_ij ≥ r_cut(i, j) + τ_w for every pair with at least one `cage_salt` ion, against ring cations and framework O; d ≥ 1.5 + τ_w to every atom | +τ_w (stricter than D1) |
+| V3 | Anchoring and L_i ≤ N_i ≤ U_i (rule A if adopted), with every opposite-charge pair |d − r_min1| ≥ τ_w | exact counts |
+| V4 | Every |q_c| ≤ q_max(c) | exact fractions |
 | V5 | Q_fw = 24 and Q_exc = N_Cl | exact |
+| V6 | Single-image precondition (§2) | — |
 
-- **Precision.** Distance values near r_cut are compared in float64.
-  Rounding to 10 decimals moves a position by at most 10⁻¹⁰ in fractional
-  units, about 2×10⁻⁹ Å. That is far below δ_b, so the build margin, not
-  verification, absorbs it.
-- **Coordination counts** use the strict inequality d < r_min1 on the same
-  canonical coordinates.
+D4 adds a writer round-trip test: re-parse each written file and re-run V1-V5
+with τ_w = 0. The verdicts must agree.
 
 ## 8. Stochastic, error and reproducibility semantics
 
-- **What is random.** The insertion order and positions (R_s), the
-  relocation tie-breaks (R_s), and the choice of site within a class during
-  rebalancing (R_q). The output is a deterministic function of the inputs,
-  the seed and the numerical stack.
-- **No sampling law is claimed.** The distribution of outputs over seeds is
-  whatever this procedure induces. It is biased toward configurations with
-  pairs near ρ_cut and counts near L_i + μ, because penalty relaxation
-  settles on constraint boundaries. That is accepted (D-9: MD melts the
-  structure) and made visible (§8.1).
-- **Reproducibility envelope.**
-  - Same inputs, seed, and pinned NumPy/SciPy/BLAS versions on the same
-    platform give byte-identical output.
-  - Across numerical stacks, L-BFGS-B trajectories may diverge, so outputs
-    may differ. Every output still satisfies §7, and the qualification grid
-    (§9) is re-run when the stack changes.
-  - The v7.15 legacy model and the dry path do not use this machinery, and
-    keep their existing byte-identity guarantees.
-- **Numerical error sources.**
+- **Random elements.**
+  - Insertion order and positions, R_s,k.
+  - The choice of site and variant within a class during rebalancing, R_q.
+  - Nothing else: relocation choices are deterministic.
+- **No sampling law.** No sampling law is claimed. Outputs are biased toward
+  pair distances near ρ_cut and counts just inside the floor and cap
+  margins, because penalty relaxation settles on constraint boundaries. This
+  is accepted under D-9 and made visible (§8.1).
+- **No probability bound.** D2 gives no bound on the probability of a CN miss
+  or a failure outside the S-12 grid. That grid is a census, not a sample.
+- **Reproducibility envelope.** Output is byte-identical for the same
+  inputs, seed and recorded stack:
+  - Python version;
+  - NumPy (Generator stream stability is not guaranteed across versions,
+    NEP 19), SciPy (L-BFGS-B implementation) and pymatgen (writers);
+  - BLAS library and thread count;
+  - platform.
+
+  Across stacks, outputs may differ but still satisfy §7. The S-12 census is
+  re-run on any stack change in a release. The legacy model and the dry path
+  are unaffected.
+- **Numerical error.**
 
   | Source | Bound | Effect |
   |---|---|---|
-  | V_eff quadrature | ≤ 0.5 % | can shift a floor L_i only near integer thresholds; reported |
-  | float64 distances | negligible against δ_b | none |
-  | Minimiser non-convergence | — | caught by §7: it can only cause a restart or a failure, never a wrong output |
-
-  The D1 parameter uncertainties (a, d_wall, f_V, r_cut) are D1's and are not
-  propagated here.
+  | V_eff | ≤ 0.5 % (measured +0.06 %) | floors L_i can flip only if a·C lies within that band of an integer; reported with its distance |
+  | float64 | ≪ τ_w | none |
+  | non-convergence | — | restart or failure only, never a wrong output |
 
 ### 8.1 Numerical inspectability (O1)
 
-**Material realized record per run**, written to the run report that D1 §14
-accepts:
-- **Rebalancing:** the class-count vector chosen in step 4, the moves made,
-  and the alternatives' objective values.
-- **Effective volume:** G and h, and V_eff at d_wall and ± 0.3 Å.
+Fields added to the D1 §14 per-run report:
+- **Rebalancing:** the chosen class vector, its objective, the next 5 best,
+  and the moves.
+- **Volume:** G and V_eff at d_wall and ± 0.3 Å, and each floor's distance
+  from an integer threshold.
 - **Per start:**
   - E_W after each stage;
-  - the best slack per constraint class (salt–salt, salt–ring, salt–O,
-    guard, membership);
-  - the CN deficit and excess per ion class;
-  - the relocation moves;
-  - pass/fail with the failing check.
+  - the best slack per constraint class (salt–salt, salt–ring, salt–O, guard,
+    membership, count dead zone);
+  - CN deficit and excess;
+  - relocation moves;
+  - the failing check.
 - **Final structure:**
-  - the V1-V5 table;
-  - histograms of d − r_cut per pair class over the first 0.5 Å;
-  - histograms of N_i − L_i per species;
-  - the starts used and K_max.
+  - the V1-V6 table;
+  - histograms of d − r_cut per pair class (0-0.5 Å, 0.05 Å bins);
+  - N_i − L_i per species;
+  - the start used, and K_max;
+  - the stack versions.
 
-**Reader and questions.** The stakeholder and qualifier ask:
+**Reader and questions.**
 - Did it pass, and on which start?
-- How close to the bounds did it sit?
-- Was the solution boundary-hugging?
-- Did relocation or rebalancing move ring cations?
-- How sensitive are the floors to V_eff?
+- How tight was the packing?
+- Was the result boundary-hugging?
+- Which ring cations moved?
+- Were any floors near a threshold?
 
-**Product surface.** This is the D1 §14 per-run report, already accepted at
-D1 ratification. D2 adds only the fields above to it.
+**Product surface.** These fields extend the D1 §14 product surface. Technical
+acceptance does not accept them; the human acknowledgement (§12) does.
 
-## 9. Evidence and oracles (to be produced in D4; defined here first)
+## 9. Evidence and oracles (produced in D4; defined here first)
 
-**Oracles independent of the production code.**
-1. **Volume quadrature.** On a manufactured cubic cell with a single "O" at
-   the origin, V_eff of the complement of a sphere is known in closed form.
-   The error must be ≤ 0.5 % at h = 0.10 Å, and refinement h → h/2 must
-   converge.
-2. **Brute-force verifier.** An independent O(N²) verifier, written
-   separately from the production checks, recomputes V1-V5 on written files
-   (CIF, POSCAR and LAMMPS). The two verdicts must agree.
-3. **Manufactured feasibility.** A hand-built salt configuration known to
-   satisfy V1-V5 must pass verification. Perturbing it to violate each check
-   alone must be rejected by exactly that check (one test per check).
-4. **Rebalancing.** On small synthetic class problems, the exhaustive search
-   is compared with brute force over individual site assignments.
-   Σ_c q_c = 0 always holds.
-5. **Streams.** For a fixed seed, steps 1-3 are byte-identical with and
-   without the cage-salt model. Changing R_s leaves steps 1-6 unchanged.
-6. **Determinism.** Two runs with the same seed and stack give identical
-   bytes.
+1. **V_eff:**
+   - d = 0 gives exactly V/4 per cage;
+   - at d = d_wall, the Monte Carlo reference (≥ 10⁷ points) agrees within
+     0.5 %;
+   - α₀ = α₁ and β₀ = β₁ by symmetry;
+   - the scale identity V(s·L; d) = s³·V(L; d/s) holds.
+2. **An independent brute-force verifier**, written separately from the
+   production checks, re-checks V1-V6 on re-parsed CIF, POSCAR and LAMMPS
+   output.
+3. **Manufactured feasibility.** A configuration known to satisfy every
+   check passes. Single-check violations, one per check, are rejected by
+   exactly that check.
+4. **Rebalancing.** The exhaustive search is compared with brute force over
+   individual site assignments on small synthetic problems. Σ_c q_c = 0
+   always holds.
+5. **Streams.** Steps 1-3 are byte-identical to the same request with the
+   cage-salt model off and volume factor 1. Changing R_s,k leaves steps 1-6
+   unchanged.
+6. **Determinism.** Same seed and stack give identical bytes.
+7. **Precondition.** A volume factor below the single-image limit fails
+   closed.
 
-**S-12 qualification protocol (pre-specified).**
-- **Grid.** Na-A and K-A rings; seeds 0-4; eutectic loadings of 2, 4, 6, 8,
-  10 and 12 Cl per α, each β holding 1 Cl and 1 Li; plus the three P5 dopant
-  compositions (Li5K4Cs1, Li5K3Sr1, Li6K4Ba1 per α) at seeds 0-4. That is
-  2 × 5 × (6 + 3) = 90 requests.
-- **Per request.** Pass means a structure that passes §7 within K_max = 20.
-  Each request is deterministic, so the result is a census of the grid, not
-  a statistical estimate.
-- **Decision rule, fixed now.**
-  - Rule B is retained iff ≤ 4 of the 90 requests fail (pass rate ≥ 95 %).
-  - Otherwise the release default becomes rule A with a = 0.7, which must
-    then pass the same criterion. If it does not, that reopens D1.
-  - The record states both pass rates, and the Wilson 95 % interval for
-    information.
-- **V_eff refinement check.** Run at G and 2G on the fixture, as in oracle 1.
+**S-12 qualification census (pre-specified; all parameters frozen before
+it is run; any re-tuning re-runs the whole census).**
+- **Entry point.** The population entry point
+  `generate_lta_cation_structure_from_specs`, with integer seeds 0-4 and the
+  modelled f_V (no override).
+- **Rings.** Na:2/16/6 and K:2/16/6, with no `occlusion_counterion`s.
+- **α loadings,** per α-cage, both α-cages the same, Li/K split by
+  round(0.592·n):
 
-**Prior exploratory evidence.** Probes P5-P8 (D1 §12) used an earlier
-variant of this method: insertion, L-BFGS penalty with CN continuation, and
-greedy relocation. Shaped runs reached the per-ion floors in P7 (18/18) and
-P8 (26/30), and all four P8 misses were anchoring failures. These probes
-motivate the method but are not acceptance evidence. The production method
-differs in four ways:
-- explicit anchoring and membership terms;
-- the build margin δ_b;
-- charge-constrained relocation;
-- exact verification.
+  | n | 2 | 4 | 6 | 8 | 10 | 12 |
+  |---|---|---|---|---|---|---|
+  | Li/K | 1/1 | 2/2 | 4/2 | 5/3 | 6/4 | 7/5 |
+
+- **Dopant rows,** per α-cage, at seeds 0-4:
+  - Li5K4Cs1 with 10 Cl;
+  - Li5K3Sr1 with 10 Cl;
+  - Li6K4Ba1 with 12 Cl.
+- **β content.** Each β holds 1 Cl and 1 Li in every row.
+- **Size.** 2 rings × 5 seeds × 9 compositions = 90 requests.
+- **Decision rule.**
+  - Rule B is retained iff at most 4 of the 90 fail.
+  - Otherwise rule A (a = 0.7) becomes the release default and must pass the
+    same criterion. If A also fails, that reopens D1.
+  - Both pass rates are recorded, with Wilson intervals for information.
+
+**Prior exploratory evidence.** P5-P8 (D1 §12) are probes of an earlier
+variant of this method. They motivate it but are not acceptance evidence.
 
 ## 10. Parameter register (agent-proposed D2 defaults)
 
-| Parameter | Value | Origin | Basis |
-|---|---|---|---|
-| δ_b build margin | 0.01 Å | agent | ≫ float error, ≪ MD-relevant length |
-| ε_m membership margin | 0.05 Å | agent | keeps membership strict after rounding |
-| w, smooth-count width | 0.12 Å | agent (P6-P8) | sharp enough to count, smooth enough for L-BFGS |
-| μ, count margin | 0.3 | agent | pushes smooth count past the integer threshold |
-| W continuation | 10, 100, 1000 | agent (P6-P8) | penalty continuation |
-| L-BFGS-B iterations per stage | 6000 | agent (P6-P8) | — |
-| M_ins insertion tries | 2000 | agent | — |
-| K_max starts | 20 | agent | 4 to 5 × the P6-P8 start counts |
-| R_reloc rounds per start | 4 | agent (P5) | — |
-| h, quadrature spacing | 0.10 Å | agent | error target 0.5 % (§4.2) |
-| Coordinate canonicalisation | 10 decimals | agent | §7 |
-| Stream tags | `v7.16-charge-rebalance:{seed}`, `v7.16-cage-salt:{seed}` | agent | follows v7.15 |
-| S-12 grid and threshold | §9 | stakeholder (fallback and 95 % idea) and agent (grid) | D1 §7 |
+| Parameter | Value | Basis |
+|---|---|---|
+| δ_b build margin | 0.01 Å | ≫ the penalty residual (about 0.002 Å, review estimate) and τ_w |
+| τ_w writer band | 10⁻⁵ Å | above the worst writer quantization (< 10⁻⁶ Å) |
+| ε_m membership margin | 0.05 Å | — |
+| δ_cn count dead zone | 0.05 Å | keeps smooth and discrete counts consistent |
+| w smooth-count width | 0.12 Å | P6-P8 |
+| μ count margin | 0.3 | — |
+| W continuation | 10, 100, 1000 | P6-P8 |
+| L-BFGS-B options | maxiter 6000, maxfun 15000, maxcor 10, ftol 2.2e-9, gtol 1e-5, maxls 20 | SciPy defaults, except maxiter |
+| M_ins and insertion fallback metric | 2000; minimum sum of squared violations | — |
+| Relocation choice | resolving candidates only; maximum minimum slack; (site_id, variant_id) | D1 §8 |
+| K_max, R_reloc | 20, 4 | — |
+| V_eff grid | G = 192, fixed fractional, tie sharing within 10⁻⁹ Å | §4.2 |
+| Ceiling guard | 10⁻⁹ | §2 |
+| Canonicalisation | round to 10 decimals, then wrap into [0, 1) | §7 |
+| Streams | SHA-256 tags, first 8 bytes big-endian, PCG64; per-start substreams | §3 |
+| z_max with no contributor | 1 | §4.3 |
+| Report sizes | 5 best alternatives; histogram bins 0.05 Å over 0-0.5 Å | §8.1 |
+| S-12 census | §9 | stakeholder (rule) and agent (grid) |
 
-These are governed defaults. Changing them is a D2 change unless D3 exposes
-one as a user option with this default and a recorded value per run. Only
-K_max and the seed are proposed as user options.
+Changing a value is a D2 change unless D3 exposes it as a recorded user
+option. Only the seed and K_max are proposed as options.
 
 ## 11. D2 → D3 hand-off
 
 D3 must preserve:
-- the step order and stream derivation of §3, including that steps 4-8 run
-  once on the population the smoothing entry point selected;
-- exact rational charge arithmetic and the exhaustive class-count search (§5);
-- the V_eff estimator definition, including the offset grid and tie order
-  (§4.2);
-- the objective and continuation (§6.1-6.3), relocation acceptance (§6.4) and
-  first-success restarts (§6.5);
-- verification on the canonical written coordinates by brute force (§7),
-  with all writers emitting those coordinates;
-- the run-report fields of §8.1;
-- SciPy as a declared runtime dependency, for L-BFGS-B. NumPy `Generator`
-  PCG64 is used for the derived streams;
-- the reproducibility envelope (§8) recorded in qualification (stack
-  versions).
+- the §3 order, including smoothing on the V_ref cell and scaling at step 5,
+  and the stream derivation with per-start substreams;
+- §4.2: a fixed G = 192 grid with tie sharing, and the scale identity;
+- §4.3: the window table keyed by site_id and validated at load, exact
+  fractional charge, and z_max(c) on the configuration under test;
+- §5: aggregation by (family, charge), exhaustive search, the lexicographic
+  objective and canonical orders;
+- §6: the objective, including the dead zone; continuation; L-BFGS-B
+  options; resolving-only relocation; first-success restarts;
+- §7: canonical coordinates as the single source for every writer, the τ_w
+  margins, brute-force verification, and the single-image precondition;
+- §8.1: the report fields;
+- SciPy and NumPy as runtime dependencies, and stack versions recorded in
+  qualification.
 
-D3 owns modules, data structures, neighbour handling outside verification,
-vectorisation, the CLI and schema, error types and report format.
+D3 owns modules, data structures, neighbour lists outside verification,
+vectorisation, CLI and schema, errors and report format.
 
-## 12. Acceptance request and open points
+## 12. Acceptance request
 
-- **Requested:** independent falsification review of this draft. Then human
-  acknowledgement of the method-level choices that can change outputs or
-  failure rates: first-success restarts, K_max = 20, the boundary-hugging
-  bias (§8), and the S-12 decision rule (§9).
-- **Tension search.** Searched the D1 spec §13 (T1-T22), the workplan and
-  the repository issues (none). Tensions bearing on D2:
-  - T8, unshaped packing isolates ions: addressed by the anchoring terms;
-  - T17 and T21, V_eff uncertainty: handled by the deterministic estimator,
-    with the range reported;
-  - T22, resolved by S-11/S-12: the fallback is implemented in §6.6.
-  None is closed by this document.
-- **Known risks.**
-  - The per-ion floor may be hard to meet for dopants (not probed; D1 §12).
-  - First-success makes the output depend on the order of starts. That is
-    deterministic, but it means a later start is never "better".
+- **Requested:** a short independent re-review of the r1 changes, then human
+  acknowledgement of the output-changing choices:
+  - first-success restarts with K_max = 20, and their runtime;
+  - the boundary-hugging bias;
+  - V2 margins stricter than D1 by τ_w;
+  - smoothing on the V_ref cell in cage-salt mode, which differs from
+    v7.15's scale-then-smooth;
+  - the S-12 census and decision rule;
+  - the added report fields.
+- **D1 readings for the stakeholder to confirm.** R-1 (membership applies to
+  `cage_salt` only) and R-2 (window weights per physical site).
+- **Tensions.** Searched D1 §13 (T1-T22), the workplans, the D1 git log and
+  the repository issues (none). Relevant: T8 (anchoring), T17/T21 (V_eff,
+  handled deterministically) and T22 (fallback, §6.6). None is closed here.
+
+## 13. Review record
+
+**Independent D2 review 1** (2026-10-17). AI reviewer: a fresh subagent
+context with the same model family. It is process-independent and carries
+common-mode risk.
+
+**SERIOUS CHALLENGES.**
+- **SC-1: ring cations on 8R are equidistant from α₀ and α₁, so V1 failed by
+  construction.** Fixed by R-1 and R-2.
+- **SC-2: writers cannot emit the canonical coordinates exactly.** Fixed by
+  the τ_w margins and a round-trip test.
+
+**Findings and dispositions.**
+- **Major:**
+  1. The search bound was false → aggregation by (family, charge), worst case
+     163,072 vectors.
+  2. The feasible set was underdefined → z_max(c) on the configuration under
+     test; excess-only up-front check; default 1; quarter-integers.
+  3. Realization was ambiguous → canonical departure order, R_q for site and
+     variant, canonical class order.
+  4. Relocation conflicted with D1 → resolving-only, with a defined choice.
+  5. The V_eff claims were false → fixed commensurate G = 192, tie sharing,
+     the scale identity, and oracles in place of refinement. Measured: exact
+     at d = 0 and +0.06 % at d_wall.
+  6. The smooth count did not guarantee the discrete count → dead zone added,
+     labelled a heuristic.
+  8. Stream semantics → seeding specified, per-start substreams, seed = None
+     corrected, envelope expanded.
+  9. Scaling order → smoothing on the V_ref cell, scaling at step 5,
+     oracle 5 reworded.
+  10. S-12 was underspecified → fully specified, with rule A pooling defined.
+  11. The parameter register was incomplete → completed.
+- **Minor:**
+  7. Differentiability wording → fixed.
+  12. Single-image precondition → added as V6.
+  13. Report size and product surface → top 5, with human acknowledgement.
+  14. No probability bound outside the grid → stated.
+  15. Insertion guard → added.
+
+**Verified by the reviewer:**
+- the window classes on the fixture;
+- the up-front check wording;
+- floors and caps cannot conflict;
+- the penalty residual is below δ_b;
+- the 10-decimal rounding bound;
+- the S-12 arithmetic;
+- first-success is independent of K_max;
+- S-10 is preserved for `cage_salt` ions;
+- cross-window counting;
+- relocation cannot change the floors.
