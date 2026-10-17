@@ -17,7 +17,7 @@ its own ring family; O1a (other positional variant of the same physical site) is
 Coordination (reported only, no CN shaping): first-shell count inside r_min1 of the
 opposite-charge pair, counting ring cations as neighbours of cage Cl (O4c proposed).
 
-Run: python probe_p5_supplied_cutoffs_d12.py [grid]   (grid = main | sens | dopant | cn | cnd | all)
+Run: python probe_p5_supplied_cutoffs_d12.py [grid]   (grid = main | sens | dopant | cn | cnd | cnm | all)
 """
 import csv, sys, json, itertools, time, warnings
 from pathlib import Path
@@ -373,6 +373,14 @@ def grid(name):
             tgt = {m: round(t * n / 12, 3) for m, t in base.items()}
             out.append(dict(grid="cnd", ring=ring, seed=seed, n=n, reloc=True, O1a=True, F="F2", C="C2",
                             beta="B1a", cn_target=tgt, tname="A-density-scaled", starts=4))
+    if name in ("cnm", "all"):
+        # P8: Option A targets scaled by alpha Cl density relative to the 800 K eutectic melt
+        # (n_melt = 15.0 Cl per alpha free volume), floored at 1 (anchoring); low loadings included
+        base = {"Li": 4.3, "K": 5.2}
+        for ring, seed, n in itertools.product(("Na", "K"), (0, 1, 2), (2, 4, 6, 8, 12)):
+            tgt = {m: round(max(1.0, t * n / 15.0), 3) for m, t in base.items()}
+            out.append(dict(grid="cnm", ring=ring, seed=seed, n=n, reloc=True, O1a=True, F="F2", C="C2",
+                            beta="B1a", cn_target=tgt, tname="A-melt800-scaled", starts=4))
     return out
 
 
