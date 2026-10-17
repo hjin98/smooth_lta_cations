@@ -14,37 +14,27 @@ header-includes:
 
 # v7.16 variable-loading molten-salt occlusion extension
 
-**Lifecycle: PROPOSED (D1 draft, not accepted).** Drafted 2026-10-17 by an AI
-agent (Claude Code session
-https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi) under workplan
-`LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1. Nothing here binds D2-D4 until
-independent falsification review and stakeholder ratification are complete.
-Revision r1 (same day) folds in independent falsification review 1 (§17): it
-raised two SERIOUS CHALLENGES against this draft, both now carried as
-stakeholder decisions or fixes. Revision r2 (same day) records the
-stakeholder's answers. Where the stakeholder delegated, it records the agent
-recommendations adopted (§15). Revision r3 records stakeholder decisions S-4
-to S-6:
-- S-4: "dense" is defined by melt density at 800 K;
-- S-5: a charge-balance criterion with rebalancing;
-- S-6: the contraction form.
-Revision r4 folds in independent falsification review 2 (§17). It changes
-the calibration route for the charge threshold, adds framework cations to the
-charge observable, and corrects the rationale for the contraction form. Revision
-r5 records stakeholder decisions S-7 to S-10:
-- S-7: the coordination minimum a·C(ρ);
-- S-8: the interface thickness and volume uncertainty;
-- S-9: q_max left to the agent;
-- S-10: no inter-cage moves.
+**Lifecycle: ACCEPTED-CURRENT D1 (human-ratified 2026-10-17).** The
+stakeholder ratified revision r7 in chat on 2026-10-17 ("Sounds good. I
+ratify."). The authoring session (an AI agent) records the ratification; it
+does not supply it. Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
+SSDP 7.2.1, by Claude Code session
+https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
 
-Revision r6 folds in independent review 3 (§17). Revision r7 records
-stakeholder decision S-11: the S-7 minimum applies to every ion (reading B),
-with a = 0.4. No open items remain. The document stays PROPOSED until the
-stakeholder ratifies it as a whole.
-Items marked
-**(proposed)** are agent-chosen defaults that become binding only if ratified.
-Stakeholder decisions D-1 to D-13 are cited from the workplan §2; they are
-instructions, and this document is where they would become ratified D1.
+- **What it governs.** The scientific meaning of the v7.16 cage-salt model,
+  for the D2 method, D3 design and D4 implementation that follow.
+- **What it does not do.** It does not change shipped software behaviour.
+  Until v7.16 is implemented and qualified, the released generator still
+  behaves as v7.15.0. It does not self-qualify any implementation either:
+  independent post-implementation review remains required.
+- **History.** It was revised r1-r7 through three independent falsification
+  reviews (§17) and stakeholder decisions S-1 to S-12 (§15).
+- **Proposed items.** Items marked **(proposed)** were agent-chosen defaults.
+  They are binding as ratified, and later changes go through this D1 owner.
+- **Workplan decisions.** Stakeholder decisions D-1 to D-25 are recorded in
+  the workplan §2; this document is their ratified D1 form.
+- **Sole remaining gate.** The S-12 coordination-rule fallback is decided at
+  qualification against the stated criterion.
 
 **Predecessor.** `doc/specs/v7_15_chloride_occlusion_extension.md`
 (accepted-current, human-ratified) at base commit

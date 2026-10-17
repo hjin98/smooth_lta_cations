@@ -46,7 +46,9 @@ Module specifications:
 - `doc/specs/lta_cation_performance_optimization_spec.md` and `.pdf`
 - `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current framework-compensation chemistry/charge authority for v7.15; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
-- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization.
+- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization (the legacy model once v7.16 is implemented).
+- `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified (2026-10-17) D1 scientific contract for the variable-loading cage-salt occlusion model. It is **not yet implemented**: D2 method, D3 design and D4 implementation follow under `workplans/V7.16-MOLTEN-SALT-OCCLUSION.md`. Its PDF is produced at release qualification.
+- `doc/evidence/` - stakeholder-supplied, non-authoritative evidence package (rev 3) for v7.16: occlusion literature, molten-salt pair distances, coordination numbers and lattice contraction, with CSVs and generator scripts.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
@@ -67,6 +69,7 @@ The current source hierarchy is intentionally explicit:
 - **Scientific chemistry/charge authority:** `doc/specs/v7_13_group_i_ii_cation_extension.md`.
 - **Scientific/numerical volume authority:** `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`.
 - **Sparse chloride-occlusion authority:** `doc/specs/v7_15_chloride_occlusion_extension.md`.
+- **Cage-salt occlusion D1 authority (ratified, not yet implemented):** `doc/specs/v7_16_molten_salt_occlusion_extension.md`.
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.

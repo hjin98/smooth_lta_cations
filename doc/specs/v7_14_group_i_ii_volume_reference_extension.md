@@ -319,3 +319,18 @@ Neither `occlusion_counterion` cations nor Cl cage guests participate in the
 automatic interpolation. This preserves the qualified dry reference as an
 initialization policy; it is not evidence that salt loading causes zero
 physical volume change.
+
+## v7.16 occlusion boundary (added on v7.16 D1 ratification, 2026-10-17)
+
+V_ref above remains the dry reference of the framework-compensating
+population. When the v7.16 cage-salt model is active,
+`v7_16_molten_salt_occlusion_extension.md` §9 changes the *default* volume
+factor:
+
+```
+f_V(n_bar) = 1 - (1 - f_ref) * min(n_bar / n_ref, 1)
+f_ref = 0.97,   n_ref = 10.5 Cl per pseudo-cell
+```
+
+An explicit `--volume-factor` replaces it, so V_target = volume_factor · V_ref
+as here. The dry path and the v7.15 legacy model keep the default of 1.0.
