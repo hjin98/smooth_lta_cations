@@ -19,6 +19,9 @@ agent (Claude Code session
 https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi) under workplan
 `LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1. Nothing here binds D2-D4 until
 independent falsification review and stakeholder ratification are complete.
+Revision r1 (same day) folds in independent falsification review 1 (§17): it
+raised two SERIOUS CHALLENGES against this draft, both now carried as
+stakeholder decisions or fixes.
 Items marked **[DECIDE]** are open stakeholder decisions; items marked
 **(proposed)** are agent-chosen defaults that become binding only if ratified.
 Stakeholder decisions D-1 to D-13 are cited from the workplan §2; they are
@@ -46,10 +49,16 @@ On ratification this document:
   v7.15 Al24 scope, canonical-template gating, maximum-symmetry and
   unique-batch rejection, RNG isolation and single assembly path.
 
-Unchanged authorities: `v7_13_group_i_ii_cation_extension.md` (supported
-cations, formal charges, Q_fw = +24), `v7_14_group_i_ii_volume_reference_extension.md`
-(dry reference volume V_ref), and the dry (no-occlusion) generator path, which
-must remain output-identical.
+Retained authorities, with boundary notes needed on ratification:
+- `v7_13_group_i_ii_cation_extension.md` keeps the supported cations, formal
+  charges and Q_fw = +24. Boundary: when the cage-salt model is *active* (§3),
+  §5 restricts the cations in the structure to S.
+- `v7_14_group_i_ii_volume_reference_extension.md` keeps the dry reference
+  volume V_ref. Boundary: when the cage-salt model is active, the default
+  volume factor becomes f_V (§9).
+
+The dry (no-occlusion) generator path is unaffected and must remain
+output-identical.
 
 Non-authoritative evidence bound by this document (stakeholder-supplied
 package rev 3, 2026-10-17, `doc/evidence/`):
@@ -84,8 +93,9 @@ no thermodynamic quantity.
 **What a configuration claims.** Exact inventory and charge (§4); no ion pair
 closer than the bound melt onset distance (§6); every ion anchored to an
 opposite-charge first neighbour and per-species first-shell coordination
-approximately at bound melt values (§7); a cell volume from the bound
-contraction model (§9). "Amorphous" means only: positions are random subject
+approximately at bound melt values where the loading makes that meaningful
+(§7); a cell volume from the bound contraction model (§9). Ring cations are
+not coordination centres. "Amorphous" means only: positions are random subject
 to these constraints (D-9).
 
 **What it does not claim.** Equilibrium siting, g(r), occupancy statistics,
@@ -98,7 +108,9 @@ are melt or crystal data transferred to a confined phase by assumption.
 (v7.15 gating); base salt LiCl–KCl (the only base salt the loading evidence
 supports, 773–823 K [R1, R2, R15]); dopants from the species set S (§5);
 0 ≤ Cl ≤ 12 per α-cage, 0–1 per β-cage. Pair data refer to 950–1300 K melts;
-CN data to 1100 K or T_m; the contraction value to 650–800 K in situ. The
+CN data to 1100 K or T_m. The contraction working value rests on 294 K
+crystals at 4 Br per pseudo-cell; only its bound comes from in-situ
+650–800 K data. The
 generator does not take a temperature; these are interpretation limits.
 
 ## 3. Definitions
@@ -113,11 +125,23 @@ generator does not take a temperature; these are interpretation limits.
   `occlusion_counterion` (ring site, compensates Cl; v7.15 role); `cage_salt`
   (new: an ion of the salt phase assigned to a cage). Cl⁻ is always
   `cage_salt`.
+- **Active.** The cage-salt model is *active* iff any cage-salt input is
+  nonzero: some N_Cl(c) > 0 or some N_i^salt(c) > 0. Otherwise every
+  cage-salt rule (§5-§9) is inert and the dry or legacy path applies
+  unchanged.
 - **Cage assignment (proposed, O8).** An ion belongs to the cage whose centre
   is nearest under the minimum-image Cartesian metric (nearest-centre
-  partition). Ties are a construction failure. **[DECIDE]** alternative: a
-  sphere of radius 5.7 Å about each α centre (11.4 Å free diameter [R31]).
-  Probe P5 found feasibility insensitive to this choice.
+  partition). Ties are a construction failure.
+  - Geometry note: the α–β centre distance is 10.63 Å, so the bisector lies
+    5.32 Å from the α centre, about 1.1 Å on the α side of the 6R sites. An
+    ion on the α face of a 6R is therefore counted as β. This affects only
+    accounting, not distances.
+  - **[DECIDE]** alternative: a sphere of radius 5.7 Å about each α centre
+    (11.4 Å free diameter [R31]). As stated, this option still lacks a β
+    region and a rule for the 5.7–6.1 Å window shell; it would need both
+    before adoption.
+  - Feasibility in P5 was insensitive to the choice, but only 24 points
+    tested the partition (§12).
 - **First neighbour.** For ions i, j of opposite charge, j is a first
   neighbour of i iff d_ij < r_min1(i, j) (E-pair column `r_min1`), minimum
   image, both ions in any role.
@@ -136,7 +160,7 @@ roles (exact integers, v7.13 typing rules).
 ```
 0 <= N_Cl(alpha_k) <= 12                  (D-2, hard cap; never lowered)
 N_Cl(beta_k) in {0, 1}                    (D-2)
-sum_i N_i^salt(beta_k) <= 1               (proposed; D-6 "MCl unit")
+sum_i N_i^salt(beta_k) <= N_Cl(beta_k)    (proposed; D-6 "MCl unit")
 ```
 
 **Invariants (independent, never collapsed).**
@@ -147,9 +171,19 @@ N_Cl  = sum_c N_Cl(c)
 Q_exc = sum_i z_i ( N_i^occ + sum_c N_i^salt(c) ) = N_Cl          (generalises v7.15)
 ```
 
-There is no per-cage neutrality requirement (proposed; D-5, D-6): a β-cage Cl
-may be compensated by a cation in the β-cage or on a ring site. Ring-site
-capacity sum_i (N_ri^fw + N_ri^occ) ≤ C_r holds as in v7.15.
+A β-cage Cl may be compensated by a cation in the β-cage or on a ring site
+(D-6). For α-cages the stakeholder has not decided. With no per-cage rule, a
+compliant input can put 12 Cl and no cations in α₀, with all compensation on
+ring sites placed before any Cl exists. That is a −12 e cage, contrary to
+"each occluded Cl⁻ arrives with a charge-balancing cation" (E-occ §0, §6.3).
+**[DECIDE]** one of:
+(a) no per-cage rule, with per-cage net charge reported;
+(b) per-α net charge bounded, |Σ_i z_i N_i^salt(α) − N_Cl(α)| ≤ q_max
+    (proposed q_max = 1);
+(c) (b) also counting the ring counterions nearest that cage.
+Inputs that are cation-only in a cage (N_i^salt(c) > 0, N_Cl(c) = 0) are
+rejected up front (proposed), because those cations could never be anchored.
+Ring-site capacity sum_i (N_ri^fw + N_ri^occ) ≤ C_r holds as in v7.15.
 
 The final structure is a construction failure unless every role, cage and
 species count equals its input exactly, with cage membership evaluated on the
@@ -204,9 +238,16 @@ d_ab ≥ r_cut(a, b), with r_cut from E-pair:
       oxide rows: M–O r_cut for cation–O(framework) and the weighted "Cl–O
       around M" r_cut for Cl–O(framework). Check: Sr–O 2.09 Å ≤ crystal
       Sr–O3 2.21 Å;
-  (c) keep only the v7.15 catastrophic guard.
+  (c) keep only the v7.15 catastrophic guard. **Scientifically inadmissible
+      unless the stakeholder explicitly accepts it as such.** It permits Cl⁻ or
+      Li⁺ 1.5 Å from framework O, far inside any M–O or Cl–O contact.
   Framework Si/Al: no data. Proposed: no separate T-atom minimum beyond the
-  catastrophic guard below.
+  catastrophic guard below. (The probes used 0.85 × Shannon sums for Si/Al.
+  That is a radius formula outside D-3 and is disclosed in §12.)
+- **Reading of D-3.** "Same-sign cut-off larger than opposite-sign" holds per
+  pair member in the table: every like pair's r_cut exceeds both members' r_cut
+  against Cl. It does not hold globally (for example Li–Sr 2.65 < Cs–Cl
+  2.78 Å). This document adopts the per-member reading.
 - **Catastrophic guard (retained from v7.15).** Every `cage_salt` ion is at
   least 1.5 Å from every atom. This is not a contact distance.
 
@@ -220,40 +261,74 @@ in LTA are anchored to cations and never seen isolated [E-occ §4]; D-5 relies
 on coordination in place of a binding rule. Probe P5 showed that unconstrained
 random packing leaves isolated cations (CN 0), so this needs to be stated.
 
-**Coordination target (cation-centred).** For each `cage_salt` cation species
-M with n_M ≥ 1 centres, the mean of N_i(Cl) over those centres must lie in the
-band T_M ± δ_M. Ring cations count as neighbours of Cl (O4c, proposed yes), but
-ring cations are not CN centres. Only cation-centred targets are imposed
-(D-13). Cl-centred counts are reported, not targeted, because:
-
+**Coordination target (cation-centred, α only).** For each species M with
+n_M ≥ 1 `cage_salt` centres *in α-cages*, the mean of N_i(Cl) over those centres
+must lie in the band T_M ± δ_M. β-cage cations are excluded. Under D-2 they
+have at most one Cl in their own cage (CN of about 1, as measured in review 1).
+Their CN is reported separately and subject only to anchoring. Ring cations
+count as neighbours of Cl (O4c, proposed yes), but are not CN centres. Only
+cation-centred targets are imposed (D-13). Cl-centred counts are reported, not
+targeted, because:
 - by number conservation they follow from the cation targets plus the ring
   contribution;
 - with ring cations counted they exceed bulk values (finding T7).
 
+**Low-loading semantics (SERIOUS CHALLENGE SC1 → [DECIDE]).** A melt CN is
+undefined for a dilute, non-percolating salt. With 1 Cl per α, every cage
+cation has CN ≤ 2, so no band near 4–5 can be met. Realistic process loadings
+of 3.4–3.9 Cl per pseudo-cell [R4, R5] fall in this region. Options:
+(a) the CN band applies only to α-cages holding N_Cl(α) ≥ n_CN, with only
+    anchoring below; proposed n_CN = 8, the lowest loading probed with
+    shaping;
+(b) a loading-dependent target, min(T_M, attainable);
+(c) narrow the validity regime to N_Cl(α) ≥ n_CN.
+The attainable-CN threshold below 8 Cl per α has not been probed.
+
 **Bound target values [DECIDE between two options].**
 
-| M | Option A (proposed): E-cn §1a, defined inside `r_min1` | Option B: eutectic E-cn §1c |
+| M | Option A (proposed) | Option B: base-salt E-cn §1c |
 |---|---|---|
-| Li | 4.3 ± 0.5 | 4.2 (4.1–4.3), R_min unstated |
-| Na | 5.2 ± 0.5 | unavailable → A |
-| K | 5.2 ± 0.5 | 7.0 (6.8–7.2), definition-dependent |
-| Rb | 5.4 ± 0.5 | 5.8 (dilute, XAFS) |
-| Cs | 5.5 ± 0.5 | unavailable → A |
-| Sr | 6 ± 1 (E, dilute working value) | same |
-| Ba | 7 ± 1 (E; 6.4 vs 7.7 conflict open) | same |
+| Li | 4.3 ± 0.5 (§1a, inside r_min1) | 4.2 ± δ_B |
+| Na | 5.2 ± 0.5 (§1a, inside r_min1) | unavailable → A |
+| K | 5.2 ± 0.5 (§1a, inside r_min1) | 7.0 ± δ_B (definition-dependent) |
+| Rb | 5.4 ± 0.5 (§1a; r_min1 here is an E ratio estimate) | 5.8 ± δ_B (dilute, XAFS, no cutoff) |
+| Cs | 5.5 ± 0.5 (§1a; r_min1 here is an E ratio estimate) | unavailable → A |
+| Sr | 6 ± 1 (E working value, dilute; not defined inside r_min1) | same |
+| Ba | 7 ± 1 (E working value; 6.4 vs 7.7 conflict open) | same |
 
-Option A is proposed because it is the only set whose integration boundary is
-the same `r_min1` the generator counts within (E-cn §0: "use §1a values as
-targets inside r_min1"). Option B matches the base-salt composition but uses
-an unstated boundary. Probe P6 reached both options within about ±0.5 (§12).
+Option A is proposed because, for Li, Na and K, it is the only set whose
+integration boundary is the same `r_min1` the generator counts within (E-cn
+§0). For Rb, Cs, Sr and Ba no supplied value shares that boundary, and the
+targets are E-grade transfers. Option B matches the base-salt composition but
+uses an unstated boundary. Its source ranges (Li 4.1–4.3, K 6.8–7.2) are run
+spreads, not tolerances. If B is chosen, δ_B must be set by the stakeholder
+(proposed 0.5).
+
+**Per-ion admissible range [DECIDE].** A mean-only target would admit a
+bimodal population, for example Li at CN 8 and CN 1. Proposed: every α
+`cage_salt` cation also has N_i(Cl) within the integer hull of the E-cn §1a
+"spread across all sources", in addition to anchoring:
+
+| M | Admissible N_i(Cl) |
+|---|---|
+| Li | 3–6 |
+| Na | 3–6 |
+| K | 3–7 |
+| Rb | 4–7 |
+| Cs | 3–6 |
+
+Sr and Ba take T ± 2. This rule applies only where the loading clause above
+makes the band apply.
 
 - **Distribution form.** The evidence supplies means ± spread, not P(CN)
-  histograms (O4b answered by data availability). Only the mean is targeted.
-  The spread arises from randomness, satisfying D-9, and is reported.
-- **Failure policy (proposed).** Missing the band after the D2 restart budget
-  is a construction failure (fail closed), as is a hard-minimum violation.
-  **[DECIDE]** alternatively write the structure and flag the CN miss in the
-  report.
+  histograms (O4b answered by data availability). The mean and the per-ion
+  range are targeted. The spread inside that range arises from randomness,
+  satisfying D-9, and is reported.
+- **Failure policy (proposed).** Missing the band or the per-ion range after
+  the D2 restart budget is a construction failure (fail closed), as is a
+  hard-minimum violation. **[DECIDE]** alternatively write the structure and
+  flag the miss. That alternative needs the per-run report (§14) or the
+  existing v7.15 `--report` text path.
 
 ## 8. Ring cations during the salt build (D-12)
 
@@ -286,11 +361,24 @@ V_target = f_V(n_bar) * V_ref
 - n_ref = 10.5 Cl per pseudo-cell, the calibration loading of 4A + LiCl–KCl
   at 823 K [R1, R2] (E-occ §6.4).
 
-**Form.** The evidence has one loaded point and no loading dependence. It
-does show the contraction grows with occlusion and that the fully loaded phase
-is the smallest [R18]. Linear interpolation from the dry endpoint, constant
-above n_ref, is therefore the minimal monotone model. No dependence on
-composition or cation form is modelled, because there are no data for one.
+**Form [DECIDE].** The only quantitative datum, the K/Br analogue, sits at
+**4 Br per pseudo-cell** and gives f_V = 0.968 (E-vol rows 21/7 and CSV row
+28 note). E-vol §5b assigns it to the fully loaded state "by assumption
+(intended application)". The evidence gives no loading dependence. It does
+show that contraction grows with occlusion and that the fully loaded phase is
+the smallest [R18]. Options:
+(a) linear in n̄ up to n_ref, constant above (proposed: minimal monotone, and
+    follows E-vol's intended application). Its known defect: f_V(4) = 0.989
+    lies outside 0.968 ± 0.011, the datum at its own loading;
+(b) saturating step: f_V = f_ref for any n̄ > 0;
+(c) linear with n_ref = 4.
+At n̄ ≲ 3.5, 1 − f_V < 1 % under (a). There E-vol §4 warns the thermal term
+(about 0.3 %, sign unknown) is no longer negligible.
+- **Fixed framework population.** f_V is an occlusion-only factor at a fixed
+  framework population. Ion exchange (Na → Li) is represented only through the
+  framework population in V_ref, never through f_V (tension T14).
+- No dependence on composition or cation form is modelled, because there are
+  no data for one.
 
 **Override [DECIDE].** Proposed: an explicit `--volume-factor` *replaces*
 f_V(n̄), so V_target = volume_factor · V_ref, exactly the v7.14 meaning. The
@@ -319,11 +407,14 @@ per-cage inputs use new names (D3).
 1. framework ring placement (legacy stream);
 2. `occlusion_counterion` ring placement (v7.15 secondary stream);
 3. cation density smoothing (ring cations only; Cl and `cage_salt` excluded);
-4. cage-salt build, including D-12 relocation, on its own stream derived from
-   the seed;
-5. exact verification on the final coordinates: inventory (§4), hard minima
-   (§6), anchoring and CN (§7);
-6. volume model (§9);
+4. volume model (§9): V_target depends only on the inputs, so the cell is
+   scaled to V_target *before* the salt is built;
+5. cage-salt build in the final cell, including D-12 relocation, on its own
+   stream derived from the seed;
+6. exact verification on the final scaled coordinates: inventory (§4), hard
+   minima (§6), anchoring and CN (§7). No tolerance below r_cut. Verification
+   of an unscaled cell does not count, because isotropic scaling by f_V^{1/3}
+   would shrink verified distances by up to 1 %;
 7. write.
 
 Enabling the cage-salt model must not perturb the streams of steps 1-3. The D2
@@ -339,7 +430,11 @@ Scripts: `workplans/v716-probes/`. P5 and P6 used the E-pair r_cut and
 r_min1 columns exactly, the D-12 relocation, the fixture
 `tests/real_lta_primitive.cif`, a base salt at x_Li = 0.592, and 1 Cl + 1 Li
 in each β (B1a) unless stated. The framework proxy F2 is option (b) of §6.
-"Feasible" means the exact final check passed with slack ≥ −1e-3 Å.
+Si/Al used 0.85 × Shannon sums. Except in the sensitivity grid, the cage region
+was C1: a 5.7 Å sphere about each α centre, plus a 1.0 Å confinement of β
+guests that neither O8 option contains. Builds took place in the scaled cell.
+"Feasible" means the exact final check passed with slack ≥ −1e-3 Å, a probe
+tolerance that §11 does not allow for production. Reported CN is α-only.
 
 | Probe | Variants | Result |
 |---|---|---|
@@ -347,8 +442,8 @@ in each β (B1a) unless stated. The framework proxy F2 is option (b) of §6.
 | P5 sensitivity (Na-A, seed 0) | F1/F2 × C1/C2 × β B0/B1a/B1b × n 10, 12 × f_V 1.0/0.97, plus O1a off | 8/8 at all 50 points |
 | P5 dopants | {Li5 K4 Cs1}, {Li5 K3 Sr1}, {Li6 K4 Ba1} × 3 seeds | 9/9 points 8/8 |
 | P5 Ca ring | Ca-A | rejected: missing pair (Ca, Cl), as §5 requires |
-| P5 unshaped CN | all feasible points | Li–Cl mean 1.9-2.1, K–Cl 3.5-3.7, min 0 (isolated ions); ring–ring slack ≥ +0.27 Å |
-| P6 CN-shaped | Na/K-A × seeds 0-2 × n 8, 10, 12 × options A/B; 4 starts | all hard minima met. A: Li 3.9-4.5, K 5.1-5.5. B: Li 3.6-4.3, K 6.2-7.1. Cl-centred (cage + ring) 5.4-7.1; anchoring min ≥ 1 |
+| P5 unshaped CN | all feasible points | Group means Li–Cl 1.9-2.1 and K–Cl 3.5-3.7. Per-point ranges Li 1.2-2.8, K 2.5-5.1. Sr–Cl 2.0-2.5, Ba–Cl 3.0-4.5. Min 0 (isolated ions). Ring–ring slack ≥ +0.27 Å |
+| P6 CN-shaped | Na/K-A × seeds 0-2 × n 8, 10, 12 × options A/B; 4 starts | All hard minima met. α-only, Option A: Li 3.9-4.5, K 5.1-5.5, all 18 points within ±0.5. Option B: Li 3.6-4.3, K 6.2-7.1; 3 of 18 points outside ±0.5, and 17 of 18 outside the source ranges. Cl-centred (cage + ring) 5.4-7.1. Anchoring min ≥ 1 (α). If β-Li (CN 1) were included in the mean, 6 of 18 Option A points would miss (review 1). |
 
 **Variant disclosure (cumulative v7.16).**
 - P1-P4 (previous session): about 90 points (workplan §5).
@@ -358,9 +453,22 @@ in each β (B1a) unless stated. The framework proxy F2 is option (b) of §6.
   these results. All probe parameters were chosen by the agent, as were the F1
   proxy, the 5.7 Å sphere, the smooth CN surrogate width of 0.12 Å and the
   restart counts.
-- Not examined: mixed or Group-II ring populations, more than 3 seeds,
-  dopant-rich salts, n < 8, realism or uniformity of the configurations, and
-  CN-band misses under a production restart budget.
+- Review 1 re-ran 2 probe cases with parameters unchanged and reproduced the
+  stored values. It found 0 nearest-centre misassignments in a C1 build at
+  12/α, and a minimum ion–framework distance of 1.72 Å.
+- Not examined:
+  - mixed or Group-II ring populations;
+  - more than 3 seeds;
+  - dopant-rich salts;
+  - n < 8 (the SC1 threshold);
+  - CN shaping with Cs/Sr/Ba;
+  - the per-ion range rule, which was not a shaping objective. Recounted after
+    the fact, 2 of 18 Option A P6 points have at least one α ion outside it;
+  - β anchoring;
+  - option (c) of §6;
+  - the spec's own cage partition beyond 24 points;
+  - realism or uniformity of the configurations;
+  - CN-band misses under a production restart budget.
 
 ## 13. Tension assessment (agent-asserted, proposed until ratification)
 
@@ -382,7 +490,10 @@ recorded tension against v7.13 was found.
 | T8 | Unshaped packing isolates ions | **Applicable** → anchoring rule (§7). D2 must shape CN. |
 | T9 | BaCl₂ CN conflict (6.4 vs 7.7) | **Applicable.** E working value 7 ± 1. |
 | T10 | Ca/Mg forms (5A) excluded | **Applicable** → §5 decision. |
-| T11 | Contraction rests on one E-grade analogue point (K/Br-LTA), linear in loading by assumption | **Applicable.** Reopen when matched 4A data or the user's DFT/MLFF f_V(n) arrive (E-vol §5b route ii). |
+| T11 | Contraction rests on one E-grade analogue point (K/Br-LTA at 4 Br per pseudo-cell, 294 K), linear in loading by assumption, and the linear form excludes that point at its own loading | **Applicable.** Reopen when matched 4A data or the user's DFT/MLFF f_V(n) arrive (E-vol §5b route ii). |
+| T13 | Bulk melt CN targets are undefined at low loading (review 1 SC1) | **Applicable** → §7 low-loading decision. |
+| T14 | The f_V bound (f_a ≥ 0.972) equals the v7.14 Li-A/Na-A ratio 0.9724, and 4A exchanges Na → Li in LiCl–KCl [R22, R32]. The R18 small-a phase may be partly an exchange effect, so f_V on a Li-rich V_ref could double-count (hypothesis, review 1) | **Applicable, open.** f_V is defined as occlusion-only (§9). Reopen with matched data. |
+| T15 | Charge separation between α-cages is permitted without a per-cage rule (review 1) | **Applicable** → §4 decision. |
 | T12 | Committed evidence file was rev 2.0. Rev 2.1 corrects the packing range (79-87 %, not 70-80 %) and R33/R32 conversions | **Resolved by committing rev 2.1.** The workplan T1 wording is superseded. |
 
 No SERIOUS CHALLENGE against v7.13, v7.14 or the retained parts of v7.15 is
@@ -403,6 +514,14 @@ selection, not found false.
 - Seed and derived stream identities.
 - Bound evidence-file SHA-256s.
 - Volume inputs: n̄, f_V, V_ref, and whether the factor was overridden.
+- Per-cage net charge, salt only and with the nearest ring counterions.
+- α and β CN reported separately, with the CN option, band and per-ion range
+  in force.
+- The x_M weights and the resulting Cl–Cl r_cut.
+- Ion–framework slack per class.
+- The minimum cage-assignment margin.
+- A statement that verification ran on the final scaled cell.
+- Ring-cation density after relocation (nearest-neighbour statistics).
 
 **Reader.** The stakeholder preparing MD runs.
 
@@ -427,17 +546,26 @@ Otherwise these questions are answered through agent reports only.
 
 ## 15. Decisions requested at ratification
 
-1. §6 ion–framework minima: (a) supply data / (b) ratify the free-oxide proxy / (c) guard only. **Blocking.**
-2. §7 CN target set: A (proposed) or B; and the failure policy for a CN-band miss.
-3. §5 exclusion of Ca/Mg/H/Be/Fr/Ra from salt-mode structures, or supply rows.
-4. §6 Cl–Cl weighting population.
-5. §9 n_ref = 10.5, and whether `--volume-factor` replaces (proposed) or multiplies.
-6. O1a and O1b (§8): proposed yes to both.
-7. O8 cage assignment: nearest-centre (proposed) or 5.7 Å sphere.
-8. §4 the β cage-salt cation cap of 1, and no per-cage neutrality.
-9. O7 legacy flag handling (§10).
-10. §14 the per-run report as a product surface.
-11. O6: confirm trivalent cations are out of scope.
+1. §6 ion–framework minima: (a) supply data, (b) ratify the free-oxide proxy,
+   or (c) guard only, which is inadmissible unless explicitly accepted.
+   **Blocking.**
+2. §7 low-loading semantics (SC1): option (a) with n_CN = 8 (proposed), (b),
+   or (c). **Blocking.**
+3. §7 CN target set: A (proposed) or B with δ_B. The per-ion admissible range.
+   The failure policy for a miss.
+4. §4 per-α-cage charge rule: (a), (b) with q_max = 1 (proposed), or (c).
+5. §5 exclusion of Ca/Mg/H/Be/Fr/Ra from active cage-salt structures, or
+   supply their rows.
+6. §6 Cl–Cl weighting population.
+7. §9 contraction form (a) (proposed), (b) or (c); n_ref = 10.5; whether
+   `--volume-factor` replaces (proposed) or multiplies.
+8. O1a and O1b (§8): proposed yes to both.
+9. O8 cage assignment: nearest-centre (proposed) or the 5.7 Å sphere (needs
+   completion).
+10. §4 β salt cations ≤ N_Cl(β); rejecting cation-only cages.
+11. O7 legacy flag handling (§10).
+12. §14 the per-run report as a product surface.
+13. O6: confirm trivalent cations are out of scope.
 
 ## 16. D1 → D2 hand-off (on ratification)
 
@@ -452,7 +580,8 @@ D2 must preserve:
 D2 owns:
 - the packing and relaxation method;
 - CN shaping;
-- the restart budget;
+- the restart budget, which must be calibrated so feasible requests above
+  n_CN rarely fail;
 - tie handling;
 - how the CN miss probability is bounded.
 
@@ -478,3 +607,54 @@ Evidence tags [Rn], [Pn], [Qn] resolve in the `doc/evidence/` files listed in
 - [Q1] S. Turner et al., *Microporous Mesoporous Mater.* 107, 252 (2008).
 
 All v7.13, v7.14 and v7.15 references remain applicable within their scopes.
+
+## 17. Review record
+
+**Independent falsification review 1** (2026-10-17). AI reviewer: a fresh
+Claude Code subagent context of this session, with the same model family,
+source corpus and toolchain as the author. It is therefore process-independent
+but has common-mode risk.
+
+**SERIOUS CHALLENGES.**
+- **SC1 (low loading).** Carried as decision 15.2.
+- **SC2 (β cations in the CN mean).** Fixed: the target is now α-only and the
+  P6 claim is corrected.
+
+**Findings and dispositions.**
+- **Blocking: verify-then-scale.** Fixed in §11.
+- **Major:**
+  - per-cage charge separation → §4 decision;
+  - option (c) inadmissible → §6;
+  - Option A rationale overstated for Rb/Cs/Sr/Ba → §7;
+  - Option B "±0.5" claim false → §7, §12;
+  - mean-only CN → per-ion range decision;
+  - volume datum at 4 Br contradicts the linear form → §9 decision, T11;
+  - exchange double-count hypothesis → T14;
+  - "active" undefined → §3;
+  - probe and spec mismatches → §12.
+- **Minor:**
+  - authority boundary notes → §1;
+  - partition geometry → §3;
+  - β cap ≤ N_Cl(β) → §4;
+  - §2 wording → fixed;
+  - relocation diagnostics → §14;
+  - record omissions → §14;
+  - unapplied evidence README corrections → below.
+
+The review verified as correct:
+- the CSV hashes and byte-identical regeneration;
+- the spot-checked r_cut and r_min1 values;
+- the CN table values;
+- f_V 0.97 ± 0.03, its bounds and n_ref;
+- the reopen triggers;
+- the charge-invariant generalisation;
+- T4;
+- every §12 count.
+
+**Evidence corrections not yet applied.** The evidence README lists
+corrections to the rev 2.1 pair file (drop P14; P5 SI provenance;
+bibliographic completions). None changes a bound value. The CSVs are bound by
+hash as supplied.
+
+A second review is required only if ratification changes the scientific
+content beyond choosing among the options listed in §15.
