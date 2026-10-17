@@ -30,9 +30,16 @@ to S-6:
 - S-6: the contraction form.
 Revision r4 folds in independent falsification review 2 (§17). It changes
 the calibration route for the charge threshold, adds framework cations to the
-charge observable, and corrects the rationale for the contraction form. Open
-items are marked **[CONFIRM]**; they are listed in §15. The document stays
-PROPOSED until the stakeholder ratifies it as a whole.
+charge observable, and corrects the rationale for the contraction form. Revision
+r5 records stakeholder decisions S-7 to S-10:
+- S-7: the coordination minimum a·C(ρ);
+- S-8: the interface thickness and volume uncertainty;
+- S-9: q_max left to the agent;
+- S-10: no inter-cage moves.
+
+No [CONFIRM] items remain. An independent review of the r5 content (review
+3) is required before ratification (§17). The document stays PROPOSED until
+the stakeholder ratifies it as a whole.
 Items marked **[DECIDE]** are open stakeholder decisions; items marked
 **(proposed)** are agent-chosen defaults that become binding only if ratified.
 Stakeholder decisions D-1 to D-13 are cited from the workplan §2; they are
@@ -218,8 +225,10 @@ salts.
     |q_c| ≤ q_max. This is the D-12 move set.
   - Later D-12 relocations of any ring cation are accepted only if they keep
     every |q_c| ≤ q_max.
-  - Per-cage salt inventories are input (D-1) and are never changed
-    **[CONFIRM]**. Moving salt ions between cages would require relaxing D-1.
+  - Per-cage salt inventories are input (D-1) and are never changed.
+    **No inter-cage moves (stakeholder decision S-10,
+    2026-10-17):** a `cage_salt` ion never moves from an α- to a β-cage or
+    back, and never between cages. It may move freely inside its own cage.
 - **Failure handling.**
   - *Up-front rejection* is a capacity bound. The input is rejected, naming
     the cages, if no assignment of the requested counterions to any sites of
@@ -232,38 +241,44 @@ salts.
     no cage cations and 12 counterions on 4R needs all 12 of α₀'s 4R sites,
     but on seed 0 two of them hold framework Na. The report names the blocking
     sites.
-- **Threshold q_max (stakeholder-set; provisional 1 e, [CONFIRM]).**
-  - **Literature (context only; agent search, 2026-10-17; abstracts and
-    snippets, full texts blocked by this environment's network policy).**
-    Molten salts screen charge perfectly: the charge–charge structure factor
-    satisfies S_ZZ(k) → 0 as k → 0 (zeroth moment), and the Stillinger–Lovett
-    condition fixes its k² coefficient (second moment). Molten NaCl is
-    discussed in [P4: Zeidler et al., *J. Chem. Phys.* 157, 094504 (2022)].
-    For large sub-volumes, the variance of the net charge then grows with the
-    boundary area, not the volume (charge hyperuniformity):
+- **Threshold q_max (S-9, 2026-10-17: the stakeholder delegated the choice to
+  the agent's reading of the charge-fluctuation literature).**
+
+  ```
+  q_max = z_max * e,   z_max = largest formal charge among the cations in the structure
+  ```
+
+  This gives 1 e for alkali-only structures and 2 e when Sr²⁺ or Ba²⁺ is
+  present.
+  - **Basis.** Molten salts screen charge perfectly: S_ZZ(k) → 0 as k → 0
+    (zeroth moment), and the Stillinger–Lovett condition fixes the k²
+    coefficient (second moment). Net charge in a region is thereby confined to
+    the region's boundary (charge hyperuniformity). For a region the size of
+    one cage (about 1.5–2 ion spacings across), whose boundary is mostly a
+    wall the ions cannot cross, the agent's reading is that a screened
+    configuration carries at most about one unscreened ion's charge. The
+    rule therefore allows at most one ion's worth of imbalance.
+  - The threshold is z_max rather than 1 because framework Sr/Ba placement
+    alone can create ±2 e imbalances that only counterion re-siting can
+    offset.
+  - The literature gives no number at cage scale. This threshold is an
+    agent judgment under S-9, not an imported value.
+  - **Literature (context; agent search, 2026-10-17; abstracts and snippets,
+    full texts blocked by this environment's network policy):**
+    - [P4: Zeidler et al., *J. Chem. Phys.* 157, 094504 (2022)] for molten
+      NaCl;
     - Ph. A. Martin, T. Yalcin, *J. Stat. Phys.* 22, 435 (1980);
     - J. L. Lebowitz, *Phys. Rev. A* 27, 1491 (1983);
     - T. Hoang Ngoc Minh, B. Rotenberg, S. Marbach, *Faraday Discuss.* 246,
-      225 (2023), by simulation.
-
-    No study gives a number at cage scale.
-  - **Why a bulk-melt sphere statistic is not used (review 2, SERIOUS
-    CHALLENGE SC-A).** Counting ion centres in a cage-sized bulk sphere
-    (R ≈ 5.9 Å) is dominated by ions cut by the arbitrary boundary. Even a
-    perfect rock-salt lattice at melt density gives σ_Q ≈ 1.35 e and |Q| up
-    to 4 (review-2 probe). A rule ⌈3σ_Q⌉ would therefore allow about 5 e and
-    fail S-5. A cage boundary is instead mostly an impenetrable wall with
-    fixed framework charge, so the two statistics are different estimands.
-  - **Calibration route (proposed, optional).** Run MD of salt-loaded LTA at
-    800 K with the stakeholder's MLFF. Compute the distribution of q_c, with
-    exactly this observable, partition and weights. Set q_max to a stated
-    upper percentile of |q_c|, for example the 99th.
-  - **Provisional value.** Until calibrated, q_max = 1 e is an agent
-    placeholder for the stakeholder to accept or replace. It allows a single
-    β-Cl counterion on a 4R site (q_β = −1) and the fixture's framework
-    imbalance of ±1 e. The E-occ statement "each Cl⁻ arrives with a
-    charge-balancing cation" concerns inventory, not locality, and is not
-    cited as support.
+      225 (2023).
+  - **Why a bulk-melt sphere statistic is not used (review 2, SC-A).**
+    Counting ion centres in a cage-sized bulk sphere is dominated by ions
+    cut by the arbitrary boundary. A perfect rock-salt lattice already gives
+    σ_Q ≈ 1.35 e, and ⌈3σ_Q⌉ would allow about 5 e.
+  - **Optional later calibration.** Run MD of salt-loaded LTA at 800 K with
+    the stakeholder's MLFF. Compute the distribution of q_c with exactly this
+    observable, and replace z_max by a stated upper percentile of |q_c| if
+    the two differ materially (reopen trigger).
 - **Reported:** every q_c^exc and q_c^fw, the rebalancing and relocation moves
   with their charge effect, and the distribution of q_c against q_max.
 
@@ -390,61 +405,84 @@ targeted, because:
   eutectic value may be circular if that value was itself computed by
   additivity (T19).
 
-**Cage capacity at that density.** n_melt(c) = V_free,α(c) / v_pair(800 K,
-x_Li(c)). The proposed V_free,α is the cage's nearest-centre cell volume lying
-more than 1.40 Å from every framework O (Shannon O²⁻ [P7]) and more than the
-Si/Al radii from T atoms. It is computed on the realized, scaled cell with a
-deterministic estimator of stated tolerance (D2). The exclusion radius is an
-agent choice and strongly affects the result (review-2 sensitivity, Na-A
-fixture):
+**Effective salt volume (stakeholder decision S-8, 2026-10-17).** The cage
+volume is not well defined, because the interfacial structure between the
+cage's inner surface and the salt is unknown. An interface of uncertain
+thickness t is therefore assumed, and the effective volume carries a range.
 
-| O exclusion radius (Å) | 1.2 | 1.35 | 1.40 (proposed) | 1.6 | 1.8 | 2.0 |
-|---|---|---|---|---|---|---|
-| V_free,α (Å³) | 893 | 875 | 867 | 816 | 744 | 667 |
-| n_melt (x_Li 0.58) | 15.5 | 15.2 | 15.0 | 14.1 | 12.9 | 11.6 |
+```
+V_eff,α(c; t) = volume of the nearest-centre cell of alpha-cage c
+                at distance > r_O + t from every framework O
+                (and > r_T + t from Si/Al)
+n_melt(c; t)  = V_eff,α(c; t) / v_pair(800 K, x_Li(c))
+```
 
-The 1.35–1.40 Å radii follow the usual O-radius convention behind
-free-diameter figures such as the 11.4 Å of [R31]. Radii of 1.4–2.0 Å are
-"peak-consistent" (Cl–O peak minus half the Cl–Cl peak). The choice moves the
-12/α Li target from 3.4 to 4.3, more than δ.
+- r_O = 1.40 Å (Shannon O²⁻ [P7]), the usual O-radius convention behind
+  free-diameter figures such as the 11.4 Å of [R31]; r_Si = 0.26 and
+  r_Al = 0.39 Å [P7].
+- **Interface range: t ∈ [0, 0.6] Å (proposed).** The upper end makes the
+  closest salt-centre-to-O distance 2.0 Å. That is the "peak-consistent"
+  wall distance derived in review 2 from the E-pair rows: the Cl–O peak
+  minus half the Cl–Cl peak, 1.4–2.0 Å.
+- V_eff is computed on the realized, scaled cell with a deterministic
+  estimator of stated tolerance (D2).
 
-| α volume definition | V (Å³) | Cl at 800 K melt density |
-|---|---|---|
-| Nearest-centre free volume (adopted; Na-A, V_ref, agent Monte Carlo) | 867 | **15.0** (14.7 also excluding ring Na) |
-| 11.4 Å free-diameter sphere [R31] | 776 | 13.4 |
-| 11.05 Å IZA maximum included sphere (idealized LTA) | 707 | 12.2 |
-| Adopted definition with f_V = 0.97 applied | about 841 | about 14.6 |
+Na-A fixture at V_ref (agent Monte Carlo, 6×10⁵ points, two seeds, agreeing
+within 3 Å³):
 
-**Finding (T17).** At the proposed radius and for x_Li ≳ 0.07, the 800 K
-melt capacity of an α-cage (12.2–15.0 across the volume definitions above) is
-at or above the D-2 cap of 12. Such cages are never "dense". K-rich cages
-(pure KCl: n_melt ≈ 11.7, or 11.3 with f_V) and radii of 2.0 Å or more can be
-dense. The measured capacity of about 10.5 Cl per pseudo-cell [R1,
+| t (Å) | 0 | 0.15 | 0.30 | 0.45 | 0.60 |
+|---|---|---|---|---|---|
+| V_eff,α (Å³) | 867 | 831 | 781 | 725 | 666 |
+| n_melt, eutectic x_Li 0.592 | 15.1 | 14.5 | 13.6 | 12.6 | 11.6 |
+| n_melt, pure KCl | 11.7 | 11.2 | 10.5 | 9.8 | 9.0 |
+
+The reported uncertainty range of n_melt(c) is [n_melt(c; 0.6),
+n_melt(c; 0)]. The comparison spheres are 11.4 Å [R31] (776 Å³, 13.4) and
+11.05 Å [IZA] (707 Å³, 12.2); both fall inside this range.
+
+**Finding (T17).** For the eutectic, the 800 K melt capacity of an α-cage is
+11.6–15.1 Cl (centre 13.6). The D-2 cap of 12 therefore lies inside the
+uncertainty range: a fully loaded eutectic cage may or may not be "dense".
+K-rich cages (pure KCl: 9.0–11.7) can be dense at 10–12 Cl. The measured capacity of about 10.5 Cl per pseudo-cell [R1,
 R2], about 9.5 per α with 1 Cl in β, is about 63 % of melt density under the
 adopted definition.
 
-**Coordination rule under S-2/S-4 ([CONFIRM]; three readings).** Notation:
-φ(c) = min(1, N_Cl(c)/n_melt(c)) and T_M(c) = max(1, T_M^bulk φ(c)). Basis
-(grade D): N(M–Cl) = 4π ρ_Cl ∫₀^{r_min1} g_MCl(r) r² dr, which is linear in
-the Cl number density *if g is unchanged*. That assumes the salt is spread
-uniformly over the cage.
+**Coordination rule (stakeholder decision S-7, 2026-10-17).** "Coordination
+is a distribution, not a strict number, so you should conservatively set a
+minimum that is below the ideal. Say if the projected coordination is C(ρ),
+then the minimum is set to a·C(ρ), where a is a number from 0 to 1."
 
-| Reading | Rule in an α-cage | Consequence |
-|---|---|---|
-| (i) literal | Anchoring and per-ion range everywhere. The band T^bulk ± δ only if φ ≥ 1 (dense). | No mean target in nearly all cages (T17). Unshaped packing then gives Li–Cl about 2 at 8–12 Cl/α (P5). |
-| (ii) two-sided linear (r3) | mean ∈ T_M(c) ± δ | At ≤ 4 Cl/α it forces CN of about 1, i.e. isolated ion pairs (P8 at n = 2, 4). That contradicts the cluster evidence below. |
-| **(iii) one-sided linear floor (recommended)** | mean ≥ T_M(c) − δ when φ < 1. Two-sided T^bulk ± δ when φ ≥ 1. Per-ion 1 ≤ N_i ≤ U_M always. | Requires enough coordination at high loading and allows clustered salt (higher local CN) at low loading. U_M caps extremes. |
+```
+C_M(c) = T_M^bulk * phi(c),   phi(c) = min(1, N_Cl(c) / n_melt(c; t = 0))
+mean_{i in M, alpha-cage c} N_i(Cl) >= a * C_M(c)      (per alpha-cage c, per species M)
+1 <= N_i(Cl) <= U_M                                     (every cage_salt cation in an alpha-cage)
+```
 
-- Example floors T_M(c) at n_melt = 15:
+- **Projection C(ρ) (grade D).** N(M–Cl) = 4π ρ_Cl ∫₀^{r_min1}
+  g_MCl(r) r² dr, which is linear in the Cl number density if g is
+  unchanged. C reaches T^bulk at melt density.
+- **Conservative volume end.** The minimum uses the largest effective volume
+  (t = 0), so the projection is lowest. C over the whole range t ∈ [0, 0.6] is
+  reported.
+- **a = 0.7 (proposed default; governed parameter, 0 < a ≤ 1).** a is the
+  median, over Li, Na, K, Rb and Cs, of the ratio between the lower edge of
+  the measured definition-dependent spread and the recommended value in E-cn
+  §1a. The ratios are Li 3.5/4.3 = 0.81, Na 3.7/5.2 = 0.71, K 3.5/5.2 = 0.67,
+  Rb 4.2/5.4 = 0.78 and Cs 3/5.5 = 0.55. The minimum is applied to the mean of
+  the distribution, not to each ion.
+- **Individual ions.** They only need anchoring (≥ 1) and the cap U_M. So the
+  rule is one-sided: clustered salt with higher local coordination is allowed,
+  which is consistent with the cluster counterevidence below.
+- **Example minima at a = 0.7, t = 0 (eutectic, n_melt ≈ 15):**
 
   | Cl per α | 4 | 8 | 9.5 | 12 |
   |---|---|---|---|---|
-  | Li | 1.15 | 2.29 | 2.72 | 3.44 |
-  | K | 1.39 | 2.77 | 3.29 | 4.16 |
+  | a·C, Li | 0.80 | 1.61 | 1.91 | 2.41 |
+  | a·C, K | 0.97 | 1.94 | 2.31 | 2.91 |
 
-- A physical reason for low Cl coordination of wall cations, if one is
-  needed, is coordination by framework O (for example Sr–O3 × 3 at 6R
-  [Q25]). This is not modelled.
+  Below about 5 Cl per α, the anchoring floor of 1 is the binding constraint.
+- A physical reason for low Cl coordination of wall cations is coordination by
+  framework O (for example Sr–O3 × 3 at 6R [Q25]). This is not modelled.
 
 **Literature on CN vs density (agent search, 2026-10-17).** No study was
 found that reports the coordination of a confined chloride melt as a function
@@ -461,12 +499,12 @@ of loading or density. Indirect support for the direction only:
 - *Counterevidence to a uniform linear reduction:* small chloride clusters
   and LTA halide units keep CN 2–4 at very low overall density. At low
   loading the salt is therefore likely to cluster, not disperse. This is why
-  reading (iii) bounds the mean only from below.
+  the S-7 rule bounds the mean only from below.
 
 The linear form is an assumption (T16).
 
 **Evaluation.** The rule is evaluated per α-cage c and per species M with ≥ 1
-centres in c. T_M(c) uses only the cage's own Cl, but first neighbours may
+centres in c. C_M(c) uses only the cage's own Cl, but first neighbours may
 include Cl in adjacent cages through the windows. This is accepted as an
 approximation.
 
@@ -499,7 +537,7 @@ every `cage_salt` cation must therefore have 1 ≤ N_i(Cl) ≤ U_M:
 
 U_M is the integer ceiling of the upper "spread across all sources" in E-cn
 §1a, or T + 2 for Sr and Ba. The lower bound is the anchoring rule, not a
-spread bound, because the density-reduced floor goes down to 1.
+spread bound, because the S-7 minimum goes below 1 at low loading.
 
 - **Distribution form.** The evidence supplies means ± spread, not P(CN)
   histograms (O4b answered by data availability). The per-cage mean and the
@@ -647,7 +685,10 @@ tolerance that §11 does not allow for production. Reported CN is α-only.
 | P5 Ca ring | Ca-A | rejected: missing pair (Ca, Cl), as §5 requires |
 | P5 unshaped CN | all feasible points | Group means Li–Cl 1.9-2.1 and K–Cl 3.5-3.7. Per-point ranges Li 1.2-2.8, K 2.5-5.1. Sr–Cl 2.0-2.5, Ba–Cl 3.0-4.5. Min 0 (isolated ions). Ring–ring slack ≥ +0.27 Å |
 | P7 density-reduced CN (Option A, superseded reference N_Cl/12) | Na/K-A × seeds 0-2 × n 8, 10, 12 × nearest-centre partition (C2); 4 starts | 18/18 points: per-α-pooled means within ±0.5 of T·n/12, 1 ≤ N_i ≤ U_M for every Li/K, hard minima met. Achieved Li 2.6-4.4, K 3.0-5.5 against targets 2.87-4.30 and 3.47-5.20 |
-| P8 melt-density CN (S-4 reading, Option A, n_melt = 15) | Na/K-A × seeds 0-2 × n 2, 4, 6, 8, 12 × C2; 4 starts; targets max(1, T·n/15) | Hard minima met at all 30 points. Pooled α means lie within ±0.5, counting band edges as inside. Under spec rules 26/30 comply: 4 points (n = 2 three times, n = 6 once) leave one cation with CN 0, because the probe's smooth objective does not enforce anchoring, so D2 must enforce it explicitly. The probe pools both α-cages and uses n_melt = 15 throughout, whereas §7 is per cage (x_Li 0.5–0.67 would give 14.5–15.9). All points also satisfy reading (iii). |
+| P8 melt-density CN (S-4 reading, Option A, n_melt = 15) | Na/K-A × seeds 0-2 × n 2, 4, 6, 8, 12 × C2; 4 starts; targets max(1, T·n/15) | Hard minima met at all 30 points. Pooled α means lie within ±0.5, counting band edges as inside. Under spec rules 26/30 comply: 4 points (n = 2 three times, n = 6 once) leave one cation with CN 0, because the probe's smooth objective does not enforce anchoring, so D2 must enforce it explicitly. The probe pools both α-cages and uses n_melt = 15 throughout, whereas §7 is per cage (x_Li 0.5–0.67 would give 14.5–15.9). Recounted against the S-7 minimum, the mean condition holds at 30/30 points
+for a = 0.6 and 0.7, and at 22/30 for a = 0.8. With all rules (anchoring, cap,
+minima) it is 26/30 at a = 0.7. P8 shaped toward C itself, not toward the
+minimum, so it is an existence check only. |
 | P6 CN-shaped | Na/K-A × seeds 0-2 × n 8, 10, 12 × options A/B; 4 starts | All hard minima met. α-only, Option A: Li 3.9-4.5, K 5.1-5.5, all 18 points within ±0.5. Option B: Li 3.6-4.3, K 6.2-7.1; 3 of 18 points outside ±0.5, and 17 of 18 outside the source ranges. Cl-centred (cage + ring) 5.4-7.1. Anchoring min ≥ 1 (α). If β-Li (CN 1) were included in the mean, 6 of 18 Option A points would miss (review 1). |
 
 **Variant disclosure (cumulative v7.16).**
@@ -656,7 +697,11 @@ tolerance that §11 does not allow for production. Reported CN is α-only.
 - P6: 36 points.
 - P7: 18 points (one form, chosen after the stakeholder's S-2 instruction,
   not selected from alternatives).
-- P8: 30 points (the S-4 reading, one form).
+- P8: 30 points (the S-4 reading, one form). Recounted after the fact
+  against a ∈ {0.6, 0.7, 0.8}. a = 0.7 was chosen from E-cn §1a data, not
+  from this recount.
+- V_eff(t): 5 thicknesses × 2 Monte Carlo seeds. The range t ∈ [0, 0.6] was
+  fixed from the review-2 wall-distance derivation before computing.
 - The α free-volume estimate: one Monte Carlo run (4×10⁵ points, Na-A,
   seed 0, O radius 1.35 and 1.40 Å), with the two sphere definitions as
   comparison.
@@ -672,7 +717,8 @@ tolerance that §11 does not allow for production. Reported CN is α-only.
   - more than 3 seeds;
   - dopant-rich salts;
   - n < 2;
-  - the §4 charge rebalancing and the q_c criterion;
+  - the §4 charge rebalancing and the q_c criterion with q_max = z_max;
+  - V_eff on ring forms other than Na-A, and t > 0 in any CN probe;
   - CN shaping with Cs/Sr/Ba;
   - the per-ion range rule, which was not a shaping objective. Recounted after
     the fact, 2 of 18 Option A P6 points have at least one α ion outside it;
@@ -703,12 +749,13 @@ recorded tension against v7.13 was found.
 | T9 | BaCl₂ CN conflict (6.4 vs 7.7) | **Applicable.** E working value 7 ± 1. |
 | T10 | Ca/Mg forms (5A) excluded | **Applicable** → §5 decision. |
 | T11 | Contraction rests on one E-grade analogue point (K/Br-LTA at 4 Br per pseudo-cell, 294 K), with 3 of the 4 Br in β-cage Ag₄Br₄, so it is no loading equivalent for this model. The loading dependence is assumed: form (a) is linear to 10.5. The r3 form (c) was withdrawn after review 2 | **Applicable.** Reopen when matched 4A data or the user's DFT/MLFF f_V(n) arrive (E-vol §5b route ii). |
-| T13 | Bulk melt CN targets are undefined at low loading (review 1 SC1) | **Resolved by S-2 and S-4:** density-reduced target max(1, T·φ). Interpretation per §7 [CONFIRM]. |
+| T13 | Bulk melt CN targets are undefined at low loading (review 1 SC1) | **Resolved by S-2, S-4 and S-7:** one-sided minimum a·C(ρ) plus anchoring. |
 | T14 | The f_V bound (f_a ≥ 0.972) equals the v7.14 Li-A/Na-A ratio 0.9724, and 4A exchanges Na → Li in LiCl–KCl [R22, R32]. The R18 small-a phase may be partly an exchange effect, so f_V on a Li-rich V_ref could double-count (hypothesis, review 1) | **Applicable, open.** f_V is defined as occlusion-only (§9). Reopen with matched data. |
 | T15 | Charge separation between α-cages is permitted without a per-cage rule (review 1) | **Resolved by S-5:** criterion abs(q_c) ≤ q_max with rebalancing (§4). Threshold per T18. |
 | T16 | No study gives CN vs loading or density for a confined chloride melt. The linear-in-density form (§7) assumes uniform dispersal. Cluster evidence (CN 2–4 at low overall density) is counterevidence to applying it two-sided | **Applicable.** Reopen with an MD-computed CN(n) in LTA, for example from the user's MLFF (cf. E-cn §6.3). |
-| T17 | The 800 K melt-density capacity of an α-cage (11.6–15.5 Cl across volume definitions and radii, 15.0 proposed) is mostly at or above the D-2 cap of 12. Only K-rich cages or large exclusion radii can be dense | **Applicable** → §7 [CONFIRM] readings and the proposed radius. |
-| T18 | The q_max threshold is not calibrated, and no study quantifies cage-scale charge fluctuations. A bulk-sphere statistic is the wrong estimand (review 2, SC-A) | **Applicable** → stakeholder-set provisional 1 e; calibrate on salt-loaded LTA MD (§4). |
+| T17 | The 800 K melt capacity of an α-cage spans 11.6–15.1 Cl (eutectic) over the S-8 interface range, so the D-2 cap of 12 lies inside the uncertainty | **Applicable; handled** by the S-7 minimum at the conservative end (t = 0), with the range reported. |
+| T18 | No study quantifies cage-scale charge fluctuations, so q_max = z_max e is an agent judgment under S-9. A bulk-sphere statistic is the wrong estimand (review 2, SC-A) | **Applicable.** Reopen if salt-loaded LTA MD shows a materially different q_c distribution. |
+| T21 | The interface thickness range t ∈ [0, 0.6] Å is an agent choice anchored on a review-derived wall distance. The interfacial structure is unknown (S-8) | **Applicable.** Reopen with MD density profiles of salt in LTA. |
 | T20 | The r3 q_c excluded framework cations, hiding a ±1 e local imbalance (review 2) | **Resolved:** q_c^fw added (§4). |
 | T19 | Melt density rests on Janz correlations read via citing papers (grade C), ideal mixing, and no dopant volumes | **Applicable, minor.** The check reproduces the cited eutectic value to 10⁻⁴ g cm⁻³. |
 | T12 | Committed evidence file was rev 2.0. Rev 2.1 corrects the packing range (79-87 %, not 70-80 %) and R33/R32 conversions | **Resolved by committing rev 2.1.** The workplan T1 wording is superseded. |
@@ -733,7 +780,8 @@ selection, not found false.
 - Volume inputs: n̄, f_V, V_ref, and whether the factor was overridden.
 - Per-cage excess charge q_c, the rebalancing moves, and q_max with its
   provenance (provisional or calibrated).
-- n_melt(c), V_free,α(c), φ(c) and T_M(c) per α-cage.
+- Per α-cage: V_eff,α(c; t) and n_melt(c; t) at t = 0 and 0.6, φ(c), C_M(c)
+  over that range, a, and the achieved mean against a·C_M(c).
 - α and β CN reported separately, with the CN option, band and per-ion range
   in force.
 - The x_M weights and the resulting Cl–Cl r_cut.
@@ -817,27 +865,33 @@ certainty.
 
   The stakeholder may reverse any of these at ratification.
 
-**Open [CONFIRM] at ratification.**
-1. §7: coordination reading (i), (ii) or (iii). Reading (iii), the one-sided
-   floor, is recommended and provisionally written in.
-2. §7: V_free,α definition and O exclusion radius 1.40 Å (proposed), and the
-   x_Li fallback and dopant-validity flag.
-3. §4: the q_c observable including q_c^fw (proposed); q_max = 1 e
-   (provisional placeholder, stakeholder-set); calibration from salt-loaded
-   LTA MD (optional).
-4. §4: rebalancing never changes per-cage salt inventory (D-1).
+**Stakeholder decisions, third round (human, via chat, 2026-10-17).**
+- **S-7.** The coordination minimum is a·C(ρ), 0 < a ≤ 1, applied below the
+  ideal because coordination is a distribution (§7). The agent sets a = 0.7
+  (proposed default, from E-cn §1a).
+- **S-8.** Cage volume is not well defined. Assume an interface thickness so
+  that the effective salt volume carries an uncertainty range (§7: t ∈ [0,
+  0.6] Å, proposed).
+- **S-9.** q_max is to be picked by the agent from its charge-fluctuation
+  study (§4: z_max e).
+- **S-10.** Ions are not moved between α- and β-cages. Moves within a cage
+  are allowed (§4).
+
+**Superseded by S-7.** The three readings and the two-sided band.
+
+**Open.** None, beyond review 3 and ratification.
 
 ## 16. D1 → D2 hand-off (on ratification)
 
 D2 must preserve:
 - §4 exact inventory and invariants;
 - §6 hard minima with exact final verification (no tolerance below r_cut);
-- §7 anchoring (enforced explicitly; see P8), the density-reduced CN band per
-  α-cage, the per-ion range, and V_free,α computed on the realized cell;
+- §7 anchoring (enforced explicitly; see P8), the S-7 mean minimum a·C(ρ) per
+  α-cage, the per-ion range, and V_eff,α(t) computed on the realized cell;
 - §4 the cage charge criterion (q_c^exc + q_c^fw), the rebalancing move set,
   relocation acceptance under the criterion, and seed-level failure
   reporting;
-- a deterministic V_free,α estimator with a stated tolerance, so output stays
+- a deterministic V_eff,α estimator with a stated tolerance, so output stays
   byte-deterministic;
 - §8 relocation limits;
 - §11 stream isolation;
@@ -882,7 +936,7 @@ source corpus and toolchain as the author. It is therefore process-independent
 but has common-mode risk.
 
 **SERIOUS CHALLENGES.**
-- **SC1 (low loading).** Resolved by S-2/S-4 and the §7 readings.
+- **SC1 (low loading).** Resolved by S-2/S-4/S-7 (one-sided minimum a·C(ρ) plus anchoring, §7).
 - **SC2 (β cations in the CN mean).** Fixed: the target is now α-only and the
   P6 claim is corrected.
 
@@ -963,5 +1017,6 @@ Review 2 verified as correct:
 - the E-vol rows;
 - the CSV hashes.
 
-A third independent review is required before ratification if the stakeholder's
-[CONFIRM] answers change content beyond the listed options.
+**Review 3 is required before ratification.** The stakeholder's S-7 and S-8
+answers introduce new formulations (the a·C(ρ) minimum and the
+interface-thickness volume), beyond the options listed in r4.
