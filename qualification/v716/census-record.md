@@ -21,8 +21,8 @@ Observations (agent interpretation, labelled):
   inside a large cavity, so random insertion more often ends in a count deficit. Not a
   failure risk at K_max = 20 on this grid; a sparser request outside the grid could
   need more.
-- No D-12 relocations were needed in any passing start recorded in the summary
-  (see the per-request `relocations` field).
+- No request needed a D-12 ring relocation (`relocations` is 0 in all 90 log rows), so
+  the relocation path is exercised only by unit-level code, not by this census.
 - Variant disclosure: one census run, rule B, no re-tuning, no request rerun. One
   off-grid functional check of the worker (K ring, n = 2, seed 99, not in the plan) ran
   before the freeze; it passed on start 5 and changed nothing.
