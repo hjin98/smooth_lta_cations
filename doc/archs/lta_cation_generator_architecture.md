@@ -1633,3 +1633,116 @@ v7.15 consequently rejects nonzero occlusion before maximum-symmetry
 optimization/certification and before multi-member unique batching. Extending
 the group action to cage states is a future architecture change, not an
 implicit property of v7.15.
+
+## v7.16 architecture delta: cage-salt occlusion (PROPOSED D3, 2026-10-18)
+
+**Lifecycle: PROPOSED.** The governing parents are the accepted D1
+`doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7) and the accepted
+D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r2). This section
+concretizes the D2 §11 hand-off. It becomes current once its independent
+review passes. Until v7.16 is implemented, the shipped generator is v7.15.0.
+
+### Component ownership
+
+| Component | Owns | Must not own |
+|---|---|---|
+| `lta_cage_salt_data.py` (generated) | Numeric projection of the bound evidence CSVs: r_cut, r_min1 and r_peak rows for species S ∪ {Cl, O}; T^bulk, U_M, d_M; the Janz correlations; the CSV SHA-256s | Any hand-edited value. It is regenerated from `doc/evidence/*.csv` by `lta_cage_salt_data.regenerate()`, and a test compares it byte-for-byte |
+| `lta_cage_salt.py` (domain) | The `CageSaltRequest` model and validation (D1 §4-§5); window table and exact-fraction charge (D2 §4.3); exhaustive rebalancing (D2 §5); V_eff and floors (D2 §4.2); exact verification V1-V6 (D2 §7); the run record and sidecar (D1 §14, D2 §8.1) | Optimisation numerics; ring placement; smoothing; file writing |
+| `lta_cage_salt_build.py` (numerics) | Objective E_W, analytic gradients, insertion, continuation and polish, D-12 relocation proposals, first-success restarts and per-start streams (D2 §6) | Acceptance decisions: it calls `lta_cage_salt.verify` and never decides pass/fail itself |
+| `lta_cation_population_grouped.py` (existing) | The `occlusion_model` selector; up-front validation dispatch; `finalize_cage_salt(result, request, ...)`; the single assembly `build_p1_structure` extended with `cage_salt_ions`; CLI flags; writers and the sidecar call | Salt numerics or rules, which it delegates to the two modules above |
+| `generate_smooth_lta_cations_grouped.py` (existing) | Calling `finalize_cage_salt` once on the selected attempt; `--attempt-seed` single-attempt reproduction | — |
+
+Dependency direction is acyclic: the population and smoothing modules
+import the cage-salt build module, which imports the cage-salt domain
+module, which imports the data module. Neither cage-salt module imports the
+population module. Ring and framework geometry reach them as plain data:
+lattice, framework rows, placed ions, and the physical sites with their
+anchors and variants.
+
+### State and representation
+
+- **`PopulationResult`.** It gains `cage_salt_ions: List[CageSaltIon]`, where
+  `CageSaltIon` holds element, frac, cage_id and role `cage_salt`. It also
+  gains `cage_salt_record: Optional[CageSaltRecord]`.
+- **Placed ions.** `placed_ions` remains the single owner of ring-cation state.
+  Rebalancing and D-12 moves produce a new `placed_ions` list through
+  `dataclasses.replace`, never by in-place mutation.
+- **Assembly.** `build_p1_structure` is the only structure assembler. Atoms
+  appear in the order framework, ring ions (existing order), then cage-salt
+  ions (by cage, then element, then index).
+- **Coordinates.** Cage-salt ions carry D2 canonical fractional coordinates
+  (10 decimals, wrapped). Writers receive the assembled structure, so every
+  format serializes the canonical set.
+- **Legacy and dry results.** These keep `cage_salt_ions = []`, and their
+  assembly is byte-identical to v7.15.0.
+
+### Control flow (cage-salt mode)
+
+```text
+CLI/API -> parse CageSaltRequest -> validate (species set S, domain, cation-only cages,
+           capacity, up-front charge check)                          [fail fast, no RNG]
+        -> generate population at volume_factor = 1 (V_ref cell), salt deferred   [steps 1-2]
+        -> (smoothing entry point) attempts / repair / select                     [step 3]
+        -> finalize_cage_salt:
+             rebalance (R_q) -> scale to f_V or override -> V_eff/floors
+             -> build (R_s,k, restarts) -> verify -> assemble -> record
+        -> write structure + <output>.salt.json (record + per-atom sidecar)
+```
+
+- **Failure.** `CageSaltConstructionError` carries the record. The CLI writes
+  `<output>.salt.json` with status `failed`, writes no structure, and exits
+  non-zero.
+- **Inactive model.** If the cage-salt model is inactive (D1 §3), the
+  pipeline is exactly v7.15.0's dry path.
+
+### Public interface (D4 contract, proposed names)
+
+- `--occlusion-model {cage-salt, sparse-v715}`, default `cage-salt`. The
+  legacy flags (`--alpha-cl`, `--beta-cl`, `--occlusion-n4/6/8`,
+  `--occlusion-min-distance`) are rejected unless `sparse-v715` is chosen.
+- **Salt inventory:**
+  - `--alpha-salt SPEC` and `--beta-salt SPEC` apply to both cages of that
+    type;
+  - `--alpha0-salt`, `--alpha1-salt`, `--beta0-salt` and `--beta1-salt`
+    override per cage;
+  - SPEC looks like `Cl:10,Li:6,K:4`.
+- **Ring counterions:** `--salt-counterion-n4/n6/n8 SPEC`.
+- **Controls:** `--salt-max-starts N` (K_max, default 20), plus the existing
+  `--volume-factor` (override) and `--seed`.
+- **Smoothing entry point:** adds `--attempt-seed N`.
+- **Python API:** `generate_lta_cation_structure_from_specs(...,
+  occlusion_model="cage-salt", cage_salt=CageSaltRequest | None,
+  salt_max_starts=20)`. The legacy keyword arguments raise unless
+  `occlusion_model="sparse-v715"`.
+- **Still rejected when active:** maximum symmetry, unique batches larger
+  than one, ratio allocation, `--auto-rebalance` and `--write-candidate`.
+
+### Realized record (O1)
+
+`CageSaltRecord` is the canonical source for every field required by D1 §14
+and D2 §8.1. The text report and the JSON file are projections of it.
+- **Per-atom sidecar.** It is in written-file order, which the writers
+  determine by grouping atoms by element. For each atom it lists index,
+  element, role, cage_id or site_id/variant_id, and canonical frac.
+- **Retention.** One JSON file per output structure. Nothing else is
+  retained.
+- **Product surface.** D1 §14 accepted it, and D2 §12 acknowledged the added
+  fields.
+
+### Resources and determinism
+
+- **Single process.** There are no new concurrency mechanisms.
+- **V_eff caching.** The V_eff grid result for a V_ref cell is cached in
+  process, keyed by (template SHA-256, lattice bytes, d), and scaled through
+  the D2 scale identity.
+- **Dependencies.** SciPy is added to `[project] dependencies`.
+- **Stack record.** The record stores the versions of Python, NumPy, SciPy and
+  pymatgen.
+
+### Reopen triggers
+
+- Any need to mutate ring state outside `placed_ions` replacement.
+- A second structure assembler.
+- A cage-salt module importing the population module.
+- A writer that cannot serialize the canonical coordinates within τ_w.
+- A failure of legacy or dry byte-identity.
