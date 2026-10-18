@@ -183,7 +183,7 @@ def main():
                 ok = False
             row["as_expected"] = ok
             with open(log, "a") as fh:
-                fh.write(json.dumps(row, sort_keys=True) + "\n")
+                fh.write(json.dumps(row, sort_keys=True, default=lambda o: o.item() if hasattr(o, "item") else str(o)) + "\n")
             print(f"{'OK ' if ok else 'BAD'} {row['id']}: exit {row['exit']} ({row['seconds']} s)"
                   f" {row.get('status', '')} starts={row.get('start_used')}", flush=True)
 
