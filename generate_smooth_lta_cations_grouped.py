@@ -22,6 +22,13 @@ High-level grouped-site generator:
  10. Write the complete framework + cations + chloride structure as CIF, VASP
      POSCAR-format, or LAMMPS data according to the output filename.
 
+v7.16: steps 4 and 8 above describe the legacy model, now selected by
+--occlusion-model sparse-v715. The default cage-salt model validates the
+request once, runs every attempt at volume factor 1 with the salt deferred,
+and builds the salt only on the selected attempt (finalize_cage_salt).
+--attempt-seed N reruns exactly one attempt with seed N, so an attempt seen
+in the log can be reproduced byte for byte.
+
 Dry-volume reference sources:
 Carey et al., Chem. Mater. 26, 1561-1566 (2014), DOI 10.1021/cm403312q
 (alkali references; exact values in Carey PhD thesis, 2013, Ch. 3);
@@ -70,6 +77,17 @@ import numpy as np
 from lta_cation_population_grouped import (
     RING_CLASSES,
     SUPPORTED_CATIONS,
+    OcclusionCageSalt,
+    OcclusionLegacySparse,
+    _counterion_allocations,
+    add_occlusion_arguments,
+    finalize_cage_salt,
+    load_lta_template,
+    make_allocations_from_cli,
+    reject_cage_salt_modes,
+    resolve_occlusion_mode_from_args,
+    run_cage_salt_cli,
+    validate_cage_salt_request,
     PhysicalSite,
     PlacedIon,
     PopulationResult,
@@ -228,15 +246,27 @@ def generate_one_smooth_population(
     master_rng: random.Random,
     species: Sequence[str],
     cutoffs: dict,
+    mode=None,
+    cage_salt=None,
 ) -> Tuple[PopulationResult, object, float, List[str]]:
     """Generate one density-screened population, including optional repair."""
     best_result = None
     best_report = None
     best_score = float("inf")
     log_lines: List[str] = []
+    salt_mode = isinstance(mode, OcclusionCageSalt)
+    attempt_seed = getattr(args, "attempt_seed", None)
+    n_attempts = 1 if attempt_seed is not None else args.max_attempts
+    salt_kwargs = (
+        dict(occlusion_model=args.occlusion_model, cage_salt=cage_salt,
+             _defer_cage_salt=True, _skip_cage_salt_validation=True)
+        if salt_mode
+        else dict(occlusion_model=getattr(args, "occlusion_model", "cage-salt"),
+                  _defer_chloride_placement=True)
+    )
 
-    for attempt in range(1, args.max_attempts + 1):
-        seed = master_rng.randrange(2**63)
+    for attempt in range(1, n_attempts + 1):
+        seed = attempt_seed if attempt_seed is not None else master_rng.randrange(2**63)
         result = generate_lta_cation_structure_from_specs(
             args.input_cif,
             n4=args.n4,
@@ -258,8 +288,8 @@ def generate_one_smooth_population(
             variant_group_cutoffs=cutoffs,
             group_by_label=not args.no_group_by_label,
             auto_rebalance=args.auto_rebalance,
-            volume_factor=args.volume_factor,
-            _defer_chloride_placement=True,
+            volume_factor=None if salt_mode else args.volume_factor,
+            **salt_kwargs,
         )
         report = analyze_cation_density(
             result.structure,
@@ -310,13 +340,44 @@ def generate_one_smooth_population(
 
     if best_result is None or best_report is None:
         raise RuntimeError("No structure was generated")
-    best_result = finalize_occluded_chlorides(
-        best_result,
-        alpha_cl=args.alpha_cl,
-        beta_cl=args.beta_cl,
-        occlusion_min_distance=args.occlusion_min_distance,
-    )
+    if salt_mode:
+        best_result = finalize_cage_salt(
+            best_result,
+            mode.request,
+            volume_factor=args.volume_factor,
+            seed=best_result.seed,
+            salt_max_starts=args.salt_max_starts,
+            density_settings={
+                "sigma": args.sigma,
+                "max_density_ratio": args.max_density_ratio,
+                "max_density_zscore": args.max_density_zscore,
+                "min_pair_distance": args.min_pair_distance,
+            },
+        )
+    elif isinstance(mode, OcclusionLegacySparse):
+        best_result = finalize_occluded_chlorides(
+            best_result,
+            alpha_cl=mode.alpha_cl,
+            beta_cl=mode.beta_cl,
+            occlusion_min_distance=mode.min_distance,
+        )
     return best_result, best_report, best_score, log_lines
+
+
+def _validate_cage_salt_once(args: argparse.Namespace, request, cutoffs: dict) -> None:
+    """The one up-front cage-salt validation, on sites loaded with this script's options."""
+    _, framework, physical_sites, _ = load_lta_template(
+        args.input_cif,
+        site_map=args.site_map,
+        template_elements=args.template_elements,
+        dedup_digits=args.dedup_digits,
+        variant_group_cutoffs=cutoffs,
+        group_by_label=not args.no_group_by_label,
+    )
+    allocations = make_allocations_from_cli(physical_sites, n4=args.n4, n6=args.n6, n8=args.n8)
+    validate_cage_salt_request(
+        args.input_cif, framework, physical_sites, allocations, _counterion_allocations(request), request
+    )
 
 
 def main() -> None:
@@ -340,12 +401,7 @@ def main() -> None:
     p.add_argument("--ratio4", default=None)
     p.add_argument("--ratio6", default=None)
     p.add_argument("--ratio8", default=None)
-    p.add_argument("--alpha-cl", type=int, default=0)
-    p.add_argument("--beta-cl", type=int, default=0)
-    p.add_argument("--occlusion-n4", default=None)
-    p.add_argument("--occlusion-n6", default=None)
-    p.add_argument("--occlusion-n8", default=None)
-    p.add_argument("--occlusion-min-distance", type=float, default=1.5)
+    add_occlusion_arguments(p)
     p.add_argument("--site-map", default="NA1:6,NA2:8,NA3:4")
     p.add_argument("--template-elements", default="Na")
     p.add_argument("--dedup-digits", type=int, default=8)
@@ -358,8 +414,8 @@ def main() -> None:
     p.add_argument(
         "--volume-factor",
         type=float,
-        default=1.0,
-        help="Multiply the charge-equivalent Group I/II dry-LTA interpolation reference volume. H/Be/Fr/Ra use the standard Na-LTA corner as placeholders. Use 0.95 or 1.05 for -5%% or +5%% volume.",
+        default=None,
+        help="Multiply the charge-equivalent Group I/II dry-LTA interpolation reference volume (default 1.0; with cage salt, the modelled contraction f_V). H/Be/Fr/Ra use the standard Na-LTA corner as placeholders. Use 0.95 or 1.05 for -5%% or +5%% volume.",
     )
     p.add_argument("--species", default=",".join(SUPPORTED_CATIONS))
     p.add_argument("--sigma", type=float, default=5.0)
@@ -377,6 +433,12 @@ def main() -> None:
     p.add_argument("--max-moves", type=int, default=100)
     p.add_argument("--trial-sites-per-move", type=int, default=50)
     p.add_argument("--seed", type=int, default=None)
+    p.add_argument(
+        "--attempt-seed",
+        type=int,
+        default=None,
+        help="Run exactly one attempt with this seed (as logged by an earlier run) instead of drawing seeds from --seed.",
+    )
     p.add_argument(
         "--unique-batch-size",
         type=int,
@@ -439,13 +501,25 @@ def main() -> None:
     if args.unique_batch_size < 1:
         raise ValueError("--unique-batch-size must be at least 1")
 
+    mode, cage_salt = resolve_occlusion_mode_from_args(p, args)
+    legacy = mode if isinstance(mode, OcclusionLegacySparse) else None
     occlusion_requested = bool(
-        args.alpha_cl
-        or args.beta_cl
-        or occlusion_specs_have_nonzero_counts(
-            args.occlusion_n4, args.occlusion_n6, args.occlusion_n8
+        legacy is not None
+        and (
+            legacy.alpha_cl
+            or legacy.beta_cl
+            or occlusion_specs_have_nonzero_counts(
+                legacy.occlusion_n4, legacy.occlusion_n6, legacy.occlusion_n8
+            )
         )
     )
+    if args.attempt_seed is not None:
+        if args.population_mode == "maximum-symmetry" or args.unique_batch_size != 1:
+            p.error("--attempt-seed is only valid for one random-mode structure")
+        if args.seed is not None:
+            p.error("--attempt-seed replaces --seed; give only one of them")
+    if isinstance(mode, OcclusionCageSalt):
+        reject_cage_salt_modes(p, args)
     if occlusion_requested:
         if args.population_mode == "maximum-symmetry":
             p.error("occlusion is unsupported with --population-mode maximum-symmetry in v7.15")
@@ -551,9 +625,19 @@ def main() -> None:
         p.error("--hard-min-pair-distance is only valid in maximum-symmetry mode")
 
     if args.unique_batch_size == 1:
-        best_result, best_report, best_score, log_lines = generate_one_smooth_population(
-            args, master_rng=master_rng, species=species, cutoffs=cutoffs
-        )
+        if isinstance(mode, OcclusionCageSalt):
+            def _run():
+                _validate_cage_salt_once(args, mode.request, cutoffs)
+                return generate_one_smooth_population(
+                    args, master_rng=master_rng, species=species, cutoffs=cutoffs,
+                    mode=mode, cage_salt=cage_salt,
+                )
+
+            best_result, best_report, best_score, log_lines = run_cage_salt_cli(p, args, _run)
+        else:
+            best_result, best_report, best_score, log_lines = generate_one_smooth_population(
+                args, master_rng=master_rng, species=species, cutoffs=cutoffs, mode=mode
+            )
         output_format = best_result.write(args.output_file)
 
         final_text = []
@@ -595,7 +679,7 @@ def main() -> None:
 
     for candidate_index in range(1, max_candidates + 1):
         result, density_report, score, attempt_log = generate_one_smooth_population(
-            args, master_rng=master_rng, species=species, cutoffs=cutoffs
+            args, master_rng=master_rng, species=species, cutoffs=cutoffs, mode=mode
         )
         if symmetry_group is None:
             symmetry_group = build_site_symmetry_group(

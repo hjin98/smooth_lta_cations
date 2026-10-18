@@ -130,13 +130,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import shlex
+import shutil
+import tempfile
 from collections import Counter
 from dataclasses import dataclass, field, replace
 from numbers import Integral
 from pathlib import Path
-from typing import Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
 
 import numpy as np
 from pymatgen.core import Element, Lattice, Structure
@@ -441,6 +444,67 @@ class OccludedChloride:
     frac: Tuple[float, float, float]
 
 
+@dataclass(frozen=True)
+class CageSaltIon:
+    """One v7.16 cage-salt ion; ``ion_id`` is ``S-<cage>-<element>-<k>`` (k = input order)."""
+
+    ion_id: str
+    element: str
+    frac: Tuple[float, float, float]
+    cage_id: str
+    k: int
+
+
+@dataclass(frozen=True)
+class AtomMeta:
+    """Per-index metadata of an assembled structure (D3 r3 ``assemble_structure``)."""
+
+    element: str
+    role: str  # framework_atom | framework | occlusion_counterion | occluded_chloride | cage_salt
+    ion_id: str
+    site_id: Optional[str] = None
+    variant_id: Optional[int] = None
+    cage_id: Optional[str] = None
+
+
+@dataclass(frozen=True)
+class OcclusionDry:
+    """No occlusion guests (resolver result)."""
+
+
+@dataclass(frozen=True)
+class OcclusionLegacySparse:
+    """v7.15 sparse cage-centre chloride model, selected by ``sparse-v715``."""
+
+    alpha_cl: int
+    beta_cl: int
+    occlusion_n4: Optional[str]
+    occlusion_n6: Optional[str]
+    occlusion_n8: Optional[str]
+    min_distance: float
+
+
+@dataclass(frozen=True)
+class OcclusionCageSalt:
+    """v7.16 per-cage molten-salt model."""
+
+    request: Any  # lta_cage_salt.CageSaltRequest (imported lazily)
+
+
+OcclusionMode = Union[OcclusionDry, OcclusionLegacySparse, OcclusionCageSalt]
+OCCLUSION_MODELS = ("cage-salt", "sparse-v715")
+DEFAULT_OCCLUSION_MODEL = "cage-salt"
+LEGACY_OCCLUSION_DEFAULT_MIN_DISTANCE = 1.5
+CAGE_SALT_MIN_SIGNIFICANT_FIGURES = 8
+CAGE_SALT_DEFAULT_MAX_STARTS = 20
+CAGE_SALT_DEFAULT_DENSITY_SETTINGS: Dict[str, Optional[float]] = {
+    "sigma": 5.0,
+    "max_density_ratio": 2.0,
+    "max_density_zscore": 2.5,
+    "min_pair_distance": None,
+}
+
+
 CANONICAL_CAGE_SITES: Tuple[CageSite, ...] = (
     CageSite("beta-0", "beta", (0.0, 0.0, 0.0)),
     CageSite("beta-1", "beta", (0.5, 0.5, 0.5)),
@@ -475,6 +539,9 @@ class PopulationResult:
     occluded_chlorides: List[OccludedChloride] = field(default_factory=list)
     occlusion_min_distance_ang: Optional[float] = None
     occlusion_actual_min_distance_ang: Optional[float] = None
+    cage_salt_ions: List[CageSaltIon] = field(default_factory=list)
+    cage_salt_record: Optional[Any] = None
+    cage_salt_pending: Optional[Any] = None
 
     # Backward-compatible alias for code that used the old name.
     @property
@@ -487,11 +554,18 @@ class PopulationResult:
         return dict(self.alkali_counts)
 
     @property
+    def cage_salt_cation_counts(self) -> Dict[str, int]:
+        """Cage-salt cation counts (v7.16; empty outside cage-salt mode)."""
+        return count_by_species(ion for ion in self.cage_salt_ions if ion.element != "Cl")
+
+    @property
     def cation_counts(self) -> Dict[str, int]:
-        """Total physical cation counts across framework and occlusion roles."""
+        """Total physical cation counts across framework, occlusion and cage-salt roles."""
+        salt = self.cage_salt_cation_counts
         return {
             el: int(self.alkali_counts.get(el, 0))
             + int(self.occlusion_counterion_counts.get(el, 0))
+            + int(salt.get(el, 0))
             for el in SUPPORTED_CATIONS
         }
 
@@ -500,17 +574,20 @@ class PopulationResult:
         """Compatibility-explicit alias for the total physical cation view."""
         return self.cation_counts
 
+    def _salt_cl(self, prefix: str = "") -> int:
+        return sum(1 for ion in self.cage_salt_ions if ion.element == "Cl" and ion.cage_id.startswith(prefix))
+
     @property
     def chloride_count(self) -> int:
-        return len(self.occluded_chlorides)
+        return len(self.occluded_chlorides) + self._salt_cl()
 
     @property
     def alpha_chloride_count(self) -> int:
-        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "alpha")
+        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "alpha") + self._salt_cl("alpha")
 
     @property
     def beta_chloride_count(self) -> int:
-        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "beta")
+        return sum(1 for chloride in self.occluded_chlorides if chloride.cage_type == "beta") + self._salt_cl("beta")
 
     @property
     def framework_positive_charge(self) -> int:
@@ -518,7 +595,10 @@ class PopulationResult:
 
     @property
     def occlusion_positive_charge(self) -> int:
-        return total_cation_charge(self.occlusion_counterion_counts)
+        """Excess positive charge Q_exc: occlusion counterions plus cage-salt cations."""
+        return total_cation_charge(self.occlusion_counterion_counts) + total_cation_charge(
+            self.cage_salt_cation_counts
+        )
 
     @property
     def total_positive_charge(self) -> int:
@@ -534,7 +614,15 @@ class PopulationResult:
         return self.required_cations
 
     def write(self, filename: str | Path, significant_figures: int = 8) -> str:
-        """Write the structure in the format inferred from the output filename."""
+        """Write the structure in the format inferred from the output filename.
+
+        In cage-salt mode this also writes ``<filename>.salt.json`` (record plus
+        per-atom sidecar), atomically, sidecar first (D3 r3).
+        """
+        if self.cage_salt_pending is not None:
+            raise ValueError("Cannot write a cage-salt-pending intermediate; call finalize_cage_salt first")
+        if self.cage_salt_record is not None:
+            return write_cage_salt_outputs(self, filename, significant_figures=significant_figures)
         return write_structure_by_suffix(
             self.structure,
             filename,
@@ -616,19 +704,11 @@ def detect_output_format(filename: str | Path) -> str:
     )
 
 
-def group_structure_by_element_for_output(structure: Structure) -> Structure:
-    """Return a copy whose sites form one contiguous block per element.
+def output_site_order(structure: Structure) -> List[int]:
+    """Return the written order: original site indices, grouped stably by element.
 
-    POSCAR species/count entries are defined by consecutive runs of identical
-    elements. A structure ordered by ring family can therefore produce repeated
-    symbols such as ``Li Na K Li Na K`` even though the chemistry contains only
-    three alkali species. This routine performs a stable global grouping before
-    serialization. Coordinates, lattice, site properties, labels, total charge,
-    and structure-level properties are preserved.
-
-    The preferred LTA order is ``OUTPUT_SPECIES_ORDER`` (Si, Al, O followed by all supported Group I/II cations). Any unexpected elements are
-    appended afterward in atomic-number order. The original relative order of
-    sites within each element block is retained.
+    This is the single owner of the written order (D3 r3); the sidecar rows of
+    cage-salt output follow it.
     """
     if not structure.is_ordered:
         raise ValueError(
@@ -645,10 +725,27 @@ def group_structure_by_element_for_output(structure: Structure) -> Structure:
     symbol_order = preferred + unexpected
     rank = {symbol: idx for idx, symbol in enumerate(symbol_order)}
 
-    indices = sorted(
+    return sorted(
         range(len(structure)),
         key=lambda idx: (rank[structure[idx].specie.symbol], idx),
     )
+
+
+def group_structure_by_element_for_output(structure: Structure) -> Structure:
+    """Return a copy whose sites form one contiguous block per element.
+
+    POSCAR species/count entries are defined by consecutive runs of identical
+    elements. A structure ordered by ring family can therefore produce repeated
+    symbols such as ``Li Na K Li Na K`` even though the chemistry contains only
+    three alkali species. This routine performs a stable global grouping before
+    serialization. Coordinates, lattice, site properties, labels, total charge,
+    and structure-level properties are preserved.
+
+    The preferred LTA order is ``OUTPUT_SPECIES_ORDER`` (Si, Al, O followed by all supported Group I/II cations). Any unexpected elements are
+    appended afterward in atomic-number order. The original relative order of
+    sites within each element block is retained.
+    """
+    indices = output_site_order(structure)
     if indices == list(range(len(structure))):
         return structure.copy()
 
@@ -1682,6 +1779,7 @@ def _build_population_result(
     beta_cl: int = 0,
     occlusion_min_distance: float = 1.5,
     defer_chloride_placement: bool = False,
+    cage_salt_pending: Optional[Any] = None,
 ) -> PopulationResult:
     """Validate role-partitioned chemistry, rescale, place Cl, and assemble once."""
     validate_framework_model(framework)
@@ -1696,7 +1794,8 @@ def _build_population_result(
     required_cations = enforce_charge_neutrality(framework_counts, alkali_counts)
     n_cl = alpha_cl + beta_cl
     occlusion_charge = total_cation_charge(occlusion_counts)
-    if occlusion_charge != n_cl:
+    # While cage salt is pending, Q_exc = N_Cl is checked by finalize_cage_salt.
+    if cage_salt_pending is None and occlusion_charge != n_cl:
         raise ValueError(
             "Occlusion charge-neutrality violation: excess-role cations provide "
             f"+{occlusion_charge}, but alpha+beta chloride count is {n_cl}."
@@ -1746,6 +1845,7 @@ def _build_population_result(
         occluded_chlorides=chlorides,
         occlusion_min_distance_ang=occlusion_min_distance if chlorides else None,
         occlusion_actual_min_distance_ang=actual_min,
+        cage_salt_pending=cage_salt_pending,
     )
 
 
@@ -1791,6 +1891,514 @@ def finalize_occluded_chlorides(
         occlusion_min_distance_ang=occlusion_min_distance if chlorides else None,
         occlusion_actual_min_distance_ang=actual_min,
     )
+
+
+# ------------------------- v7.16 cage-salt occlusion ------------------------- #
+#
+# D1 doc/specs/v7_16_molten_salt_occlusion_extension.md (r7), D2
+# doc/specs/v7_16_cage_salt_numerical_method.md (r2), D3 "v7.16 architecture
+# delta" in doc/archs/lta_cation_generator_architecture.md (r3). The cage-salt
+# modules are imported lazily so dry and legacy runs need neither them nor SciPy.
+
+def resolve_occlusion_mode(
+    occlusion_model: Optional[str] = DEFAULT_OCCLUSION_MODEL,
+    *,
+    alpha_cl: Optional[int] = None,
+    beta_cl: Optional[int] = None,
+    occlusion_n4: Optional[str] = None,
+    occlusion_n6: Optional[str] = None,
+    occlusion_n8: Optional[str] = None,
+    occlusion_min_distance: Optional[float] = None,
+    cage_salt: Optional[Any] = None,
+) -> OcclusionMode:
+    """The only interpreter of the occlusion sentinels (D3 r3, precedence N10)."""
+    model = DEFAULT_OCCLUSION_MODEL if occlusion_model is None else occlusion_model
+    if model not in OCCLUSION_MODELS:
+        raise ValueError(f"occlusion_model must be one of {OCCLUSION_MODELS}, got {model!r}")
+    legacy = {
+        "alpha_cl": alpha_cl,
+        "beta_cl": beta_cl,
+        "occlusion_n4": occlusion_n4,
+        "occlusion_n6": occlusion_n6,
+        "occlusion_n8": occlusion_n8,
+        "occlusion_min_distance": occlusion_min_distance,
+    }
+    given = sorted(k for k, v in legacy.items() if v is not None)
+    # 1. legacy flags need the legacy selector
+    if given and model != "sparse-v715":
+        flags = ", ".join("--" + k.replace("_", "-") for k in given)
+        raise ValueError(
+            f"{flags} belong to the v7.15 sparse chloride model; pass --occlusion-model sparse-v715 "
+            "(occlusion_model='sparse-v715') to use it, or use the cage-salt options"
+        )
+    # 2. salt flags are not valid under the legacy selector
+    if model == "sparse-v715" and cage_salt is not None:
+        raise ValueError("cage-salt and salt-counterion options are not valid with --occlusion-model sparse-v715")
+    # 3. counterions without salt
+    if cage_salt is not None and not cage_salt.is_active and cage_salt.counterion_total:
+        raise ValueError("salt counterions were given but every cage-salt count is zero")
+    # 4. classify
+    if model == "sparse-v715":
+        if not given:
+            return OcclusionDry()
+        return OcclusionLegacySparse(
+            alpha_cl=0 if alpha_cl is None else alpha_cl,
+            beta_cl=0 if beta_cl is None else beta_cl,
+            occlusion_n4=occlusion_n4,
+            occlusion_n6=occlusion_n6,
+            occlusion_n8=occlusion_n8,
+            min_distance=(
+                LEGACY_OCCLUSION_DEFAULT_MIN_DISTANCE
+                if occlusion_min_distance is None
+                else occlusion_min_distance
+            ),
+        )
+    if cage_salt is None or not cage_salt.is_active:
+        return OcclusionDry()
+    return OcclusionCageSalt(cage_salt)
+
+
+def resolve_volume_factor(value: Optional[float], mode: OcclusionMode) -> float:
+    """Map the ``None`` sentinel: 1.0 for dry and legacy, f_V(n_bar) for cage salt."""
+    if value is None:
+        if isinstance(mode, OcclusionCageSalt):
+            import lta_cage_salt as S
+
+            return S.f_v(mode.request.n_cl())
+        return 1.0
+    value = float(value)
+    if not np.isfinite(value) or value <= 0.0:
+        raise ValueError(f"--volume-factor must be positive, got {value}")
+    return value
+
+
+def cage_salt_request_from_specs(
+    *,
+    alpha_salt: Optional[str] = None,
+    beta_salt: Optional[str] = None,
+    alpha0_salt: Optional[str] = None,
+    alpha1_salt: Optional[str] = None,
+    beta0_salt: Optional[str] = None,
+    beta1_salt: Optional[str] = None,
+    salt_counterion_n4: Optional[str] = None,
+    salt_counterion_n6: Optional[str] = None,
+    salt_counterion_n8: Optional[str] = None,
+) -> Optional[Any]:
+    """Build a ``CageSaltRequest`` from CLI SPEC strings, or ``None`` when none is given."""
+    specs = (alpha_salt, beta_salt, alpha0_salt, alpha1_salt, beta0_salt, beta1_salt,
+             salt_counterion_n4, salt_counterion_n6, salt_counterion_n8)
+    if all(spec is None for spec in specs):
+        return None
+    import lta_cage_salt as S
+
+    return S.CageSaltRequest.from_specs(
+        alpha=alpha_salt, beta=beta_salt, alpha0=alpha0_salt, alpha1=alpha1_salt,
+        beta0=beta0_salt, beta1=beta1_salt, counterion_n4=salt_counterion_n4,
+        counterion_n6=salt_counterion_n6, counterion_n8=salt_counterion_n8,
+    )
+
+
+def _cage_centres() -> Dict[str, Tuple[float, float, float]]:
+    return {site.cage_id: site.frac for site in CANONICAL_CAGE_SITES}
+
+
+def _counterion_allocations(request: Any) -> Dict[str, Dict[str, int]]:
+    out = _empty_allocations()
+    for ring in RING_CLASSES:
+        for el, n in request.counterions.get(ring, {}).items():
+            if int(n):
+                if el not in SUPPORTED_CATIONS:
+                    raise ValueError(f"Unsupported salt counterion species {el!r} on {ring}R")
+                out[ring][el] = int(n)
+    return out
+
+
+def validate_cage_salt_request(
+    input_cif: str | Path,
+    framework: List[AtomRow],
+    physical_sites_by_ring: Dict[str, List[PhysicalSite]],
+    allocations: Dict[str, Dict[str, int]],
+    counterion_allocations: Dict[str, Dict[str, int]],
+    request: Any,
+) -> None:
+    """Up-front validation: no RNG, no files written (D3 r3 template gate and D1 §4-§5)."""
+    import lta_cage_salt as S
+
+    validate_occlusion_template_setting(input_cif, framework)
+    framework_species = sorted(sum_allocations(allocations))
+    S.validate_request(request, CATION_CHARGES, [el for el in framework_species if sum_allocations(allocations)[el]])
+    validate_combined_allocations_against_capacity(physical_sites_by_ring, allocations, counterion_allocations)
+    lattice = read_cif_minimal(input_cif).lattice
+    S.check_site_join(physical_sites_by_ring, np.asarray(lattice.matrix), _cage_centres())
+    S.upfront_charge_check(request, CATION_CHARGES)
+
+
+def _atoms_for_verify(meta: Sequence[AtomMeta]) -> List[Any]:
+    import lta_cage_salt as S
+
+    return [S.Atom(m.element, m.role, m.ion_id, cage_id=m.cage_id, site_id=m.site_id) for m in meta]
+
+
+def _salt_ions_from_request(request: Any) -> List[Tuple[str, str, str, int]]:
+    """(ion_id, element, cage_id, k) in input order; k counts within (cage, element) from 1."""
+    import lta_cage_salt as S
+
+    out = []
+    for cage in S.CAGE_IDS:
+        for el, n in request.cage(cage).items():
+            for k in range(1, n + 1):
+                out.append((f"S-{cage}-{el}-{k}", el, cage, k))
+    return out
+
+
+def _ring_density_record(lattice: Lattice, framework: List[AtomRow], placed: List[PlacedIon],
+                         settings: Mapping[str, Optional[float]]) -> Dict[str, Any]:
+    """Nearest-neighbour statistics of the ring cations only (D3 r3)."""
+    from lta_cation_density_grouped import analyze_cation_density
+
+    struct = build_p1_structure(lattice, framework, placed)
+    species = sorted({ion.element for ion in placed})
+    rep = analyze_cation_density(
+        struct,
+        species=species,
+        sigma=settings["sigma"],
+        max_density_ratio=settings["max_density_ratio"],
+        max_density_zscore=settings["max_density_zscore"],
+        min_pair_distance=settings["min_pair_distance"],
+    )
+    idx = [i for i, site in enumerate(struct) if site.specie.symbol in species]
+    nn: List[float] = []
+    if len(idx) > 1:
+        dm = np.array(struct.distance_matrix)[np.ix_(idx, idx)]
+        np.fill_diagonal(dm, np.inf)
+        nn = [float(x) for x in dm.min(axis=1)]
+    return {
+        "settings": dict(settings),
+        "species": species,
+        "clustered": bool(rep.clustered),
+        "max_over_mean": float(rep.max_over_mean),
+        "max_zscore": float(rep.max_zscore),
+        "min_pair_distance": float(rep.min_pair_distance),
+        "nearest_neighbour_mean": float(np.mean(nn)) if nn else None,
+        "nearest_neighbour_min": float(np.min(nn)) if nn else None,
+    }
+
+
+def _pair_histograms(S: Any, matrix: np.ndarray, fracs: np.ndarray, atoms: Sequence[Any], pairs: Any) -> Dict[str, Any]:
+    """D2 §8.1 histograms: d - r_cut per pair class and d - r_min1 for opposite-charge pairs."""
+    salt = [i for i, a in enumerate(atoms) if a.role == "cage_salt"]
+    ring = [i for i, a in enumerate(atoms) if a.role in ("framework", "occlusion_counterion")]
+    oxy = [i for i, a in enumerate(atoms) if a.role == "framework_atom" and a.element == "O"]
+    by_class: Dict[str, List[float]] = {"salt-salt": [], "salt-ring": [], "salt-O": []}
+    band: List[float] = []
+    for n_i, i in enumerate(salt):
+        ei = atoms[i].element
+        for j in salt[n_i + 1:]:
+            d = float(np.linalg.norm(S.min_image(fracs[j] - fracs[i], matrix)))
+            by_class["salt-salt"].append(d - pairs.r_cut(ei, atoms[j].element))
+            if (ei == "Cl") != (atoms[j].element == "Cl"):
+                cat = atoms[j].element if ei == "Cl" else ei
+                band.append(d - pairs.r_min1(cat))
+        for j in ring:
+            d = float(np.linalg.norm(S.min_image(fracs[j] - fracs[i], matrix)))
+            by_class["salt-ring"].append(d - pairs.r_cut(ei, atoms[j].element))
+            if ei == "Cl":
+                band.append(d - pairs.r_min1(atoms[j].element))
+        d_o = np.linalg.norm(S.min_image(fracs[oxy] - fracs[i], matrix), axis=1)
+        by_class["salt-O"].extend(float(d) - pairs.r_cut(ei, "O") for d in d_o)
+    out = {f"d_minus_r_cut/{k}": S.histogram([v for v in vals if v < 0.5], 0.0, 0.5, 0.05)
+           for k, vals in by_class.items()}
+    out["d_minus_r_min1/opposite"] = S.histogram([v for v in band if abs(v) <= 0.5], -0.5, 0.5, 0.01)
+    return out
+
+
+def finalize_cage_salt(
+    result: PopulationResult,
+    request: Any,
+    *,
+    volume_factor: Optional[float] = None,
+    seed: Optional[int] = None,
+    salt_max_starts: int = CAGE_SALT_DEFAULT_MAX_STARTS,
+    density_settings: Optional[Mapping[str, Optional[float]]] = None,
+) -> PopulationResult:
+    """Build the cage salt on a factor-1 population (D3 r3 control flow, steps 4-8).
+
+    ``result`` must be the cage-salt-pending intermediate at volume factor 1. On
+    construction failure ``lta_cage_salt.CageSaltConstructionError`` is raised
+    carrying the record.
+    """
+    import lta_cage_salt as S
+    import lta_cage_salt_build as B
+
+    if result.volume_factor != 1.0:
+        raise ValueError("finalize_cage_salt needs the factor-1 (V_ref) intermediate")
+    if int(salt_max_starts) < 1:
+        raise ValueError("salt_max_starts must be at least 1")
+    mode = OcclusionCageSalt(request)
+    overridden = volume_factor is not None
+    vf = resolve_volume_factor(volume_factor, mode)
+    settings = dict(CAGE_SALT_DEFAULT_DENSITY_SETTINGS if density_settings is None else density_settings)
+    centres = _cage_centres()
+    charges = CATION_CHARGES
+    ref_lattice = result.structure.lattice
+    ref_matrix = np.asarray(ref_lattice.matrix, float)
+    record = S.CageSaltRecord(
+        status="running", request=request.to_dict(), seed=seed, rule=S.COORDINATION_RULE,
+        parameters=S.parameters_snapshot(int(salt_max_starts)), stack=S.stack_versions(),
+        evidence_sha256=dict(S._data().EVIDENCE_CSV_SHA256),
+    )
+
+    def fail(message: str) -> None:
+        record.status = "failed"
+        record.message = message
+        raise S.CageSaltConstructionError(message, record)
+
+    # gate re-check on the run's own sites (cheap)
+    S.check_site_join(result.physical_sites_by_ring, ref_matrix, centres)
+
+    # step 4: exact charge rebalancing
+    rng_q, tag_q = S.rebalance_stream(seed)
+    record.streams["rebalance"] = tag_q
+    rb = S.rebalance(request, result.placed_ions, result.physical_sites_by_ring, charges, rng_q)
+    record.rebalance = {
+        "feasible": rb.feasible, "class_vector": rb.vector, "objective": list(rb.objective),
+        "next_best": rb.alternatives, "moves": rb.moves,
+        "best_violation_e": rb.best_violation_quarters / 4, "blocking_sites": rb.blocking_sites,
+    }
+    if not rb.feasible:
+        fail("Charge rebalancing found no placement of the salt counterions keeping every "
+             f"|q_c| <= q_max(c) (best excess {rb.best_violation_quarters / 4:.2f} e)")
+    ring = list(rb.placed)
+
+    # step 5: scaling
+    target_volume = result.reference_volume_ang3 * vf
+    final_lattice, s_rel = isotropically_rescaled_lattice(ref_lattice, target_volume)
+    M = np.asarray(final_lattice.matrix, float)
+    n_cl = request.n_cl()
+    record.volume = {
+        "n_cl": n_cl, "n_bar": n_cl / 2.0, "f_V": S.f_v(n_cl), "applied_factor": vf,
+        "overridden": overridden, "V_ref": result.reference_volume_ang3, "V_final": float(final_lattice.volume),
+        "scale_from_V_ref": s_rel, "v_eff_grid": S.V_EFF_GRID,
+    }
+    ok6, half, need = S.single_image_ok(M)
+    if not ok6:
+        record.verification = {"checks": {"V6_single_image": False}, "detail": {"V6": {"half_width": half, "required": need}}}
+        fail(f"Single-image precondition fails: half cell width {half:.4f} A <= {need:.4f} A (D2 §2)")
+
+    # step 6: V_eff and floors on the V_ref cell, scaled by the D2 identity
+    o_fracs = np.array([a.frac for a in result.framework_atoms if a.element == "O"], float)
+    floors = S.cage_floors(request, ref_matrix, o_fracs, centres, s_rel)
+    record.floors = {}
+    for c, fl in floors.items():
+        row = fl.to_dict()
+        row["floor_threshold_distance"] = {
+            m: float(abs(fl.a * fl.c_by_species[m] - round(fl.a * fl.c_by_species[m]))) for m in fl.c_by_species
+        }
+        record.floors[c] = row
+
+    # step 7: build
+    salt_specs = _salt_ions_from_request(request)
+    salt_cation_elements = [el for _, el, _, _ in salt_specs if el != "Cl"]
+    weights = S.cl_weights(salt_cation_elements, [ion.element for ion in ring])
+    pairs = S.PairTable(weights)
+    record.floors["x_M_weights"] = weights
+    record.floors["r_cut_Cl_Cl"] = pairs.r_cut("Cl", "Cl")
+    fw_el = [a.element for a in result.framework_atoms]
+    fw_fr = np.array([a.frac for a in result.framework_atoms], float)
+    salt = [B.SaltIon(ion_id, el, cage) for ion_id, el, cage, _ in salt_specs]
+    site_variants = {
+        site.site_id: [v.frac for v in site.variants]
+        for r in RING_CLASSES for site in result.physical_sites_by_ring[r]
+    }
+    expected: Dict[Tuple[str, str, str], int] = {}
+    for ion in ring:
+        key = (ion.role, ion.ring_class, ion.element)
+        expected[key] = expected.get(key, 0) + 1
+    verify_kw = dict(pairs=pairs, floors=floors, centres=centres, charges=charges,
+                     expected_ring_counts=expected, site_variants=site_variants, rule=S.COORDINATION_RULE)
+    fw_atoms = [S.Atom(e, "framework_atom", f"F{k}") for k, e in enumerate(fw_el)]
+    salt_atoms = [S.Atom(x.element, "cage_salt", x.ion_id, cage_id=x.cage_id) for x in salt]
+
+    def verifier(salt_fracs: np.ndarray, ring_now: List[PlacedIon]) -> Any:
+        atoms = fw_atoms + [S.Atom(r.element, r.role, f"R{r.site_id}", site_id=r.site_id) for r in ring_now] + salt_atoms
+        F = np.vstack([fw_fr, np.array([r.frac for r in ring_now], float).reshape(-1, 3), salt_fracs])
+        return S.verify(M, F, atoms, request, ring_ions=ring_now, **verify_kw)
+
+    problem = B.BuildProblem(M, salt, fw_el, fw_fr, ring, result.physical_sites_by_ring, pairs, floors,
+                             centres, request, charges, S.COORDINATION_RULE)
+    outcome = B.build(problem, verifier, seed, int(salt_max_starts))
+    record.starts = outcome.starts
+    record.streams["starts"] = outcome.stream_tags
+    if not outcome.success:
+        if outcome.verification is not None:
+            record.verification = {"checks": outcome.verification.checks, "detail": outcome.verification.detail}
+        fail(f"No start of {salt_max_starts} passed verification (last failing: "
+             f"{', '.join(outcome.verification.failing) if outcome.verification else 'none'})")
+    ring = list(outcome.ring_ions)
+    record.relocations = outcome.relocations
+
+    # step 8: assemble and verify the object the writers receive
+    salt_ions = [
+        CageSaltIon(ion_id, el, tuple(float(x) for x in outcome.fracs[n]), cage, k)
+        for n, (ion_id, el, cage, k) in enumerate(salt_specs)
+    ]
+    structure, meta = assemble_structure(final_lattice, result.framework_atoms, ring, (), salt_ions)
+    atoms = _atoms_for_verify(meta)
+    fr = S.canonical_frac(np.asarray(structure.frac_coords, float))
+    final = S.verify(np.asarray(structure.lattice.matrix, float), fr, atoms, request, ring_ions=ring, **verify_kw)
+    record.verification = {
+        "checks": final.checks, "detail": final.detail, "on": "assembled final scaled structure",
+        "start_used": outcome.start_index, "k_max": int(salt_max_starts),
+    }
+    if not final.passed:
+        fail(f"Final verification on the assembled structure failed: {', '.join(final.failing)}")
+    record.histograms = _pair_histograms(S, np.asarray(structure.lattice.matrix, float), fr, atoms, pairs)
+    per_ion = final.detail["V3"]["per_ion"]
+    margins: Dict[str, List[int]] = {}
+    for ion_id, row in per_ion.items():
+        el = ion_id.split("-")[3] if ion_id.startswith("S-") else "?"
+        cage = "-".join(ion_id.split("-")[1:3])
+        margins.setdefault(f"{cage}/{el}", []).append(int(row["cn"] - row["floor"]))
+    record.histograms["N_minus_L"] = {k: {"min": min(v), "mean": float(np.mean(v)), "values": v}
+                                       for k, v in sorted(margins.items())}
+    record.density_after = _ring_density_record(final_lattice, result.framework_atoms, ring, settings)
+    record.status = "passed"
+
+    occlusion_counts = count_by_species(ion for ion in ring if ion.role == "occlusion_counterion")
+    out = replace(
+        result,
+        structure=structure,
+        placed_ions=ring,
+        occlusion_counterion_counts=occlusion_counts,
+        volume_factor=vf,
+        target_volume_ang3=target_volume,
+        linear_scale=result.linear_scale * s_rel,
+        cage_salt_ions=salt_ions,
+        cage_salt_record=record,
+        cage_salt_pending=None,
+    )
+    if out.occlusion_positive_charge != out.chloride_count:
+        raise AssertionError("Q_exc != N_Cl after cage-salt finalization")
+    return out
+
+
+def cage_salt_sidecar_rows(result: PopulationResult) -> List[Dict[str, Any]]:
+    """Per-atom rows in written order (D3 r3 sidecar)."""
+    import lta_cage_salt as S
+
+    structure = result.structure
+    _, meta = assemble_structure(structure.lattice, result.framework_atoms, result.placed_ions,
+                                 result.occluded_chlorides, result.cage_salt_ions)
+    if [m.element for m in meta] != [site.specie.symbol for site in structure]:
+        raise AssertionError("assembled metadata does not match the structure")
+    fr = S.canonical_frac(np.asarray(structure.frac_coords, float))
+    rows = []
+    for index, i in enumerate(output_site_order(structure)):
+        m = meta[i]
+        row: Dict[str, Any] = {"index": index, "element": m.element, "role": m.role, "ion_id": m.ion_id,
+                               "frac": [float(x) for x in fr[i]]}
+        if m.cage_id is not None:
+            row["cage_id"] = m.cage_id
+        if m.site_id is not None:
+            row["site_id"] = m.site_id
+            row["variant_id"] = m.variant_id
+        rows.append(row)
+    return rows
+
+
+def cage_salt_sidecar_path(filename: str | Path) -> Path:
+    path = Path(filename)
+    return path.with_name(path.name + ".salt.json")
+
+
+def _sha256_file(path: Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def write_cage_salt_outputs(result: PopulationResult, filename: str | Path, *, significant_figures: int = 8) -> str:
+    """Write the structure and ``<filename>.salt.json`` atomically, sidecar first."""
+    if significant_figures < CAGE_SALT_MIN_SIGNIFICANT_FIGURES:
+        raise ValueError(
+            f"Cage-salt output needs significant_figures >= {CAGE_SALT_MIN_SIGNIFICANT_FIGURES} "
+            "(the D2 writer tolerance assumes 8 decimals)"
+        )
+    path = Path(filename)
+    sidecar = cage_salt_sidecar_path(path)
+    output_format = detect_output_format(path)
+    tmpdir = Path(tempfile.mkdtemp(prefix=".salt-tmp-", dir=str(path.parent.resolve())))
+    try:
+        tmp_struct = tmpdir / path.name
+        write_structure_by_suffix(result.structure, tmp_struct, significant_figures=significant_figures)
+        digest = _sha256_file(tmp_struct)
+        tmp_side = tmpdir / sidecar.name
+        tmp_side.write_text(result.cage_salt_record.to_json(
+            cage_salt_sidecar_rows(result), structure_sha256=digest, structure_written=True))
+        os.replace(tmp_side, sidecar)
+        os.replace(tmp_struct, path)
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+    return output_format
+
+
+def write_cage_salt_failure(record: Any, filename: str | Path) -> Path:
+    """Failure path: write only ``<filename>.salt.json`` (status failed, structure_written false)."""
+    sidecar = cage_salt_sidecar_path(filename)
+    tmp = sidecar.with_name("." + sidecar.name + f".tmp-{os.getpid()}")
+    tmp.write_text(record.to_json([], structure_sha256=None, structure_written=False))
+    os.replace(tmp, sidecar)
+    return sidecar
+
+
+def make_cage_salt_report(result: PopulationResult) -> str:
+    """Text projection of the cage-salt record (D1 §14, D2 §8.1)."""
+    rec = result.cage_salt_record
+    lines = ["", "Cage-salt occlusion (v7.16 molten-salt model):"]
+    if rec is None:
+        if result.cage_salt_pending is not None:
+            lines.append("  status: cage-salt pending (salt not yet built)")
+        return "\n".join(lines) + "\n"
+    v = rec.verification
+    lines.append(f"  status: {rec.status}; coordination rule {rec.rule}; start used "
+                 f"{v.get('start_used')} of K_max {v.get('k_max')}")
+    lines.append("  verification ran on the final scaled cell: "
+                 + ", ".join(f"{k}={'PASS' if ok else 'FAIL'}" for k, ok in v.get("checks", {}).items()))
+    lines.append("  per-cage inventory:")
+    for c, inv in rec.request["cages"].items():
+        lines.append(f"    {c}: " + (", ".join(f"{e}:{n}" for e, n in inv.items()) or "empty"))
+    counter = {r: d for r, d in rec.request["counterions"].items() if d}
+    lines.append("  salt counterions: " + (
+        "; ".join(f"{r}R " + ",".join(f"{e}:{n}" for e, n in d.items()) for r, d in counter.items()) or "none"))
+    vol = rec.volume
+    lines.append(f"  volume: n_bar={vol['n_bar']:.3f}, f_V={vol['f_V']:.6f}, applied factor={vol['applied_factor']:.6f}"
+                 f" ({'override' if vol['overridden'] else 'modelled'}), V_ref={vol['V_ref']:.3f} A^3")
+    for c in ("alpha-0", "alpha-1"):
+        fl = rec.floors.get(c)
+        if not fl:
+            continue
+        lines.append(
+            f"  {c}: x_Li={fl['x_li']:.4f}{' (fallback)' if fl['x_li_fallback'] else ''}, d_wall={fl['d_wall']:.4f} A, "
+            f"V_eff={fl['v_eff']:.2f} A^3 [{fl['v_eff_range'][0]:.2f}, {fl['v_eff_range'][1]:.2f}], "
+            f"n_melt={fl['n_melt']:.3f}, phi={fl['phi']:.4f}, floors="
+            + ",".join(f"{m}:{n}" for m, n in fl["floor_by_species"].items())
+            + (" [dopant fraction above validity flag]" if fl["dopant_flag"] else "")
+        )
+    lines.append(f"  x_M weights: {rec.floors.get('x_M_weights')}; r_cut(Cl-Cl)={rec.floors.get('r_cut_Cl_Cl'):.4f} A")
+    detail = v.get("detail", {})
+    slack = detail.get("V2", {}).get("min_slack", {})
+    lines.append("  minimum slack (A): " + ", ".join(f"{k}={val:.4f}" for k, val in sorted(slack.items())))
+    v1 = detail.get("V1", {})
+    if v1.get("min_membership_margin") is not None:
+        lines.append(f"  minimum cage-assignment margin: {v1['min_membership_margin']:.4f} A")
+    if detail.get("V4"):
+        q = detail["V4"]
+        lines.append("  cage charge q_exc+q_fw (e): " + ", ".join(
+            f"{c}={q['q_exc'][c] + q['q_fw'][c]:+.2f}/max {q['q_max'][c]}" for c in q["q_exc"]))
+    lines.append(f"  rebalancing moves: {len(rec.rebalance.get('moves', []))}; D-12 relocations: {len(rec.relocations)}")
+    for key, row in rec.histograms.get("N_minus_L", {}).items():
+        lines.append(f"  CN minus floor {key}: min={row['min']}, mean={row['mean']:.3f}")
+    lines.append(f"  streams: {rec.streams}")
+    lines.append("  the cage salt is an MD initial structure, not an equilibrium structure, g(r) or siting claim")
+    return "\n".join(lines) + "\n"
 
 
 def load_lta_template(
@@ -2089,24 +2697,45 @@ def populate_physical_sites(
     return placed
 
 
+def assemble_structure(
+    lattice: Lattice,
+    framework_atoms: List[AtomRow],
+    placed_ions: List[PlacedIon],
+    occluded_chlorides: Sequence[OccludedChloride] = (),
+    cage_salt_ions: Sequence[CageSaltIon] = (),
+) -> Tuple[Structure, List[AtomMeta]]:
+    """The only assembler: framework, ring ions, legacy Cl, then cage-salt ions."""
+    species: List[str] = []
+    coords: List[np.ndarray] = []
+    meta: List[AtomMeta] = []
+    for k, atom in enumerate(framework_atoms):
+        species.append(atom.element)
+        coords.append(atom.frac)
+        meta.append(AtomMeta(atom.element, "framework_atom", f"F{k}"))
+    for ion in sorted(placed_ions, key=lambda x: (x.ring_class, x.element, x.site_id, x.variant_id)):
+        species.append(ion.element)
+        coords.append(ion.frac)
+        meta.append(AtomMeta(ion.element, ion.role, f"R{ion.site_id}", site_id=ion.site_id,
+                             variant_id=int(ion.variant_id)))
+    for chloride in sorted(occluded_chlorides, key=lambda x: (x.cage_type, x.cage_id)):
+        species.append("Cl")
+        coords.append(np.asarray(chloride.frac, dtype=float))
+        meta.append(AtomMeta("Cl", "occluded_chloride", f"L-{chloride.cage_id}", cage_id=chloride.cage_id))
+    for ion in sorted(cage_salt_ions, key=lambda x: (x.cage_id, x.element, x.k)):
+        species.append(ion.element)
+        coords.append(np.asarray(ion.frac, dtype=float))
+        meta.append(AtomMeta(ion.element, "cage_salt", ion.ion_id, cage_id=ion.cage_id))
+    structure = Structure(lattice, species, coords, coords_are_cartesian=False, to_unit_cell=True)
+    return structure, meta
+
+
 def build_p1_structure(
     lattice: Lattice,
     framework_atoms: List[AtomRow],
     placed_ions: List[PlacedIon],
     occluded_chlorides: Sequence[OccludedChloride] = (),
 ) -> Structure:
-    species: List[str] = []
-    coords: List[np.ndarray] = []
-    for atom in framework_atoms:
-        species.append(atom.element)
-        coords.append(atom.frac)
-    for ion in sorted(placed_ions, key=lambda x: (x.ring_class, x.element, x.site_id, x.variant_id)):
-        species.append(ion.element)
-        coords.append(ion.frac)
-    for chloride in sorted(occluded_chlorides, key=lambda x: (x.cage_type, x.cage_id)):
-        species.append("Cl")
-        coords.append(np.asarray(chloride.frac, dtype=float))
-    return Structure(lattice, species, coords, coords_are_cartesian=False, to_unit_cell=True)
+    return assemble_structure(lattice, framework_atoms, placed_ions, occluded_chlorides)[0]
 
 
 def generate_lta_cation_structure(
@@ -2162,12 +2791,12 @@ def generate_lta_cation_structure_from_specs(
     ratio4: Optional[str] = None,
     ratio6: Optional[str] = None,
     ratio8: Optional[str] = None,
-    alpha_cl: int = 0,
-    beta_cl: int = 0,
+    alpha_cl: Optional[int] = None,
+    beta_cl: Optional[int] = None,
     occlusion_n4: Optional[str] = None,
     occlusion_n6: Optional[str] = None,
     occlusion_n8: Optional[str] = None,
-    occlusion_min_distance: float = 1.5,
+    occlusion_min_distance: Optional[float] = None,
     seed: Optional[int] = None,
     site_map: str = "NA1:6,NA2:8,NA3:4",
     template_elements: str = "Na",
@@ -2175,10 +2804,55 @@ def generate_lta_cation_structure_from_specs(
     variant_group_cutoffs: Optional[Dict[str, float]] = None,
     group_by_label: bool = True,
     auto_rebalance: bool = False,
-    volume_factor: float = 1.0,
+    volume_factor: Optional[float] = None,
+    occlusion_model: str = DEFAULT_OCCLUSION_MODEL,
+    cage_salt: Optional[Any] = None,
+    salt_max_starts: int = CAGE_SALT_DEFAULT_MAX_STARTS,
     _enforce_supported_scope: bool = True,
     _defer_chloride_placement: bool = False,
+    _defer_cage_salt: bool = False,
+    _skip_cage_salt_validation: bool = False,
 ) -> PopulationResult:
+    """Populate from SPEC strings.
+
+    Legacy chloride arguments default to ``None`` and need
+    ``occlusion_model="sparse-v715"``; ``cage_salt`` (a
+    ``lta_cage_salt.CageSaltRequest``) selects the v7.16 molten-salt model.
+    ``volume_factor=None`` means 1.0 (dry, legacy) or the modelled f_V
+    (cage salt); an explicit value is an override.
+    """
+    mode = resolve_occlusion_mode(
+        occlusion_model,
+        alpha_cl=alpha_cl,
+        beta_cl=beta_cl,
+        occlusion_n4=occlusion_n4,
+        occlusion_n6=occlusion_n6,
+        occlusion_n8=occlusion_n8,
+        occlusion_min_distance=occlusion_min_distance,
+        cage_salt=cage_salt,
+    )
+    if isinstance(mode, OcclusionCageSalt):
+        return _generate_cage_salt_from_specs(
+            input_cif,
+            mode.request,
+            n4=n4, n6=n6, n8=n8, ratio4=ratio4, ratio6=ratio6, ratio8=ratio8,
+            seed=seed, site_map=site_map, template_elements=template_elements,
+            dedup_digits=dedup_digits, variant_group_cutoffs=variant_group_cutoffs,
+            group_by_label=group_by_label, auto_rebalance=auto_rebalance,
+            volume_factor=volume_factor, salt_max_starts=salt_max_starts,
+            _enforce_supported_scope=_enforce_supported_scope,
+            _defer_cage_salt=_defer_cage_salt,
+            _skip_cage_salt_validation=_skip_cage_salt_validation,
+        )
+    if isinstance(mode, OcclusionLegacySparse):
+        alpha_cl, beta_cl = mode.alpha_cl, mode.beta_cl
+        occlusion_n4, occlusion_n6, occlusion_n8 = mode.occlusion_n4, mode.occlusion_n6, mode.occlusion_n8
+        occlusion_min_distance = mode.min_distance
+    else:
+        alpha_cl, beta_cl = 0, 0
+        occlusion_n4 = occlusion_n6 = occlusion_n8 = None
+        occlusion_min_distance = LEGACY_OCCLUSION_DEFAULT_MIN_DISTANCE
+    volume_factor = resolve_volume_factor(volume_factor, mode)
     cutoffs = variant_group_cutoffs or {"4": 2.5, "6": 2.5, "8": 2.5}
     lattice, framework, physical_sites, ignored = load_lta_template(
         input_cif,
@@ -2253,6 +2927,84 @@ def generate_lta_cation_structure_from_specs(
     )
 
 
+def _generate_cage_salt_from_specs(
+    input_cif: str | Path,
+    request: Any,
+    *,
+    n4: Optional[str],
+    n6: Optional[str],
+    n8: Optional[str],
+    ratio4: Optional[str],
+    ratio6: Optional[str],
+    ratio8: Optional[str],
+    seed: Optional[int],
+    site_map: str,
+    template_elements: str,
+    dedup_digits: int,
+    variant_group_cutoffs: Optional[Dict[str, float]],
+    group_by_label: bool,
+    auto_rebalance: bool,
+    volume_factor: Optional[float],
+    salt_max_starts: int,
+    _enforce_supported_scope: bool,
+    _defer_cage_salt: bool,
+    _skip_cage_salt_validation: bool,
+) -> PopulationResult:
+    """Cage-salt branch: population at factor 1 with salt deferred, then finalization."""
+    if any(spec is not None for spec in (ratio4, ratio6, ratio8)):
+        raise ValueError("The cage-salt model requires exact --n4/--n6/--n8 allocations; ratio allocations are unsupported")
+    if auto_rebalance:
+        raise ValueError("The cage-salt model is incompatible with auto_rebalance")
+    if volume_factor is not None:
+        resolve_volume_factor(volume_factor, OcclusionCageSalt(request))  # validate early
+    cutoffs = variant_group_cutoffs or {"4": 2.5, "6": 2.5, "8": 2.5}
+    lattice, framework, physical_sites, ignored = load_lta_template(
+        input_cif,
+        site_map=site_map,
+        template_elements=template_elements,
+        dedup_digits=dedup_digits,
+        variant_group_cutoffs=cutoffs,
+        group_by_label=group_by_label,
+    )
+    validate_framework_model(framework)
+    if _enforce_supported_scope:
+        validate_supported_framework_scope(framework)
+    allocations = make_allocations_from_cli(physical_sites, n4=n4, n6=n6, n8=n8)
+    enforce_charge_neutrality(count_framework_elements(framework), sum_allocations(allocations))
+    counterion_allocations = _counterion_allocations(request)
+    if not _skip_cage_salt_validation:
+        validate_cage_salt_request(
+            input_cif, framework, physical_sites, allocations, counterion_allocations, request
+        )
+    rng = random.Random(seed)
+    framework_placed = populate_physical_sites(physical_sites, allocations, rng=rng)
+    counterions_placed = populate_occlusion_counterions(
+        physical_sites,
+        counterion_allocations,
+        occupied_site_ids=[ion.site_id for ion in framework_placed],
+        seed=seed,
+    )
+    result = _build_population_result(
+        input_lattice=lattice,
+        framework=framework,
+        physical_sites=physical_sites,
+        placed=framework_placed + counterions_placed,
+        allocations=allocations,
+        ignored=ignored,
+        seed=seed,
+        cutoffs=cutoffs,
+        volume_factor=1.0,
+        occlusion_allocations=counterion_allocations,
+        defer_chloride_placement=True,
+        cage_salt_pending=request,
+    )
+    if _defer_cage_salt:
+        return result
+    return finalize_cage_salt(
+        result, request, volume_factor=volume_factor, seed=seed, salt_max_starts=salt_max_starts
+    )
+
+
 def generate_unique_lta_cation_batch_from_specs(
     input_cif: str | Path,
     *,
@@ -2270,7 +3022,7 @@ def generate_unique_lta_cation_batch_from_specs(
     variant_group_cutoffs: Optional[Dict[str, float]] = None,
     group_by_label: bool = True,
     auto_rebalance: bool = False,
-    volume_factor: float = 1.0,
+    volume_factor: Optional[float] = None,
     max_attempts: Optional[int] = None,
     symmetry_mapping_tolerance_ang: float = 0.05,
     _enforce_supported_scope: bool = True,
@@ -2288,6 +3040,7 @@ def generate_unique_lta_cation_batch_from_specs(
     """
     if batch_size < 1:
         raise ValueError("batch_size must be at least 1")
+    volume_factor = resolve_volume_factor(volume_factor, OcclusionDry())
     if max_attempts is None:
         max_attempts = max(1000, 200 * batch_size)
     if max_attempts < batch_size:
@@ -2484,7 +3237,9 @@ def make_population_report(result: PopulationResult) -> str:
         )
     )
     occlusion_status = (
-        "PASS"
+        "PENDING (cage salt not yet built)"
+        if result.cage_salt_pending is not None
+        else "PASS"
         if result.occlusion_positive_charge == result.chloride_count
         else "FAIL"
     )
@@ -2524,11 +3279,17 @@ def make_population_report(result: PopulationResult) -> str:
         "  reference-volume basis: dry framework-compensating Group I/II "
         "charge-equivalent affine interpolation only"
     )
-    lines.append(
-        "  occlusion-volume policy: no automatic correction for excess cations or Cl; "
-        "this preserves the dry initialization reference and is not a claim of zero "
-        "physical volume response to salt loading"
-    )
+    if result.cage_salt_record is not None:
+        lines.append(
+            "  occlusion-volume policy: v7.16 cage-salt contraction f_V(n_bar) "
+            "= 1 - 0.03*min(n_bar/10.5, 1) unless --volume-factor overrides it"
+        )
+    else:
+        lines.append(
+            "  occlusion-volume policy: no automatic correction for excess cations or Cl; "
+            "this preserves the dry initialization reference and is not a claim of zero "
+            "physical volume response to salt loading"
+        )
     lines.append(f"  reference volume: {result.reference_volume_ang3:.6f} A^3")
     lines.append(f"  applied volume factor: {result.volume_factor:.8f}")
     lines.append(f"  target/output volume: {result.target_volume_ang3:.6f} A^3")
@@ -2587,7 +3348,10 @@ def make_population_report(result: PopulationResult) -> str:
     if result.ignored_template_atoms:
         lines.append("")
         lines.append(f"Ignored template atoms with unmapped labels: {len(result.ignored_template_atoms)}")
-    return "\n".join(lines) + "\n"
+    text = "\n".join(lines) + "\n"
+    if result.cage_salt_record is not None or result.cage_salt_pending is not None:
+        text += make_cage_salt_report(result)
+    return text
 
 
 def build_candidate_variant_structure(lattice: Lattice, framework_atoms: List[AtomRow], physical_sites_by_ring: Dict[str, List[PhysicalSite]]) -> Structure:
@@ -2602,6 +3366,93 @@ def build_candidate_variant_structure(lattice: Lattice, framework_atoms: List[At
                 species.append("Na")
                 coords.append(var.frac)
     return Structure(lattice, species, coords, coords_are_cartesian=False, to_unit_cell=True)
+
+
+def add_occlusion_arguments(p: argparse.ArgumentParser) -> None:
+    """Occlusion options shared by both CLIs (D3 r3 public interface)."""
+    p.add_argument(
+        "--occlusion-model",
+        choices=OCCLUSION_MODELS,
+        default=DEFAULT_OCCLUSION_MODEL,
+        help="cage-salt (v7.16 molten-salt model, default) or sparse-v715 (legacy cage-centre Cl; "
+        "required for --alpha-cl/--beta-cl/--occlusion-*)",
+    )
+    p.add_argument("--alpha-cl", type=int, default=None, help="[sparse-v715] Cl per alpha-cage centre set")
+    p.add_argument("--beta-cl", type=int, default=None, help="[sparse-v715] Cl per beta-cage centre set")
+    p.add_argument("--occlusion-n4", default=None, help="[sparse-v715] occlusion counterions on 4R")
+    p.add_argument("--occlusion-n6", default=None, help="[sparse-v715] occlusion counterions on 6R")
+    p.add_argument("--occlusion-n8", default=None, help="[sparse-v715] occlusion counterions on 8R")
+    p.add_argument("--occlusion-min-distance", type=float, default=None, help="[sparse-v715] Cl guard in A (default 1.5)")
+    p.add_argument("--alpha-salt", default=None, help="Cage salt in each alpha-cage, e.g. Cl:12,Li:7,K:5")
+    p.add_argument("--beta-salt", default=None, help="Cage salt in each beta-cage, e.g. Cl:1,Li:1")
+    p.add_argument("--alpha0-salt", default=None, help="Override --alpha-salt for alpha-0")
+    p.add_argument("--alpha1-salt", default=None, help="Override --alpha-salt for alpha-1")
+    p.add_argument("--beta0-salt", default=None, help="Override --beta-salt for beta-0")
+    p.add_argument("--beta1-salt", default=None, help="Override --beta-salt for beta-1")
+    p.add_argument("--salt-counterion-n4", default=None, help="Excess-charge ring counterions on 4R, e.g. Li:2")
+    p.add_argument("--salt-counterion-n6", default=None)
+    p.add_argument("--salt-counterion-n8", default=None)
+    p.add_argument("--salt-max-starts", type=int, default=CAGE_SALT_DEFAULT_MAX_STARTS,
+                   help="Maximum cage-salt build starts K_max (default 20)")
+
+
+def resolve_occlusion_mode_from_args(
+    p: argparse.ArgumentParser, args: argparse.Namespace
+) -> Tuple[OcclusionMode, Optional[Any]]:
+    """Parse the salt SPECs and resolve the mode once; input errors exit with code 2."""
+    try:
+        cage_salt = cage_salt_request_from_specs(
+            alpha_salt=args.alpha_salt, beta_salt=args.beta_salt,
+            alpha0_salt=args.alpha0_salt, alpha1_salt=args.alpha1_salt,
+            beta0_salt=args.beta0_salt, beta1_salt=args.beta1_salt,
+            salt_counterion_n4=args.salt_counterion_n4, salt_counterion_n6=args.salt_counterion_n6,
+            salt_counterion_n8=args.salt_counterion_n8,
+        )
+        mode = resolve_occlusion_mode(
+            args.occlusion_model, alpha_cl=args.alpha_cl, beta_cl=args.beta_cl,
+            occlusion_n4=args.occlusion_n4, occlusion_n6=args.occlusion_n6, occlusion_n8=args.occlusion_n8,
+            occlusion_min_distance=args.occlusion_min_distance, cage_salt=cage_salt,
+        )
+    except ValueError as exc:
+        p.error(str(exc))
+    if args.salt_max_starts < 1:
+        p.error("--salt-max-starts must be at least 1")
+    return mode, cage_salt
+
+
+def reject_cage_salt_modes(p: argparse.ArgumentParser, args: argparse.Namespace, *, write_candidate: bool = False) -> None:
+    if args.population_mode == "maximum-symmetry":
+        p.error("the cage-salt model is unsupported with --population-mode maximum-symmetry")
+    if args.unique_batch_size > 1:
+        p.error("the cage-salt model is unsupported with --unique-batch-size > 1")
+    if args.ratio4 is not None or args.ratio6 is not None or args.ratio8 is not None:
+        p.error("the cage-salt model requires exact framework allocations; --ratio4/6/8 are unsupported")
+    if args.auto_rebalance:
+        p.error("the cage-salt model is incompatible with --auto-rebalance")
+    if write_candidate:
+        p.error("the cage-salt model is incompatible with --write-candidate")
+
+
+def run_cage_salt_cli(p: argparse.ArgumentParser, args: argparse.Namespace, build) -> PopulationResult:
+    """Run a cage-salt build with the D3 failure table: input errors exit 2, construction failures 1."""
+    import lta_cage_salt as S
+
+    try:
+        return build()
+    except S.CageSaltConstructionError as exc:
+        sidecar = write_cage_salt_failure(exc.record, args.output_file)
+        text = (
+            "LTA cage-salt construction FAILED\n"
+            "=================================\n"
+            f"{exc}\n"
+            f"No structure was written; the failure record is {sidecar}.\n"
+        )
+        print(text)
+        if getattr(args, "report", None):
+            Path(args.report).write_text(text)
+        raise SystemExit(1)
+    except ValueError as exc:
+        p.error(str(exc))
 
 
 def main() -> None:
@@ -2625,12 +3476,7 @@ def main() -> None:
     p.add_argument("--ratio4", default=None, help="Fractional 4-ring allocation by physical site, e.g. Li:0.25")
     p.add_argument("--ratio6", default=None)
     p.add_argument("--ratio8", default=None)
-    p.add_argument("--alpha-cl", type=int, default=0)
-    p.add_argument("--beta-cl", type=int, default=0)
-    p.add_argument("--occlusion-n4", default=None)
-    p.add_argument("--occlusion-n6", default=None)
-    p.add_argument("--occlusion-n8", default=None)
-    p.add_argument("--occlusion-min-distance", type=float, default=1.5)
+    add_occlusion_arguments(p)
     p.add_argument("--site-map", default="NA1:6,NA2:8,NA3:4")
     p.add_argument("--template-elements", default="Na")
     p.add_argument("--dedup-digits", type=int, default=8)
@@ -2643,8 +3489,8 @@ def main() -> None:
     p.add_argument(
         "--volume-factor",
         type=float,
-        default=1.0,
-        help="Multiply the charge-equivalent Group I/II dry-LTA interpolation reference volume. H/Be/Fr/Ra use the standard Na-LTA corner as placeholders. Use 0.95 or 1.05 for -5%% or +5%% volume.",
+        default=None,
+        help="Multiply the charge-equivalent Group I/II dry-LTA interpolation reference volume (default 1.0; with cage salt, the modelled contraction f_V). H/Be/Fr/Ra use the standard Na-LTA corner as placeholders. Use 0.95 or 1.05 for -5%% or +5%% volume.",
     )
     p.add_argument("--seed", type=int, default=None)
     p.add_argument(
@@ -2709,11 +3555,16 @@ def main() -> None:
     args = p.parse_args()
 
     cutoffs = parse_cutoffs(args.variant_group_cutoff, args.variant_group_cutoff4, args.variant_group_cutoff6, args.variant_group_cutoff8)
+    mode, cage_salt = resolve_occlusion_mode_from_args(p, args)
+    legacy = mode if isinstance(mode, OcclusionLegacySparse) else None
     occlusion_requested = bool(
-        args.alpha_cl
-        or args.beta_cl
-        or occlusion_specs_have_nonzero_counts(
-            args.occlusion_n4, args.occlusion_n6, args.occlusion_n8
+        legacy is not None
+        and (
+            legacy.alpha_cl
+            or legacy.beta_cl
+            or occlusion_specs_have_nonzero_counts(
+                legacy.occlusion_n4, legacy.occlusion_n6, legacy.occlusion_n8
+            )
         )
     )
     if occlusion_requested:
@@ -2727,6 +3578,8 @@ def main() -> None:
             p.error("occlusion is incompatible with --auto-rebalance in v7.15")
         if args.write_candidate:
             p.error("occlusion is incompatible with --write-candidate in v7.15")
+    if isinstance(mode, OcclusionCageSalt):
+        reject_cage_salt_modes(p, args, write_candidate=bool(args.write_candidate))
     if args.population_mode == "maximum-symmetry":
         if args.seed is not None:
             p.error("--seed is only valid in random population mode")
@@ -2796,8 +3649,7 @@ def main() -> None:
         return
 
     if args.unique_batch_size == 1:
-        result = generate_lta_cation_structure_from_specs(
-            args.input_cif,
+        kwargs = dict(
             n4=args.n4,
             n6=args.n6,
             n8=args.n8,
@@ -2818,7 +3670,16 @@ def main() -> None:
             group_by_label=not args.no_group_by_label,
             auto_rebalance=args.auto_rebalance,
             volume_factor=args.volume_factor,
+            occlusion_model=args.occlusion_model,
+            cage_salt=cage_salt,
+            salt_max_starts=args.salt_max_starts,
         )
+        if isinstance(mode, OcclusionCageSalt):
+            result = run_cage_salt_cli(
+                p, args, lambda: generate_lta_cation_structure_from_specs(args.input_cif, **kwargs)
+            )
+        else:
+            result = generate_lta_cation_structure_from_specs(args.input_cif, **kwargs)
         output_format = result.write(args.output_file)
         report = make_population_report(result)
         report += f"Output file: {args.output_file}\nOutput format: {output_format}\n"

@@ -56,6 +56,7 @@ from lta_cation_population_grouped import (
     CandidateVariant,
     PhysicalSite,
     PlacedIon,
+    OcclusionDry,
     PopulationResult,
     _build_population_result,
     count_framework_elements,
@@ -65,6 +66,7 @@ from lta_cation_population_grouped import (
     make_allocations_from_cli,
     make_population_report,
     periodic_distance,
+    resolve_volume_factor,
     validate_supported_framework_scope,
 )
 from lta_cation_subgroups import (
@@ -287,9 +289,10 @@ def assemble_population_result(
     occupation: SiteOccupation,
     variant_assignment: VariantAssignment,
     *,
-    volume_factor: float = 1.0,
+    volume_factor: Optional[float] = None,
 ) -> PopulationResult:
     """Build the existing chemistry/volume-aware ``PopulationResult``."""
+    volume_factor = resolve_volume_factor(volume_factor, OcclusionDry())
     if occupation.site_ids != template_model.site_ids:
         raise MaximumSymmetryIntegrationError(
             "Occupation and immutable template use different site ordering"
@@ -501,7 +504,7 @@ def generate_maximum_symmetry_lta_batch_from_specs(
     variant_group_cutoffs: Optional[Mapping[str, float]] = None,
     group_by_label: bool = True,
     auto_rebalance: bool = False,
-    volume_factor: float = 1.0,
+    volume_factor: Optional[float] = None,
     symmetry_backend: str = "auto",
     framework_equivalence: str = "chemical",
     symmetry_realization: str = "exact",
@@ -526,6 +529,7 @@ def generate_maximum_symmetry_lta_batch_from_specs(
     package's historical synthetic fixtures; production callers must retain
     the default ``True``.
     """
+    volume_factor = resolve_volume_factor(volume_factor, OcclusionDry())
     if symmetry_realization not in {"exact", "occupation"}:
         raise ValueError("symmetry_realization must be exact or occupation")
     if symmetry_tiebreak not in {"canonical", "density"}:

@@ -38,7 +38,7 @@ FW = dict(n4="Na:2", n6="Na:16", n8="Na:6")
 def generate(**kwargs):
     params = dict(FW)
     params.update(kwargs)
-    return generate_lta_cation_structure_from_specs(REAL, seed=1715, **params)
+    return generate_lta_cation_structure_from_specs(REAL, seed=1715, occlusion_model="sparse-v715", **params)
 
 
 def framework_signature(result):
@@ -88,6 +88,7 @@ def test_mixed_framework_beta_cl_and_same_element_role_partition():
         beta_cl=1,
         occlusion_n4="Rb:1",
         seed=1715,
+        occlusion_model="sparse-v715",
     )
     assert mixed.framework_positive_charge == 24
     assert mixed.occlusion_positive_charge == 1
@@ -132,6 +133,7 @@ def test_framework_charge_must_pass_independently_of_global_neutrality():
             alpha_cl=1,
             occlusion_n4="Cs:1",
             seed=1715,
+            occlusion_model="sparse-v715",
         )
 
 
@@ -194,6 +196,7 @@ def test_shifted_chemically_valid_template_is_rejected(tmp_path: Path):
             alpha_cl=1,
             occlusion_n4="Cs:1",
             seed=1715,
+            occlusion_model="sparse-v715",
         )
 
 
@@ -244,67 +247,67 @@ def run_cli(script: str, *args: str):
     [
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--population-mode", "maximum-symmetry"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--population-mode", "maximum-symmetry", "--occlusion-model", "sparse-v715"),
             "maximum-symmetry",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--unique-batch-size", "2"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--unique-batch-size", "2", "--occlusion-model", "sparse-v715"),
             "unique-batch-size",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--ratio4", "Na:0.25", "--alpha-cl", "1", "--occlusion-n4", "Cs:1"),
+            ("--ratio4", "Na:0.25", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--occlusion-model", "sparse-v715"),
             "ratio",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--auto-rebalance"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--auto-rebalance", "--occlusion-model", "sparse-v715"),
             "auto-rebalance",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--write-candidate", "candidate.cif"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--write-candidate", "candidate.cif", "--occlusion-model", "sparse-v715"),
             "write-candidate",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--population-mode", "maximum-symmetry"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--population-mode", "maximum-symmetry", "--occlusion-model", "sparse-v715"),
             "maximum-symmetry",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--unique-batch-size", "2"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--unique-batch-size", "2", "--occlusion-model", "sparse-v715"),
             "unique-batch-size",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--ratio4", "Na:0.25", "--alpha-cl", "1", "--occlusion-n4", "Cs:1"),
+            ("--ratio4", "Na:0.25", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--occlusion-model", "sparse-v715"),
             "ratio",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--auto-rebalance"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1", "--occlusion-n4", "Cs:1", "--auto-rebalance", "--occlusion-model", "sparse-v715"),
             "auto-rebalance",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--beta-cl", "1.5"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--beta-cl", "1.5", "--occlusion-model", "sparse-v715"),
             "invalid int value",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1.5"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "1.5", "--occlusion-model", "sparse-v715"),
             "invalid int value",
         ),
         (
             "lta_cation_population_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1", "--occlusion-model", "sparse-v715"),
             "supported sparse range",
         ),
         (
             "generate_smooth_lta_cations_grouped.py",
-            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1"),
+            ("--n4", "Na:2", "--n6", "Na:16", "--n8", "Na:6", "--alpha-cl", "-1", "--occlusion-model", "sparse-v715"),
             "supported sparse range",
         ),
     ],
@@ -339,6 +342,7 @@ def test_greedy_move_preserves_role_metadata_and_finalizes_cl_after_move(monkeyp
         alpha_cl=1,
         occlusion_n4="Cs:1",
         seed=1715,
+        occlusion_model="sparse-v715",
         _defer_chloride_placement=True,
     )
     target = next(i for i in result.placed_ions if i.role == "occlusion_counterion")
@@ -409,6 +413,7 @@ def test_smooth_cli_places_chloride_after_cation_smoothing(tmp_path: Path):
             "--max-attempts", "1",
             "--mode", "regenerate",
             "--occlusion-min-distance", "1.5",
+            "--occlusion-model", "sparse-v715",
         ],
         cwd=ROOT,
         text=True,
@@ -427,6 +432,7 @@ def test_explicit_zero_occlusion_spec_remains_dry_inactive(tmp_path: Path):
         occlusion_n4="Cs:0",
         auto_rebalance=True,
         seed=1715,
+        occlusion_model="sparse-v715",
     )
     baseline = generate_lta_cation_structure_from_specs(
         REAL,
@@ -450,6 +456,7 @@ def test_explicit_zero_occlusion_spec_remains_dry_inactive(tmp_path: Path):
             "--n6", "Na:16",
             "--n8", "Na:6",
             "--occlusion-n4", "Cs:0",
+            "--occlusion-model", "sparse-v715",
             "--auto-rebalance",
             "--seed", "1715",
         ],
@@ -472,6 +479,7 @@ def test_explicit_zero_occlusion_spec_remains_dry_inactive(tmp_path: Path):
             "--n6", "Na:16",
             "--n8", "Na:6",
             "--occlusion-n4", "Cs:0",
+            "--occlusion-model", "sparse-v715",
             "--auto-rebalance",
             "--seed", "1715",
             "--max-attempts", "1",
