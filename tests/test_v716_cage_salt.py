@@ -668,6 +668,94 @@ def test_forced_ring_conflict_is_resolved_by_relocation_end_to_end(monkeypatch, 
     assert independent_verify(path) == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True, "V6": True}
 
 
+def test_relocation_picks_the_largest_min_slack_resolving_candidate():
+    """D2 §6.4 choice rule, recomputed independently of B._relocate."""
+    prob = _problem("B")
+    model = B._Model(prob, prob.ring_ions)
+    X = B._insert(model, np.random.default_rng(3))
+    ring = list(prob.ring_ions)
+    k = next(n for n, r in enumerate(ring) if r.ring_class == "4" and r.role == "framework")
+    target = ring[k]
+    cage = S.site_class(target.site_id).split("@")[1]
+    i = next(n for n, x in enumerate(prob.salt) if x.element == "Cl" and x.cage_id == cage)
+    X[i] = np.asarray(target.frac, float) @ model.M + np.array([0.3, 0.0, 0.0])
+    new_ring, moves = B._relocate(model, X, prob, ring)
+    # independent candidate scan: empty 4R sites and the other variants of the own site
+    occupied = {r.site_id for r in ring}
+    best = None
+    for site in prob.sites_by_ring["4"]:
+        if site.site_id != target.site_id and site.site_id in occupied:
+            continue
+        for vid, var in enumerate(site.variants):
+            if site.site_id == target.site_id and vid == target.variant_id:
+                continue
+            y = np.asarray(var.frac, float) @ model.M
+            slack = min(float(np.linalg.norm(S.min_image((X[j] - y) @ np.linalg.inv(model.M), model.M)))
+                        - (prob.pairs.r_cut(x.element, target.element) + S.DELTA_B)
+                        for j, x in enumerate(prob.salt))
+            if slack < 0:
+                continue
+            trial = list(ring)
+            trial[k] = replace(target, frac=np.asarray(var.frac, float), site_id=site.site_id, variant_id=vid)
+            if any(S.charge_violations(*S.cage_charges_quarters(prob.request, trial, P.CATION_CHARGES)).values()):
+                continue
+            key = (-slack, site.site_id, vid)
+            best = key if best is None or key < best else best
+    assert best is not None
+    move = next(m for m in moves if m["from_site"] == target.site_id)
+    assert (move["to_site"], move["to_variant"]) == (best[1], best[2])
+    assert move["min_slack_after"] == pytest.approx(-best[0])
+
+
+def test_rebalancing_realization_follows_d2_departure_and_draw_order():
+    """Replay R_q against an independent realization of D2 §5 (two-phase per family)."""
+    # a two-species group (Li, K both z = 1) makes the departure order observable
+    cases = [(FW, dict(alpha="Cl:10,Li:4,K:4", counterion_n4="Li:2,K:2"), range(60)),
+             (FW, dict(alpha="Cl:10,Li:4,K:4", counterion_n4="Li:4"), range(12)),
+             (dict(n4="Na:4", n6="Na:14", n8="Na:6"),
+              dict(alpha=None, beta=None, alpha0="Cl:3,Li:1", alpha1="Cl:2,Li:1", counterion_n6="Li:1,Sr:1"),
+              range(12))]
+    z = P.CATION_CHARGES
+    for fw, spec, seeds in cases:
+        req = request(**spec)
+        for seed in seeds:
+            res = P.generate_lta_cation_structure_from_specs(
+                REAL, cage_salt=req, seed=seed, _defer_cage_salt=True, _skip_cage_salt_validation=True, **fw)
+            rb = S.rebalance(req, res.placed_ions, res.physical_sites_by_ring, z, S.rebalance_stream(seed)[0])
+            if not rb.feasible:
+                continue
+            sites = {s_.site_id: s_ for r in res.physical_sites_by_ring.values() for s_ in r}
+            placed = list(res.placed_ions)
+            occupied = {i.site_id for i in placed}
+            rng = S.rebalance_stream(seed)[0]
+            for fam in P.RING_CLASSES:
+                classes = [c for c in S.CLASS_ORDER if c[0] == fam]
+                groups = sorted({(fam, int(g.split("R/z")[1])) for g in rb.vector if g.startswith(fam + "R")})
+                leave, need = {}, {}
+                for g in groups:
+                    tgt = rb.vector[f"{fam}R/z{g[1]}"]
+                    mine = [n for n, i in enumerate(placed)
+                            if i.role == "occlusion_counterion" and i.ring_class == fam and z[i.element] == g[1]]
+                    leave[g], need[g] = [], []
+                    for c in classes:
+                        cur = sorted((n for n in mine if S.site_class(placed[n].site_id) == c),
+                                     key=lambda n: (placed[n].site_id, placed[n].element))
+                        leave[g] += cur[:max(0, len(cur) - tgt.get(c, 0))]
+                        need[g] += [c] * max(0, tgt.get(c, 0) - len(cur))
+                for g in groups:
+                    for n in leave[g]:
+                        occupied.discard(placed[n].site_id)
+                for g in groups:
+                    for n, c in zip(leave[g], need[g]):
+                        empty = sorted(sid for sid in sites if S.site_class(sid) == c and sid not in occupied)
+                        sid = empty[int(rng.integers(len(empty)))]
+                        vid = int(rng.integers(len(sites[sid].variants)))
+                        occupied.add(sid)
+                        placed[n] = replace(placed[n], site_id=sid, variant_id=sites[sid].variants[vid].variant_id)
+            assert [(i.element, i.site_id, i.variant_id) for i in rb.placed] == \
+                [(i.element, i.site_id, i.variant_id) for i in placed], seed
+
+
 def test_internal_errors_fail_closed_with_the_record(monkeypatch):
     def boom(*a, **k):
         raise RuntimeError("synthetic")
