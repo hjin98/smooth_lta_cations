@@ -205,7 +205,7 @@ as a table keyed by site_id and checked at load.
 | Family | Rule | Weights | Classes on the template |
 |---|---|---|---|
 | 4R | the nearest **α** centre (the D4R-face anchor is nearer to β, at 6.445 Å, than to its α, at 6.719 Å, so "nearest centre" would be wrong) | w = 1 | 4R@α₀ (12 sites), 4R@α₁ (12); α gap ≥ 2.18 Å |
-| 6R | the nearest β and the nearest α | ½ / ½ | 6R@(β_k, α_l), 4 sites each; gaps ≥ 6.4 Å |
+| 6R | the nearest β and the nearest α | ½ / ½ | 6R@(β_k, α_l), 4 sites each; β gap 6.40 Å, α gap 3.48 Å (editorial correction, D3 review 4) |
 | 8R | the two α sharing the window | ½ / ½ | 8R@(α₀, α₁), 6 sites |
 
 **Charge and threshold.**
