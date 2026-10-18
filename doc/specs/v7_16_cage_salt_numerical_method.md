@@ -14,7 +14,16 @@ header-includes:
 
 # v7.16 cage-salt construction: numerical method (D2)
 
-**Lifecycle: PROPOSED (D2 draft r2, not accepted).**
+**Lifecycle: ACCEPTED-CURRENT D2 (r2; human acknowledgement 2026-10-18).**
+The stakeholder acknowledged the §12 items and the D1 readings in chat:
+"Sounds ok. These are very specific items. I'll need to run the program later
+myself in order to figure out the problems." An AI agent recorded this.
+
+- **Validation route.** The stakeholder's own runs are an expected
+  validation route. Problems they find reopen this D2 through its owner.
+- **What it does not do.** It does not self-qualify an implementation.
+
+History of the draft:
 - **Drafted:** 2026-10-17 by an AI agent (Claude Code session
   https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi), under workplan
   `LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1.

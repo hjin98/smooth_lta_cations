@@ -145,6 +145,11 @@ generator does not take a temperature; these are interpretation limits.
     5.32 Å from the α centre, about 1.1 Å on the α side of the 6R sites. An
     ion on the α face of a 6R is therefore counted as β. This affects only
     accounting, not distances.
+  - **Confirmed reading (D1 owner, 2026-10-18, via D2 acknowledgement).**
+    The tie rule and nearest-centre membership apply to `cage_salt` ions.
+    Ring cations are checked per (role, family, species) and site: every 8R
+    site lies exactly between α₀ and α₁. Window weights are fixed per
+    physical site. See D2 `v7_16_cage_salt_numerical_method.md` R-1 and R-2.
   - Not adopted: a sphere of radius 5.7 Å about each α centre (11.4 Å free
     diameter [R31]). It lacks a β region and a rule for the 5.7–6.1 Å window
     shell.
@@ -996,7 +1001,9 @@ D2 owns:
 - the restart budget, which must be calibrated so feasible requests rarely
   fail;
 - tie handling;
-- how the CN miss probability is bounded.
+- how the CN miss probability is bounded. (Confirmed deviation, D1 owner,
+  2026-10-18: D2 bounds it only by the S-12 census, not by a probability
+  bound.)
 
 D2 must not:
 - add a radius or scaling fallback;
