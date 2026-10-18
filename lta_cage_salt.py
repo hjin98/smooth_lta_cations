@@ -45,7 +45,7 @@ D1_BOUND: Dict[str, Tuple[Any, str, str]] = {
     "X_LI_FALLBACK": (0.592, D1_SPEC + " §7", "eutectic x_Li = 0.592 is used"),
     "F_REF": (0.97, D1_SPEC + " §9", "f_ref = 0.97 ± 0.03"),
     "N_REF": (10.5, D1_SPEC + " §9", "n_ref = 10.5 Cl per pseudo-cell"),
-    "A_RULE_B": (0.4, D1_SPEC + " §7", "with a = 0.4 (§7)"),
+    "A_RULE_B": (0.4, D1_SPEC + " §7", "**a = 0.4 (stakeholder decision S-11).**"),
     "A_RULE_A": (0.7, D1_SPEC + " §7", "go back to A\n  with a = 0.7."),
     "D_WALL_HALF_RANGE": (0.3, D1_SPEC + " §7", "**Uncertainty ±0.3 Å.**"),
     "DOPANT_FLAG_FRACTION": (0.2, D1_SPEC + " §7", "If dopants exceed 20 % of a cage's"),
@@ -96,6 +96,7 @@ SINGLE_IMAGE_MARGIN = 0.1
 Z_MAX_NO_CONTRIBUTOR = 1  # D2 §4.3
 EIGHTR_EQUIDISTANCE_TOL = 1.0e-6
 VARIANT_KEY_DECIMALS = 6
+VARIANT_MATCH_TOL = 1.0e-8  # fractional; canonical coordinates carry 10 decimals
 REPORT_TOP_ALTERNATIVES = 5
 
 STREAM_TAG_REBALANCE = "v7.16-charge-rebalance:{seed}"
@@ -912,7 +913,9 @@ def verify(
         key = (a.role, fam, a.element)
         ring_counts[key] = ring_counts.get(key, 0) + 1
         sites_used[a.site_id] = sites_used.get(a.site_id, 0) + 1
-        if not any(np.allclose(np.asarray(v, float) % 1.0, F[i] % 1.0, atol=1e-8) for v in site_variants[a.site_id]):
+        # periodic, absolute-only comparison (no relative tolerance)
+        if not any(float(np.abs((np.asarray(v, float) - F[i] + 0.5) % 1.0 - 0.5).max()) <= VARIANT_MATCH_TOL
+                   for v in site_variants[a.site_id]):
             v1 = False
     if any(n > 1 for n in sites_used.values()):
         v1 = False
