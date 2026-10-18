@@ -347,6 +347,10 @@ structure file's SHA-256. If the build fails, only the `.salt.json` is written
 (`status: failed`) and the exit code is non-zero; an input error exits with
 code 2 and writes nothing.
 
+Resources: a cage-salt run builds a 192^3-point effective-volume field, which
+peaks at about 1.7 GB of memory per process; a run typically takes 15-20 s
+including that setup.
+
 When re-reading a CIF, use a non-snapping reader such as
 `CifParser(path, frac_tolerance=0)`; the default pymatgen reader snaps
 near-special fractions and moves framework O by about 1e-4 Angstrom.

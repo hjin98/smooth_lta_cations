@@ -305,7 +305,7 @@ def _relocate(model: _Model, X: np.ndarray, prob: BuildProblem, ring: List[Any])
                 best = (key, trial[k])
         if best is not None:
             new = best[1]
-            moves.append({"ion": f"R{r.site_id}", "element": r.element, "role": r.role,
+            moves.append({"ion": f"R{r.site_id}", "to_ion_id": f"R{new.site_id}", "element": r.element, "role": r.role,
                           "from_site": r.site_id, "from_variant": r.variant_id,
                           "to_site": new.site_id, "to_variant": new.variant_id,
                           "min_slack_after": -best[0][0]})
@@ -333,6 +333,8 @@ def build(prob: BuildProblem, verifier: Callable[[np.ndarray, List[Any]], S.Veri
             ver = verifier(fr, ring)
             rl["failing"] = list(ver.failing)
             rl["min_slack"] = ver.detail.get("V2", {}).get("min_slack", {})
+            rl["min_membership_margin"] = ver.detail.get("V1", {}).get("min_membership_margin")
+            rl["min_distance_to_r_min1"] = ver.detail.get("V3", {}).get("min_distance_to_r_min1")
             per_ion = ver.detail.get("V3", {}).get("per_ion", {})
             rl["cn_deficit"] = sum(max(0, v["floor"] - v["cn"]) for v in per_ion.values())
             rl["cn_excess"] = sum(max(0, v["cn"] - v["cap"]) for v in per_ion.values() if v["cap"] is not None)

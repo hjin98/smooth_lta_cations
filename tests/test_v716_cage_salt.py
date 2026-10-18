@@ -220,33 +220,70 @@ def _brute_force_best(req, placed, sites_by_ring, charges):
         cls = Counter((fam, z, S.site_class(sid)) for (fam, z), combo in choice for sid in combo)
         moved = sum(max(0, n0[k] - cls.get(k, 0)) for k in n0)
         sumsq = sum((q_exc[c] + q_fw[c]) ** 2 for c in S.CAGE_IDS)
-        key = (moved, sumsq)
+        vec = tuple(cls.get((g[0], g[1], c), 0) for g in groups for c in S.CLASS_ORDER if c[0] == g[0])
+        key = (moved, sumsq, vec)
         best = key if best is None or key < best else best
     return best
 
 
-@pytest.mark.parametrize("spec,counter", [("Cl:10,Li:4,K:4", "Li:4"), ("Cl:11,Li:5,K:5", "Li:2")])
-def test_rebalancing_matches_brute_force(spec, counter):
-    _, sites = _sites()
-    req = request(alpha=spec, counterion_n4=counter)
-    for seed in range(3):
+def _vector_tuple(rb):
+    out = []
+    for g in sorted(rb.vector, key=lambda k: (k.split("R/z")[0], int(k.split("R/z")[1]))):
+        fam = g.split("R/z")[0]
+        out.extend(rb.vector[g].get(c, 0) for c in S.CLASS_ORDER if c[0] == fam)
+    return tuple(out)
+
+
+REBALANCE_CASES = [
+    # one 4R group of one charge
+    (FW, dict(alpha="Cl:10,Li:4,K:4", counterion_n4="Li:4"), range(3)),
+    (FW, dict(alpha="Cl:11,Li:5,K:5", counterion_n4="Li:2"), range(3)),
+    # two charge groups sharing the 6R family (review finding B1: needs a cross-group swap)
+    (dict(n4="Na:4", n6="Na:14", n8="Na:6"),
+     dict(alpha=None, beta=None, alpha0="Cl:3,Li:1", alpha1="Cl:2,Li:1", counterion_n6="Li:1,Sr:1"), range(40)),
+    # two families, mixed charge
+    (dict(n4="Na:4", n6="Na:14", n8="Na:6"),
+     dict(alpha="Cl:4,Li:1,K:1", beta=None, counterion_n4="Li:2", counterion_n6="Sr:1"), range(10)),
+]
+
+
+@pytest.mark.parametrize("fw,spec,seeds", REBALANCE_CASES)
+def test_rebalancing_matches_brute_force(fw, spec, seeds):
+    req = request(**spec)
+    S.validate_request(req, P.CATION_CHARGES, ["Na"])
+    for seed in seeds:
         res = P.generate_lta_cation_structure_from_specs(
-            REAL, cage_salt=req, seed=seed, _defer_cage_salt=True, **FW)
+            REAL, cage_salt=req, seed=seed, _defer_cage_salt=True, _skip_cage_salt_validation=True, **fw)
         rb = S.rebalance(req, res.placed_ions, res.physical_sites_by_ring, P.CATION_CHARGES,
                          S.rebalance_stream(seed)[0])
         brute = _brute_force_best(req, res.placed_ions, res.physical_sites_by_ring, P.CATION_CHARGES)
-        assert rb.feasible == (brute is not None)
-        assert tuple(rb.objective) == brute
+        assert rb.feasible == (brute is not None), seed
+        if brute is None:
+            assert rb.best_violation_quarters > 0 and rb.blocking_sites
+            continue
+        assert (*rb.objective, _vector_tuple(rb)) == brute, seed
+        # the realization reaches the chosen vector with one ion per site
+        assert len({i.site_id for i in rb.placed}) == len(rb.placed)
+        realized = Counter((i.ring_class, P.CATION_CHARGES[i.element], S.site_class(i.site_id))
+                           for i in rb.placed if i.role == "occlusion_counterion")
+        for g, row in rb.vector.items():
+            fam, z = g.split("R/z")
+            for cls, n in row.items():
+                assert realized.get((fam, int(z), cls), 0) == n
         q_exc, q_fw, zmax = S.cage_charges_quarters(req, rb.placed, P.CATION_CHARGES)
         assert not any(S.charge_violations(q_exc, q_fw, zmax).values())
         assert sum(q_exc[c] + q_fw[c] for c in S.CAGE_IDS) == 0
 
 
 def test_upfront_charge_check_rejects_unbalanceable_requests():
-    # all salt charge sits in alpha-0; 8R counterions cannot localize it
-    req = S.CageSaltRequest.from_specs(alpha0="Cl:12,Li:2", alpha1="Cl:0", counterion_n8="Li:10")
-    with pytest.raises(S.CageSaltInputError, match="rejected up front"):
+    # all salt charge sits in alpha-0 (-10 e); capacity suffices (6 8R + 4 4R sites) but 8R
+    # counterions split their charge between both alpha-cages, so no vector is feasible
+    req = S.CageSaltRequest.from_specs(alpha0="Cl:12,Li:2", alpha1="Cl:0", counterion_n8="Li:6",
+                                       counterion_n4="Li:4")
+    S.validate_request(req, P.CATION_CHARGES, ["Na"])
+    with pytest.raises(S.CageSaltInputError, match=r"rejected up front") as exc:
         S.upfront_charge_check(req, P.CATION_CHARGES)
+    assert "best excess 0.00" not in str(exc.value)
 
 
 # ----------------------------------------------------------------------------- S2 volume (oracle 1)
@@ -594,6 +631,74 @@ def test_oracle7_single_image_precondition_fails_closed():
     assert exc.value.record.status == "failed"
 
 
+def test_forced_ring_conflict_is_resolved_by_relocation_end_to_end(monkeypatch, tmp_path):
+    """D2 §6.4 through finalize: the first relaxation is followed by a forced Cl/ring clash."""
+    real_relax = B._relax
+    calls = {"n": 0}
+
+    def clashing_relax(model, X, log):
+        X = real_relax(model, X, log)
+        calls["n"] += 1
+        if calls["n"] == 1:
+            ring = next(r for r in model.ring if r.ring_class == "4" and r.role == "framework")
+            cage = S.site_class(ring.site_id).split("@")[1]
+            i = next(k for k, s_ in enumerate(model.p.salt) if s_.element == "Cl" and s_.cage_id == cage)
+            X = X.copy()
+            X[i] = np.asarray(ring.frac, float) @ model.M + np.array([0.3, 0.0, 0.0])
+        return X
+
+    monkeypatch.setattr(B, "_relax", clashing_relax)
+    # the move must be logged on start 1; a relocated start may still fail later checks
+    # (then a later start wins and the record keeps no move), so try a few seeds
+    for seed in range(8, 20):
+        calls["n"] = 0
+        r = generate(request(alpha="Cl:6,Li:3,K:3"), seed=seed)
+        rec = r.cage_salt_record
+        assert rec.starts[0]["rounds"][0].get("relocations"), seed
+        if rec.relocations:
+            break
+    assert rec.status == "passed" and rec.relocations and rec.verification["start_used"] == 1
+    move = rec.relocations[0]
+    assert move["from_site"] != move["to_site"] and move["to_site"].startswith("4R")
+    assert move["to_ion_id"] == "R" + move["to_site"]
+    assert any(i.site_id == move["to_site"] for i in r.placed_ions)
+    assert not any(i.site_id == move["from_site"] for i in r.placed_ions)
+    path = tmp_path / "reloc.cif"
+    r.write(path)
+    assert independent_verify(path) == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True, "V6": True}
+
+
+def test_internal_errors_fail_closed_with_the_record(monkeypatch):
+    def boom(*a, **k):
+        raise RuntimeError("synthetic")
+
+    monkeypatch.setattr(S, "rebalance", boom)
+    with pytest.raises(S.CageSaltConstructionError, match="internal construction error") as exc:
+        generate(request(alpha="Cl:4,Li:2,K:2"))
+    assert exc.value.record.status == "failed"
+
+
+def test_seed_level_rebalancing_failure_writes_the_failure_record(tmp_path):
+    args = ["--n4", "Na:4", "--n6", "Na:14", "--n8", "Na:6", "--alpha0-salt", "Cl:3,Li:1",
+            "--alpha1-salt", "Cl:2,Li:1", "--salt-counterion-n6", "Li:1,Sr:1"]
+    req = request(alpha=None, beta=None, alpha0="Cl:3,Li:1", alpha1="Cl:2,Li:1", counterion_n6="Li:1,Sr:1")
+    seed = None
+    for s_ in range(40):
+        res = P.generate_lta_cation_structure_from_specs(
+            REAL, cage_salt=req, seed=s_, _defer_cage_salt=True, n4="Na:4", n6="Na:14", n8="Na:6")
+        if not S.rebalance(req, res.placed_ions, res.physical_sites_by_ring, P.CATION_CHARGES,
+                           S.rebalance_stream(s_)[0]).feasible:
+            seed = s_
+            break
+    assert seed is not None
+    out = _cli("lta_cation_population_grouped.py", tmp_path / "f.cif", *args, "--seed", str(seed))
+    assert out.returncode == 1, out.stdout + out.stderr
+    side = json.loads((tmp_path / "f.cif.salt.json").read_text())
+    assert side["status"] == "failed" and side["rebalance"]["feasible"] is False
+    assert side["rebalance"]["best_violation_e"] > 0 and side["rebalance"]["blocking_sites"]
+    assert not (tmp_path / "f.cif").exists()
+
+
 # ----------------------------------------------------------------------------- independent verifier (oracle 2)
 
 
@@ -667,7 +772,11 @@ def _align_to_sidecar(st, rows):
 
 
 def independent_verify(path: Path, tau: float = 0.0):
-    """Brute-force V1-V5 from D1/D2 on a re-parsed file plus its sidecar (no lta_cage_salt)."""
+    """Brute-force V1-V6 from D1/D2 on a re-parsed file plus its sidecar (no lta_cage_salt).
+
+    Limit: the per-ion floors are taken from the record (they rest on the V_eff
+    estimator, which oracle 1 checks separately), not recomputed here.
+    """
     side = json.loads(Path(str(path) + ".salt.json").read_text())
     assert hashlib.sha256(path.read_bytes()).hexdigest() == side["structure_sha256"]
     st = _read_structure(path)
@@ -770,6 +879,18 @@ def independent_verify(path: Path, tau: float = 0.0):
     q_exc = sum(charges[rows[i]["element"]] for i in ring + salt
                 if rows[i]["role"] != "framework" and rows[i]["element"] != "Cl")
     checks["V5"] = q_fw == 24 and q_exc == len(cl)
+    # V6 single image: half the smallest perpendicular width exceeds max r_min1 + 0.1 A
+    a, b, c = M
+    vol = abs(float(np.dot(a, np.cross(b, c))))
+    widths = [vol / np.linalg.norm(np.cross(b, c)), vol / np.linalg.norm(np.cross(c, a)),
+              vol / np.linalg.norm(np.cross(a, b))]
+    r_min1_max = max(v[1] for k, v in csvr.items() if k[1] == "Cl" and k[2] == "" and k[0] in charges)
+    checks["V6"] = min(widths) / 2 > r_min1_max + 0.1
+    # ring cations sit on a template variant of their site (the template, not the cage-salt tables)
+    _, _, sites, _ = P.load_lta_template(REAL)
+    variants = {s_.site_id: [np.asarray(v.frac, float) for v in s_.variants] for r in sites.values() for s_ in r}
+    checks["V1"] = checks["V1"] and all(
+        min(np.abs((v - F[i] + 0.5) % 1.0 - 0.5).max() for v in variants[rows[i]["site_id"]]) < 1e-6 for i in ring)
     return checks
 
 
@@ -780,7 +901,7 @@ def test_independent_verifier_on_reparsed_output(counterion_result, tmp_path, na
     side = json.loads(Path(str(path) + ".salt.json").read_text())
     assert side["schema_version"] == 1 and side["status"] == "passed" and side["structure_written"] is True
     assert [r["index"] for r in side["atoms"]] == list(range(len(side["atoms"])))
-    assert independent_verify(path) == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True}
+    assert independent_verify(path) == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True, "V6": True}
 
 
 def test_sidecar_sha256_detects_a_stale_structure(salt_result, tmp_path):
@@ -804,7 +925,7 @@ def test_cli_end_to_end_and_failure_paths(tmp_path):
     ok = _cli("lta_cation_population_grouped.py", tmp_path / "ok.data", *base,
               "--alpha-salt", "Cl:8,Li:5,K:3", "--beta-salt", "Cl:1,Li:1", "--seed", "4")
     assert ok.returncode == 0, ok.stdout + ok.stderr
-    assert independent_verify(tmp_path / "ok.data") == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True}
+    assert independent_verify(tmp_path / "ok.data") == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True, "V6": True}
     # up-front validation error: exit 2, nothing written
     bad = _cli("lta_cation_population_grouped.py", tmp_path / "bad.cif", *base, "--alpha-salt", "Cl:13,Li:13")
     assert bad.returncode == 2 and "cap of 12" in bad.stderr

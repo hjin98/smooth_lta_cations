@@ -558,10 +558,11 @@ def _search(request: CageSaltRequest, counter_groups: Mapping[Tuple[str, int], i
                 q[c] += qf[c]
                 z[c] = max(z[c], zf[c])
         z = {c: (v if v > 0 else Z_MAX_NO_CONTRIBUTOR) for c, v in z.items()}
-        viol = sum(max(0, abs(q[c]) - 4 * z[c]) for c in CAGE_IDS)
+        # D2 §5 reports min over vectors of max_c(|q_c| - q_max(c)); feasible iff it is <= 0
+        viol = max(abs(q[c]) - 4 * z[c] for c in CAGE_IDS)
         if best_violation is None or viol < best_violation:
             best_violation = viol
-        if viol:
+        if viol > 0:
             continue
         moved = 0
         for g, split in splits.items():
@@ -575,7 +576,7 @@ def _search(request: CageSaltRequest, counter_groups: Mapping[Tuple[str, int], i
         if best is None or key < best[0]:
             best = (key, splits, q)
     ranked.sort(key=lambda t: t[0])
-    return best, ranked, best_violation or 0
+    return best, ranked, max(0, best_violation if best_violation is not None else 0)
 
 
 def upfront_charge_check(request: CageSaltRequest, charges: Mapping[str, int]) -> None:
@@ -638,7 +639,9 @@ def rebalance(
             base_z[c] = max(base_z[c], charges[ion.element])
     best, ranked, viol = _search(request, groups, capacity, base_q, base_z, n0, charges)
     if best is None:
-        blocking = sorted(sid for sid in occupied_fw)
+        # framework-held sites of the counterion families: freeing any of them widens the search
+        families = {g[0] for g in groups}
+        blocking = sorted(ion.site_id for ion in fw_only if ion.ring_class in families)
         return RebalanceResult(False, {}, (0, 0), [], [], viol, blocking, list(placed))
     key, splits, q = best
     fam_classes = _classes_by_family()
@@ -647,38 +650,54 @@ def rebalance(
     new_placed = list(placed)
     occupied = {ion.site_id for ion in new_placed}
     moves: List[Dict[str, Any]] = []
-    for g in sorted(target):
-        fam = g[0]
-        members = [i for i, ion in enumerate(new_placed)
-                   if ion.role == "occlusion_counterion" and ion.ring_class == fam and charges[ion.element] == g[1]]
-        by_cls: Dict[str, List[int]] = {}
-        for i in members:
-            by_cls.setdefault(site_class(new_placed[i].site_id), []).append(i)
-        leaving: List[int] = []
-        for cls in fam_classes[fam]:
-            cur = sorted(by_cls.get(cls, []), key=lambda i: (new_placed[i].site_id, new_placed[i].element))
-            surplus = len(cur) - target[g].get(cls, 0)
-            if surplus > 0:
-                leaving.extend(cur[:surplus])
-        for cls in fam_classes[fam]:
-            deficit = target[g].get(cls, 0) - len(by_cls.get(cls, []))
-            for _ in range(max(0, deficit)):
-                i = leaving.pop(0)
-                empty = sorted(sid for sid in sites if site_class(sid) == cls and sid not in occupied)
-                sid = empty[int(rng.integers(len(empty)))]
-                site = sites[sid]
-                vidx = int(rng.integers(len(site.variants)))
-                var = site.variants[vidx]
-                old = new_placed[i]
-                occupied.discard(old.site_id)
-                occupied.add(sid)
-                new_placed[i] = replace(old, frac=np.asarray(var.frac, float), site_id=sid,
-                                        site_label=getattr(var, "site_label", old.site_label),
-                                        variant_id=int(getattr(var, "variant_id", vidx)))
-                moves.append({"ion": f"R{old.site_id}", "element": old.element, "from_site": old.site_id,
-                              "to_site": sid, "to_variant": int(getattr(var, "variant_id", vidx)),
-                              "from_class": site_class(old.site_id), "to_class": cls})
-    alts = [{"objective": [k[0], k[1]], "q_quarters": dict(qq)} for k, _, qq in ranked[1:1 + REPORT_TOP_ALTERNATIVES]]
+    for fam in RINGS:
+        fam_groups = sorted(g for g in target if g[0] == fam)
+        leaving: Dict[Tuple[str, int], List[int]] = {}
+        before: Dict[Tuple[str, int], Dict[str, int]] = {}
+        for g in fam_groups:
+            members = [i for i, ion in enumerate(new_placed)
+                       if ion.role == "occlusion_counterion" and ion.ring_class == fam and charges[ion.element] == g[1]]
+            by_cls: Dict[str, List[int]] = {}
+            for i in members:
+                by_cls.setdefault(site_class(new_placed[i].site_id), []).append(i)
+            before[g] = {cls: len(v) for cls, v in by_cls.items()}
+            leaving[g] = []
+            for cls in fam_classes[fam]:
+                cur = sorted(by_cls.get(cls, []), key=lambda i: (new_placed[i].site_id, new_placed[i].element))
+                surplus = len(cur) - target[g].get(cls, 0)
+                if surplus > 0:
+                    leaving[g].extend(cur[:surplus])
+        # Phase 1: every surplus counterion of the family vacates its site, so a deficit
+        # class is never blocked by another charge group that leaves later (D4 realization
+        # of D2 §5; groups of one family share the same physical sites).
+        for g in fam_groups:
+            for i in leaving[g]:
+                occupied.discard(new_placed[i].site_id)
+        # Phase 2: fill deficits in canonical (group, class) order with R_q draws.
+        for g in fam_groups:
+            for cls in fam_classes[fam]:
+                deficit = target[g].get(cls, 0) - before[g].get(cls, 0)
+                for _ in range(max(0, deficit)):
+                    i = leaving[g].pop(0)
+                    empty = sorted(sid for sid in sites if site_class(sid) == cls and sid not in occupied)
+                    if not empty:
+                        raise RuntimeError(f"rebalancing realization found no empty {cls} site (D2 §5)")
+                    sid = empty[int(rng.integers(len(empty)))]
+                    site = sites[sid]
+                    vidx = int(rng.integers(len(site.variants)))
+                    var = site.variants[vidx]
+                    old = new_placed[i]
+                    occupied.add(sid)
+                    new_placed[i] = replace(old, frac=np.asarray(var.frac, float), site_id=sid,
+                                            site_label=getattr(var, "site_label", old.site_label),
+                                            variant_id=int(getattr(var, "variant_id", vidx)))
+                    moves.append({"ion": f"R{old.site_id}", "to_ion_id": f"R{sid}", "element": old.element,
+                                  "from_site": old.site_id, "to_site": sid,
+                                  "to_variant": int(getattr(var, "variant_id", vidx)),
+                                  "from_class": site_class(old.site_id), "to_class": cls})
+    alts = [{"objective": [k[0], k[1]], "q_quarters": dict(qq),
+             "vector": {f"{g[0]}R/z{g[1]}": dict(zip(fam_classes[g[0]], sp)) for g, sp in sorted(spl.items())}}
+            for k, spl, qq in ranked[1:1 + REPORT_TOP_ALTERNATIVES]]
     vector = {f"{g[0]}R/z{g[1]}": dict(target[g]) for g in sorted(target)}
     return RebalanceResult(True, vector, (key[0], key[1]), alts, moves, 0, [], new_placed)
 

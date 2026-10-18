@@ -2112,6 +2112,20 @@ def _pair_histograms(S: Any, matrix: np.ndarray, fracs: np.ndarray, atoms: Seque
     return out
 
 
+def _ring_ring_slack(S: Any, structure: Structure, atoms: Sequence[Any], pairs: Any) -> Optional[float]:
+    """Minimum ring-ring d - r_cut (Cl-bridged rows), reported only (D1 §6)."""
+    ring = [i for i, a in enumerate(atoms) if a.role in ("framework", "occlusion_counterion")]
+    F = np.asarray(structure.frac_coords, float)
+    M = np.asarray(structure.lattice.matrix, float)
+    best = None
+    for n, i in enumerate(ring):
+        for j in ring[n + 1:]:
+            d = float(np.linalg.norm(S.min_image(F[j] - F[i], M)))
+            v = d - pairs.r_cut(atoms[i].element, atoms[j].element)
+            best = v if best is None else min(best, v)
+    return best
+
+
 def finalize_cage_salt(
     result: PopulationResult,
     request: Any,
@@ -2134,6 +2148,8 @@ def finalize_cage_salt(
         raise ValueError("finalize_cage_salt needs the factor-1 (V_ref) intermediate")
     if int(salt_max_starts) < 1:
         raise ValueError("salt_max_starts must be at least 1")
+    if result.cage_salt_pending is not None and result.cage_salt_pending != request:
+        raise ValueError("finalize_cage_salt request differs from the pending request of the intermediate")
     mode = OcclusionCageSalt(request)
     overridden = volume_factor is not None
     vf = resolve_volume_factor(volume_factor, mode)
@@ -2153,6 +2169,20 @@ def finalize_cage_salt(
         record.message = message
         raise S.CageSaltConstructionError(message, record)
 
+    try:
+        return _finalize_cage_salt_steps(result, request, S, B, record, fail, vf, overridden, settings,
+                                         centres, charges, ref_lattice, ref_matrix, seed, salt_max_starts)
+    except S.CageSaltConstructionError:
+        raise
+    except Exception as exc:  # fail closed with the record (D3 failure table)
+        record.status = "failed"
+        record.message = f"internal construction error: {type(exc).__name__}: {exc}"
+        raise S.CageSaltConstructionError(record.message, record) from exc
+
+
+def _finalize_cage_salt_steps(result, request, S, B, record, fail, vf, overridden, settings,
+                              centres, charges, ref_lattice, ref_matrix, seed, salt_max_starts):
+    """Steps 4-8 of finalize_cage_salt (D3 r3 control flow)."""
     # gate re-check on the run's own sites (cheap)
     S.check_site_join(result.physical_sites_by_ring, ref_matrix, centres)
 
@@ -2165,6 +2195,11 @@ def finalize_cage_salt(
         "next_best": rb.alternatives, "moves": rb.moves,
         "best_violation_e": rb.best_violation_quarters / 4, "blocking_sites": rb.blocking_sites,
     }
+    q_before = S.cage_charges_quarters(request, result.placed_ions, charges)
+    q_after = S.cage_charges_quarters(request, rb.placed, charges) if rb.feasible else None
+    record.rebalance["q_before_e"] = {c: (q_before[0][c] + q_before[1][c]) / 4 for c in S.CAGE_IDS}
+    record.rebalance["q_after_e"] = (
+        {c: (q_after[0][c] + q_after[1][c]) / 4 for c in S.CAGE_IDS} if q_after else None)
     if not rb.feasible:
         fail("Charge rebalancing found no placement of the salt counterions keeping every "
              f"|q_c| <= q_max(c) (best excess {rb.best_violation_quarters / 4:.2f} e)")
@@ -2194,6 +2229,13 @@ def finalize_cage_salt(
         row["floor_threshold_distance"] = {
             m: float(abs(fl.a * fl.c_by_species[m] - round(fl.a * fl.c_by_species[m]))) for m in fl.c_by_species
         }
+        # C_M(c) over the n_melt range of d_wall -/+ 0.3 A (low C at the large n_melt end)
+        row["c_range_by_species"] = {
+            m: [S.T_BULK[m] * min(1.0, fl.n_cl / fl.n_melt_range[1]) if fl.n_melt_range[1] > 0 else S.T_BULK[m],
+                S.T_BULK[m] * min(1.0, fl.n_cl / fl.n_melt_range[0]) if fl.n_melt_range[0] > 0 else S.T_BULK[m]]
+            for m in fl.c_by_species
+        }
+        row["anchoring_binding"] = {m: fl.floor_by_species[m] == 1 for m in fl.floor_by_species}
         record.floors[c] = row
 
     # step 7: build
@@ -2259,8 +2301,10 @@ def finalize_cage_salt(
         el = ion_id.split("-")[3] if ion_id.startswith("S-") else "?"
         cage = "-".join(ion_id.split("-")[1:3])
         margins.setdefault(f"{cage}/{el}", []).append(int(row["cn"] - row["floor"]))
-    record.histograms["N_minus_L"] = {k: {"min": min(v), "mean": float(np.mean(v)), "values": v}
+    record.histograms["N_minus_L"] = {k: {"min": min(v), "mean": float(np.mean(v)), "values": v,
+                                           "floor_binding": min(v) == 0}
                                        for k, v in sorted(margins.items())}
+    record.histograms["ring_ring_slack_min"] = _ring_ring_slack(S, structure, atoms, pairs)
     record.density_after = _ring_density_record(final_lattice, result.framework_atoms, ring, settings)
     record.status = "passed"
 
