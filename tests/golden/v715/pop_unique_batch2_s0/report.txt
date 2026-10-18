@@ -1,0 +1,16 @@
+LTA symmetry-unique batch report
+================================
+Accepted members: 2
+Random attempts: 2
+Rejected symmetry-equivalent candidates: 0
+Input symmetry operations: 48
+Grouped-site permutation-group order: 48
+Symmetry mapping tolerance: 0.05 A
+Equivalence state alphabet: empty, H, Li, Na, K, Rb, Cs, Fr, Be, Mg, Ca, Sr, Ba, Ra
+Off-center variants within one grouped site: ignored for uniqueness
+
+member 0001: seed=7106521602475165645, canonical_signature=Na|empty|empty|empty|empty|Na|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na
+member 0002: seed=746805015404516437, canonical_signature=Na|empty|empty|empty|empty|empty|empty|empty|Na|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|empty|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na|Na
+
+member 0001 output: tests/golden/v715/pop_unique_batch2_s0/out_001.cif (cif)
+member 0002 output: tests/golden/v715/pop_unique_batch2_s0/out_002.cif (cif)

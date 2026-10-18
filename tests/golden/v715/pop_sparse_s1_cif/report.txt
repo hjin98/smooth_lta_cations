@@ -1,0 +1,82 @@
+LTA grouped cation population report
+====================================
+Random seed: 1
+Framework atoms: 144
+Final atoms: 176
+Placed cations: 28
+Framework composition: Al:24, O:96, Si:24
+Framework-compensating cation composition: Na:24
+Framework-compensating cation number fractions: x_Na=1.00000000
+Framework charge invariant: PASS (+24 = +24)
+Occlusion-counterion composition: Na:4
+Occlusion charge invariant: PASS (+4 = 4 Cl-)
+Chloride loading: alpha=2, beta=2, total=4
+Total formal charge: +28 positive; -28 negative (24 framework charge units plus chloride)
+
+Volume model:
+  interpolation: V_ref = sum_i(z_i*N_i*V_i^(24))/24
+  charge-equivalent fractions: x_Na=1.00000000
+  Na: V_i^(24)=3703.292036 A^3; Carey 2013/2014 Na96-A dry measured corner
+  input lattice volume: 3701.347187 A^3
+  reference-volume basis: dry framework-compensating Group I/II charge-equivalent affine interpolation only
+  occlusion-volume policy: no automatic correction for excess cations or Cl; this preserves the dry initialization reference and is not a claim of zero physical volume response to salt loading
+  reference volume: 3703.292036 A^3
+  applied volume factor: 1.00000000
+  target/output volume: 3703.292036 A^3
+  isotropic lattice-vector scale: 1.0001751172
+  written structure volume: 3703.292036 A^3
+  dry-LTA reference sources: Carey et al., Chem. Mater. 26, 1561-1566 (2014), DOI 10.1021/cm403312q; Carey PhD thesis (2013), Ch. 3; Adams & Rees, JSSC 62, 184-190 (1986), DOI 10.1016/0022-4596(86)90230-6; Porcher et al., Acta Cryst. B56, 766-772 (2000), DOI 10.1107/S0108768100006893; Pluth & Smith, JACS 104, 6977-6982 (1982), DOI 10.1021/ja00389a015; Kim et al., ACS Symp. Ser. 135, 137-153 (1980), DOI 10.1021/bk-1980-0135.ch007
+
+Variant grouping cutoffs (A):
+  4R: 2.500
+  6R: 2.500
+  8R: 2.500
+
+Site-family summary:
+  4R: 24 physical sites, 24 coordinate variants, variant multiplicities = 1
+      requested Na: 2
+  6R: 16 physical sites, 16 coordinate variants, variant multiplicities = 1
+      requested Na: 16
+  8R: 6 physical sites, 24 coordinate variants, variant multiplicities = 4
+      requested Na: 6
+
+Placed cations:
+  Na role=framework 4R site=4R_NA3_0004 variant=0 frac=(0.25000000, 0.25000000, 0.96200000)
+  Na role=occlusion_counterion 4R site=4R_NA3_0009 variant=0 frac=(0.46200000, 0.03800000, 0.75000000)
+  Na role=occlusion_counterion 4R site=4R_NA3_0012 variant=0 frac=(0.53800000, 0.25000000, 0.25000000)
+  Na role=occlusion_counterion 4R site=4R_NA3_0015 variant=0 frac=(0.75000000, 0.03800000, 0.46200000)
+  Na role=framework 4R site=4R_NA3_0018 variant=0 frac=(0.75000000, 0.46200000, 0.75000000)
+  Na role=occlusion_counterion 4R site=4R_NA3_0023 variant=0 frac=(0.96200000, 0.53800000, 0.25000000)
+  Na role=framework 6R site=6R_NA1_0000 variant=0 frac=(0.09960000, 0.09960000, 0.09960000)
+  Na role=framework 6R site=6R_NA1_0001 variant=0 frac=(0.09960000, 0.09960000, 0.70120000)
+  Na role=framework 6R site=6R_NA1_0002 variant=0 frac=(0.09960000, 0.70120000, 0.09960000)
+  Na role=framework 6R site=6R_NA1_0003 variant=0 frac=(0.20120000, 0.59960000, 0.59960000)
+  Na role=framework 6R site=6R_NA1_0004 variant=0 frac=(0.29880000, 0.90040000, 0.90040000)
+  Na role=framework 6R site=6R_NA1_0005 variant=0 frac=(0.40040000, 0.40040000, 0.40040000)
+  Na role=framework 6R site=6R_NA1_0006 variant=0 frac=(0.40040000, 0.40040000, 0.79880000)
+  Na role=framework 6R site=6R_NA1_0007 variant=0 frac=(0.40040000, 0.79880000, 0.40040000)
+  Na role=framework 6R site=6R_NA1_0008 variant=0 frac=(0.59960000, 0.20120000, 0.59960000)
+  Na role=framework 6R site=6R_NA1_0009 variant=0 frac=(0.59960000, 0.59960000, 0.20120000)
+  Na role=framework 6R site=6R_NA1_0010 variant=0 frac=(0.59960000, 0.59960000, 0.59960000)
+  Na role=framework 6R site=6R_NA1_0011 variant=0 frac=(0.70120000, 0.09960000, 0.09960000)
+  Na role=framework 6R site=6R_NA1_0012 variant=0 frac=(0.79880000, 0.40040000, 0.40040000)
+  Na role=framework 6R site=6R_NA1_0013 variant=0 frac=(0.90040000, 0.29880000, 0.90040000)
+  Na role=framework 6R site=6R_NA1_0014 variant=0 frac=(0.90040000, 0.90040000, 0.29880000)
+  Na role=framework 6R site=6R_NA1_0015 variant=0 frac=(0.90040000, 0.90040000, 0.90040000)
+  Na role=framework 8R site=8R_NA2_0000 variant=3 frac=(0.92760000, 0.50540000, 0.49460000)
+  Na role=framework 8R site=8R_NA2_0001 variant=1 frac=(0.00540000, 0.42760000, 0.99460000)
+  Na role=framework 8R site=8R_NA2_0002 variant=3 frac=(0.92760000, 0.07240000, 0.50540000)
+  Na role=framework 8R site=8R_NA2_0003 variant=1 frac=(0.57240000, 0.00540000, 0.99460000)
+  Na role=framework 8R site=8R_NA2_0004 variant=3 frac=(0.42760000, 0.57240000, 0.99460000)
+  Na role=framework 8R site=8R_NA2_0005 variant=0 frac=(0.57240000, 0.99460000, 0.42760000)
+
+Occluded chlorides:
+  Cl cage=alpha-0 type=alpha frac=(0.25000000, 0.25000000, 0.25000000)
+  Cl cage=alpha-1 type=alpha frac=(0.75000000, 0.75000000, 0.75000000)
+  Cl cage=beta-0 type=beta frac=(0.00000000, 0.00000000, 0.00000000)
+  Cl cage=beta-1 type=beta frac=(0.50000000, 0.50000000, 0.50000000)
+  final minimum-distance guard: 4.236780 A >= 1.500000 A
+  cage-center coordinates are AIMD initialization conventions, not equilibrium-coordinate predictions
+  WARNING: beta-cage Cl is a deliberately sampled trapped/configurational training hypothesis, not a demonstrated equilibrium LTA chloride site
+Output file: tests/golden/v715/pop_sparse_s1_cif/out.cif
+Output format: cif
