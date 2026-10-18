@@ -36,6 +36,8 @@ for seed in (0, 1):
     CASES.append((f"pop_sparse_vf098_s{seed}", POP, SPARSE + ["--volume-factor", "0.98", "--seed", str(seed)], "out.cif", True))
 CASES.append(("pop_unique_batch2_s0", POP, DRY + ["--unique-batch-size", "2", "--seed", "0"], "out.cif", True))
 CASES.append(("pop_maxsym", POP, DRY + ["--population-mode", "maximum-symmetry"], "out.cif", True))
+CASES.append(("smooth_maxsym", SMOOTH, DRY + ["--population-mode", "maximum-symmetry"], "out.cif", False))
+CASES.append(("pop_dry_candidate_s0", POP, DRY + ["--write-candidate", "tests/golden/v715/pop_dry_candidate_s0/candidate.cif", "--seed", "0"], "out.cif", True))
 
 
 def stack() -> dict:

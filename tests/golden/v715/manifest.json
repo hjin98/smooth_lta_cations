@@ -7,6 +7,31 @@
     "python": "3.13.16",
     "scipy": "1.18.1"
   },
+  "pop_dry_candidate_s0": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_candidate_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--write-candidate",
+      "tests/golden/v715/pop_dry_candidate_s0/candidate.cif",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_candidate_s0/report.txt"
+    ],
+    "files": {
+      "candidate.cif": "790a0312414018b210a427f92a70e6bf1eda02795fd30765df9b7e80fb6fe692",
+      "out.cif": "9edd9303660e985364003db84e02ed57928af1f6136399bd1ad7eb73edabb03d",
+      "report.txt": "d572537d28af977eac623092758eabf11f6bc6c0f72f79ccc01717eec8f23f9a",
+      "stdout.txt": "be014279fb71e33647606f9400cc99edab564bc5970bd3ed077d668056339936"
+    }
+  },
   "pop_dry_s0_POSCAR": {
     "argv": [
       "lta_cation_population_grouped.py",
@@ -790,6 +815,25 @@
     "files": {
       "out.cif": "bd8cc18693767c1ef797c4c94f667a1552a5bcd739c1da237a2a922e62e69c92",
       "stdout.txt": "120c91c41e7ba45e5c15983f3d04ed483b62b4d2ad54403b642bc22b504280b4"
+    }
+  },
+  "smooth_maxsym": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_maxsym/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--population-mode",
+      "maximum-symmetry"
+    ],
+    "files": {
+      "out.cif": "ea7614b8f6e552e2eeeafe3538d2f4daa6752188182d280484d599514dde3356",
+      "stdout.txt": "14b3f355de26d4b38ce764aa1cdfb264a1e32c70016f1810d651f3dbd3253997"
     }
   },
   "smooth_sparse_s0_POSCAR": {
