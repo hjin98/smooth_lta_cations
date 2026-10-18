@@ -14,7 +14,7 @@ header-includes:
 
 # v7.16 cage-salt construction: numerical method (D2)
 
-**Lifecycle: PROPOSED (D2 draft r1, not accepted).**
+**Lifecycle: PROPOSED (D2 draft r2, not accepted).**
 - **Drafted:** 2026-10-17 by an AI agent (Claude Code session
   https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi), under workplan
   `LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1.
@@ -23,6 +23,8 @@ header-includes:
   2026-10-17), cited as **D1 §n**.
 - **r1 folds in independent D2 review 1 (§13).** That review raised two
   SERIOUS CHALLENGES and 15 findings.
+- **r2 folds in D2 review 2,** which raised no SERIOUS CHALLENGE and eight
+  new findings, N1-N8 (§13).
 - **Status of choices:** every parameter value is an agent-proposed D2
   default (§10) until this document is accepted.
 - **Acceptance gate:** independent review, then human acknowledgement of the
@@ -46,14 +48,18 @@ These D1 invariants hold throughout:
 - **Fail-closed.** No structure is written unless every check passes.
 - **No sampling claim.** No sampling law is claimed (D-9).
 
-**D2 readings of D1, recorded for the D1 owner.** These change no meaning.
+**D2 readings of D1. The D1 owner must confirm both before D2 is
+accepted.**
 - **(R-1) Cage membership applies to `cage_salt` ions only.** D1 §4 requires
   every "role, cage and species count" to equal its input. Ring roles have
-  per-family inputs, not per-cage inputs, so for them the exact check is per
-  ring family, physical site and species.
-  - The reason this matters (review SC-1): on the canonical template, every 8R
-    site and variant is equidistant from α₀ and α₁, at 6.267 Å. A
-    nearest-centre test on ring cations would be decided by float noise.
+  per-family inputs, not per-cage inputs, so for them the exact check is the
+  count per (role, family, species), plus "each occupied site holds one
+  cation at a template variant of that site".
+  - **This is a narrowing of D1 §3.** It waives D1 §3's "Ties are a
+    construction failure" for ring cations.
+  - Why it is needed: read literally, D1 would fail every structure with an
+    occupied 8R site. Every 8R site anchor and variant is equidistant from α₀
+    and α₁ (anchors 6.139/6.139 Å; variants 6.2668/6.2668 Å).
 - **(R-2) Window weights w(j, c) are fixed per physical site** by ring-window
   topology on the canonical, gated template (§4.3). They are never derived
   from distances to individual variants.
@@ -66,9 +72,15 @@ These D1 invariants hold throughout:
   - d(r₁, r₂) = ‖(f − round(f)) L‖ with f = (r₁ − r₂) L⁻¹ is the
     minimum-image distance. It is single-image exact when
     max r_min1 + 0.1 Å < ½ min_k(perpendicular width k).
-  - That precondition holds on the canonical cell (7.09 Å against 5.11 Å).
-    It is checked at run time, and a violation fails closed. A small
-    `--volume-factor` (below about 0.35) would violate it.
+  - That precondition holds on the canonical cell (7.09 Å against 5.11 Å;
+    the 0.1 Å margin is an agent choice). It is checked at run time, and a
+    violation fails closed.
+  - The cut-off is a volume factor of about 0.37 for Na-A, and it depends on
+    the population through V_ref.
+  - Nearest-centre and membership results remain exact even where centre
+    distances exceed half the width. The farthest any point lies from its
+    nearest centre is 6.84 Å, below 7.09 Å, and that ratio is unchanged by
+    scaling.
 - **Ions and sets.**
   - S: `cage_salt` ions.
   - R: ring cations (`framework` and `occlusion_counterion`).
@@ -76,6 +88,8 @@ These D1 invariants hold throughout:
 - **Pair tables.**
   - r_cut and r_min1 come from the D1-bound E-pair CSV, with the D1 §6 rows
     and weights x_M.
+  - Notation: w(j, c) denotes the D1 window weights. The smooth-count width
+    is written w_s.
   - The build target is ρ_cut = r_cut + δ_b.
 - **Cage centres and membership.**
   - c ∈ {α₀, α₁, β₀, β₁}, at the D1 §3 canonical fractional positions.
@@ -108,8 +122,11 @@ These D1 invariants hold throughout:
 - **Smoothing on the V_ref cell.** In cage-salt mode, smoothing always runs
   on the V_ref cell, which is the v7.14 dry reference at volume factor 1. The
   salt-dependent f_V, or an explicit override, is applied only at step 5.
-  - Consequence: steps 1-3 are byte-identical to the same population request
-    with the cage-salt model disabled and volume factor 1.
+  - Consequence: the step-3 state is independent of every cage-salt input
+    other than the population and counterion allocations. That state covers
+    the placed ring ions, sites, variants and the V_ref cell.
+  - With an explicit `--volume-factor`, steps 1-3 run at factor 1, not at the
+    override. This is the D2 reading of D1 §11 "must not perturb".
   - This differs from v7.15, which scales before smoothing. Legacy and dry
     paths keep their existing behaviour.
 - **Smoothing entry point.** Steps 4-9 run once, on the population the
@@ -122,7 +139,10 @@ These D1 invariants hold throughout:
   - R_s,k = the same construction with tag `v7.16-cage-salt:{seed}:start{k}`.
     Each restart has its own substream, so start k does not depend on how
     many draws earlier starts consumed.
-  - A direct library call with seed = None is not reproducible, as in v7.15.
+  - With seed = None, R_q and R_s,k are seeded from OS entropy, not from a
+    tag containing "None", and the run is not reproducible, as in v7.15.
+  - Reproducing a smoothing-entry-point run from its logged attempt seed needs
+    a way to run that single attempt seed. That is a D3 obligation (§11).
 
 ## 4. Deterministic quantities
 
@@ -170,13 +190,13 @@ V_eff(c; d) = (V_cell / G^3) * sum_ijk  w_ijk(c) * [ min_{o in F_O} d(f_ijk, o) 
 ### 4.3 Window classes and charge (revised after review findings 2-3)
 
 **Window table (fixed per physical site, from the canonical template's
-site anchors).** This is a property of the gated template, so it is stored
+`anchor_frac`; verified in review 2).** This is a property of the gated template, so it is stored
 as a table keyed by site_id and checked at load.
 
 | Family | Rule | Weights | Classes on the template |
 |---|---|---|---|
-| 4R | the nearest cage centre (an α) | w = 1 | 4R@α₀ (12 sites), 4R@α₁ (12) |
-| 6R | the nearest β and the nearest α | ½ / ½ | 6R@(β_k, α_l), 4 sites each |
+| 4R | the nearest **α** centre (the D4R-face anchor is nearer to β, at 6.445 Å, than to its α, at 6.719 Å, so "nearest centre" would be wrong) | w = 1 | 4R@α₀ (12 sites), 4R@α₁ (12); α gap ≥ 2.18 Å |
+| 6R | the nearest β and the nearest α | ½ / ½ | 6R@(β_k, α_l), 4 sites each; gaps ≥ 6.4 Å |
 | 8R | the two α sharing the window | ½ / ½ | 8R@(α₀, α₁), 6 sites |
 
 **Charge and threshold.**
@@ -200,19 +220,23 @@ as a table keyed by site_id and checked at load.
 - The decision is the integer vector n[g, class]: how many counterions of
   group g occupy each class of g's family.
 - The capacity of a class is its number of sites that are empty after step 3
-  or hold an `occlusion_counterion`.
+  or hold an `occlusion_counterion`. It is shared across the charge groups of
+  the family: Σ_z n[(f, z), class] ≤ capacity(class).
 
 **Search size (corrected).** The number of candidate vectors is
 Π_g C(n_g + k_g − 1, k_g − 1), with k = 2, 4 and 1 classes for 4R, 6R and 8R.
-- Over all admissible inputs (Q_exc ≤ 26, capacities 24/16/6), the worst
-  case is 163,072 vectors. Agent enumeration found it at
+- Over all admissible inputs (Q_exc ≤ 26), the worst case is 163,072
+  vectors, or 35,840 once per-class capacities are applied (both recomputed
+  by brute force in review 2). Agent enumeration found it at
   (4R: 3 singly and 1 doubly charged; 6R: 11 singly and 5 doubly charged).
 - Each vector costs O(1) to evaluate, so exhaustive enumeration is exact and
   costs well under a second.
 
 **Objective.** Among vectors meeting every capacity and every
 |q_c| ≤ q_max(c), choose lexicographically by:
-1. the number of counterions whose class differs from step 3;
+1. the number of moved counterions,
+   Σ_g Σ_class max(0, n₀[g, class] − n[g, class]), where n₀ is the step-3
+   vector;
 2. Σ_c q_c²;
 3. the lexicographically smallest vector in canonical order. Groups are
    ordered by family (4, 6, 8), then charge; classes are ordered 4R@α₀,
@@ -244,28 +268,39 @@ vectors.
 - **Variables.** The positions x ∈ ℝ^{3|S|}. Ring and framework atoms are
   fixed except through §6.4.
 - **Penalty function.** h(u) = max(0, u)².
-- **Smooth count.** s_i = Σ_{j opposite} σ((r_min1(i, j) − d_ij)/w).
+- **Smooth count.** s_i = Σ_{j opposite} σ((r_min1(i, j) − d_ij)/w_s).
 
 ```
 E_W(x) = W * [ sum_{i<j in S} h(rho_cut(i,j) - d_ij)
              + sum_{i in S, k in R} h(rho_cut(i,k) - d_ik)
              + sum_{i in S, o in F_O} h(rho_cut(i,o) - d_io)
              + sum_{i in S, k in F} h(1.5 + delta_b - d_ik)
-             + sum_{i in S} h(eps_m - margin(i))
-             + sum_{i in S, j opposite to i} h(delta_cn - |d_ij - r_min1(i,j)|) ]
+             + sum_{i in S} h(eps_m - margin(i)) ]
+         + W_dz * sum_{i in S, j opposite to i} h(delta_cn - |d_ij - r_min1(i,j)|)
          + sum_{i in S, cation} [ h(L_i + mu - s_i) + h(s_i - (U_i - mu)) ]
          + sum_{i in S, Cl}      h(1 + mu - s_i)
 ```
 
-- **Dead-zone term (added after review finding 6).** It pushes every
-  opposite-charge pair at least δ_cn away from its counting boundary r_min1.
-  Smooth and discrete counts then agree away from the boundary.
+W_dz = 0 in the three continuation stages. It is W_dz = 10 only in a final
+polish stage (§6.3).
+
+- **Dead-zone term (added after review 1 finding 6; reweighted after review
+  2 N4).** It pushes every opposite-charge pair at least δ_cn away from its
+  counting boundary r_min1, so smooth and discrete counts agree.
+  - It carries its own weight and acts only in the final polish. Weighted by W
+    from the start, it would have frozen the counts after the first stage.
+  - It depletes a ±0.05 Å band around r_min1 in every opposite-charge pair
+    distribution. That changes the output; it is reported (§8.1) and listed
+    for acknowledgement (§12).
+  - It is not covered by probes P6-P8.
 - **The count terms remain a heuristic.** For example, a smooth count of
   2.59 is reachable with one true neighbour and four just outside r_min1.
   Only the exact verification (§7) decides acceptance.
-- **Smoothness.** E_W is piecewise C¹: h is C¹. It is not differentiable
-  where margin(i) switches the minimizing centre, where the minimum image
-  switches, or at d = 0. L-BFGS-B tolerates these measure-zero sets in
+- **Smoothness.** E_W is piecewise C¹: h is C¹. It is not differentiable:
+  - where margin(i) switches the minimizing centre;
+  - where the minimum image switches;
+  - at d = 0;
+  - at d = r_min1 when W_dz > 0, where the dead-zone gradient jumps. L-BFGS-B tolerates these measure-zero sets in
   practice, and §7 catches any failure.
 
 ### 6.2 Initialization (start k, stream R_s,k)
@@ -283,7 +318,8 @@ E_W(x) = W * [ sum_{i<j in S} h(rho_cut(i,j) - d_ij)
 ### 6.3 Relaxation and shaping
 
 - **Minimizer.** L-BFGS-B (SciPy) minimises E_W at W = 10, 100 and 1000 in
-  turn, each stage starting from the previous one.
+  turn, with W_dz = 0. A final polish stage follows at W = 1000 and W_dz = 10.
+  Each stage starts from the previous result.
 - **Options:** maxiter 6000, maxfun 15000, maxcor 10, ftol 2.2×10⁻⁹,
   gtol 10⁻⁵, maxls 20.
 - The minimiser's success flag is ignored; §7 decides.
@@ -325,9 +361,13 @@ mean condition:
 sum_{i in M, c} N_i >= sum_{i in M, c} 0.7 * C_M(c)
 ```
 
-- With pooling for small populations (D1 §7), the sum runs over both α-cages,
-  with each ion carrying its own cage's C. That makes pooling well-defined
-  when C differs between the two cages.
+- **Pooling for small populations (D1 §7).**
+  - A species is evaluated per cage wherever it has at least 3 centres there.
+  - The α-cages where it has fewer than 3 are pooled together, each ion
+    carrying its own cage's C. A cage evaluated alone is never pooled, so no
+    ion is counted twice.
+  - If the pooled set still has fewer than 3 centres, only anchoring and U_M
+    apply. In the census this branch covers n = 2 and every Cs/Sr/Ba dopant.
 - Anchoring and U_M stay per ion, and everything else is unchanged.
 
 ## 7. Exact verification (step 8; revised after review SC-2)
@@ -336,16 +376,17 @@ sum_{i in M, c} N_i >= sum_{i in M, c} 0.7 * C_M(c)
 - The canonical coordinates are the fractional coordinates rounded to 10
   decimals and wrapped into [0, 1), together with the lattice.
 - All writers serialize from these. The existing writers quantize further:
-  CIF and POSCAR to 8 significant figures, and LAMMPS to 8 decimals in its
-  rotated Cartesian frame. That worst-case quantization is below 10⁻⁶ Å per
-  coordinate, so τ_w = 10⁻⁵ Å covers it.
+  CIF and POSCAR to 8 decimals, and LAMMPS to 8 decimals in its rotated
+  Cartesian frame. Including the lattice parameters and the rotation, the
+  worst case is about 2.6×10⁻⁷ Å per atom and 5.3×10⁻⁷ Å per pair, so
+  τ_w = 10⁻⁵ Å covers it (measured in review 2).
 - Verification is brute-force O(N²) in float64 on the canonical coordinates,
   with the margins below. Every check therefore keeps its verdict after any
   writer's quantization.
 
 | # | Check | Margin |
 |---|---|---|
-| V1 | `cage_salt` inventory per cage and species, by nearest centre (R-1); ring roles per family, site and species | margin(i) ≥ τ_w |
+| V1 | `cage_salt` inventory per cage and species, by nearest centre; ring cations as counts per (role, family, species) equal to the input, with each occupied site holding one cation at a template variant (R-1) | margin(i) ≥ τ_w |
 | V2 | d_ij ≥ r_cut(i, j) + τ_w for every pair with at least one `cage_salt` ion, against ring cations and framework O; d ≥ 1.5 + τ_w to every atom | +τ_w (stricter than D1) |
 | V3 | Anchoring and L_i ≤ N_i ≤ U_i (rule A if adopted), with every opposite-charge pair |d − r_min1| ≥ τ_w | exact counts |
 | V4 | Every |q_c| ≤ q_max(c) | exact fractions |
@@ -353,7 +394,14 @@ sum_{i in M, c} N_i >= sum_{i in M, c} 0.7 * C_M(c)
 | V6 | Single-image precondition (§2) | — |
 
 D4 adds a writer round-trip test: re-parse each written file and re-run V1-V5
-with τ_w = 0. The verdicts must agree.
+with τ_w = 0. The verdicts must agree. Two conditions apply (review 2):
+- **Non-snapping reader.** The round-trip uses a reader that does not snap
+  coordinates, for example pymatgen `CifParser(frac_tolerance=0)`. The
+  default reader snaps near-common fractions, moving framework O by about
+  1.2×10⁻⁴ Å. Users re-reading the CIF should be warned of this.
+- **Role and site sidecar.** Roles and site ids are not representable in CIF,
+  POSCAR or LAMMPS, and the writer reorders atoms by element. A per-atom
+  sidecar in written order is therefore required (D3, §11).
 
 ## 8. Stochastic, error and reproducibility semantics
 
@@ -367,6 +415,10 @@ with τ_w = 0. The verdicts must agree.
   is accepted under D-9 and made visible (§8.1).
 - **No probability bound.** D2 gives no bound on the probability of a CN miss
   or a failure outside the S-12 grid. That grid is a census, not a sample.
+  - This is a recorded deviation from the D1 §16 hand-off, which lists "how
+    the CN miss probability is bounded" as D2-owned.
+  - D2 bounds it only by the census, and asks the D1 owner to acknowledge
+    this (§12).
 - **Reproducibility envelope.** Output is byte-identical for the same
   inputs, seed and recorded stack:
   - Python version;
@@ -403,6 +455,8 @@ Fields added to the D1 §14 per-run report:
 - **Final structure:**
   - the V1-V6 table;
   - histograms of d − r_cut per pair class (0-0.5 Å, 0.05 Å bins);
+  - a histogram of d − r_min1 for opposite-charge pairs (±0.5 Å, 0.01 Å
+    bins), which shows the dead-zone band;
   - N_i − L_i per species;
   - the start used, and K_max;
   - the stack versions.
@@ -434,9 +488,10 @@ acceptance does not accept them; the human acknowledgement (§12) does.
 4. **Rebalancing.** The exhaustive search is compared with brute force over
    individual site assignments on small synthetic problems. Σ_c q_c = 0
    always holds.
-5. **Streams.** Steps 1-3 are byte-identical to the same request with the
-   cage-salt model off and volume factor 1. Changing R_s,k leaves steps 1-6
-   unchanged.
+5. **Streams.** The step-3 state snapshot (ring ions, sites, variants, V_ref
+   cell) depends only on the population and counterion allocations, the seed
+   and the smoothing settings. It does not depend on the α/β salt inventories
+   or on f_V. Changing R_s,k leaves steps 1-6 unchanged.
 6. **Determinism.** Same seed and stack give identical bytes.
 7. **Precondition.** A volume factor below the single-image limit fails
    closed.
@@ -475,15 +530,17 @@ variant of this method. They motivate it but are not acceptance evidence.
 |---|---|---|
 | δ_b build margin | 0.01 Å | ≫ the penalty residual (about 0.002 Å, review estimate) and τ_w |
 | τ_w writer band | 10⁻⁵ Å | above the worst writer quantization (< 10⁻⁶ Å) |
-| ε_m membership margin | 0.05 Å | — |
+| ε_m membership margin | 0.05 Å | agent choice, no external basis |
 | δ_cn count dead zone | 0.05 Å | keeps smooth and discrete counts consistent |
-| w smooth-count width | 0.12 Å | P6-P8 |
-| μ count margin | 0.3 | — |
+| w_s smooth-count width | 0.12 Å | P6-P8 |
+| μ count margin | 0.3 | agent choice, no external basis |
 | W continuation | 10, 100, 1000 | P6-P8 |
+| W_dz dead-zone weight | 0 in continuation; 10 in the final polish (W = 1000) | review 2 N4; agent choice, not probed |
+| Single-image precondition margin | 0.1 Å | agent choice |
 | L-BFGS-B options | maxiter 6000, maxfun 15000, maxcor 10, ftol 2.2e-9, gtol 1e-5, maxls 20 | SciPy defaults, except maxiter |
-| M_ins and insertion fallback metric | 2000; minimum sum of squared violations | — |
+| M_ins and insertion fallback metric | 2000; minimum sum of squared violations | agent choice, no external basis |
 | Relocation choice | resolving candidates only; maximum minimum slack; (site_id, variant_id) | D1 §8 |
-| K_max, R_reloc | 20, 4 | — |
+| K_max, R_reloc | 20, 4 | agent choice; cost in §6.5 |
 | V_eff grid | G = 192, fixed fractional, tie sharing within 10⁻⁹ Å | §4.2 |
 | Ceiling guard | 10⁻⁹ | §2 |
 | Canonicalisation | round to 10 decimals, then wrap into [0, 1) | §7 |
@@ -511,24 +568,32 @@ D3 must preserve:
   margins, brute-force verification, and the single-image precondition;
 - §8.1: the report fields;
 - SciPy and NumPy as runtime dependencies, and stack versions recorded in
-  qualification.
+  qualification;
+- a per-atom role and site-id sidecar in written order, for the round-trip
+  verification;
+- a way to run a single logged attempt seed;
+- a non-snapping reader in the round-trip tests.
 
 D3 owns modules, data structures, neighbour lists outside verification,
 vectorisation, CLI and schema, errors and report format.
 
 ## 12. Acceptance request
 
-- **Requested:** a short independent re-review of the r1 changes, then human
-  acknowledgement of the output-changing choices:
+- **Requested:** human acknowledgement of the output-changing choices (r1
+  has had an independent re-review, review 2):
   - first-success restarts with K_max = 20, and their runtime;
   - the boundary-hugging bias;
-  - V2 margins stricter than D1 by τ_w;
+  - V1, V2 and V3 margins stricter than D1 by τ_w;
+  - the dead-zone depletion band of ±0.05 Å around r_min1;
   - smoothing on the V_ref cell in cage-salt mode, which differs from
     v7.15's scale-then-smooth;
   - the S-12 census and decision rule;
   - the added report fields.
-- **D1 readings for the stakeholder to confirm.** R-1 (membership applies to
-  `cage_salt` only) and R-2 (window weights per physical site).
+- **D1 owner confirmations required.**
+  - R-1 narrows D1 §3's tie rule to `cage_salt` ions.
+  - R-2: window weights are fixed per physical site.
+  - The D1 §16 deviation: the CN miss probability is bounded only by the
+    S-12 census.
 - **Tensions.** Searched D1 §13 (T1-T22), the workplans, the D1 git log and
   the repository issues (none). Relevant: T8 (anchoring), T17/T21 (V_eff,
   handled deterministically) and T22 (fallback, §6.6). None is closed here.
@@ -583,3 +648,35 @@ common-mode risk.
 - S-10 is preserved for `cage_salt` ions;
 - cross-window counting;
 - relocation cannot change the floors.
+
+**Independent D2 review 2** (2026-10-17/18, of r1). AI reviewer: a fresh
+subagent context, with the same common-mode caveat. No SERIOUS CHALLENGE.
+
+**Closure of review 1.** The re-review closed findings 1-5, 12, 13 and 15.
+It judged the rest partly closed, and finding 7 stale; the gaps are
+addressed below.
+
+**New findings and dispositions.**
+- **N1:** the 4R rule must be "nearest α" → fixed, with anchor distances.
+- **N2:** the default CIF reader snaps coordinates → non-snapping reader
+  required; the "8 decimals" wording corrected.
+- **N3:** roles are not in the written files → sidecar added to the D3
+  hand-off.
+- **N4:** the W-weighted dead zone froze the counts → separate W_dz in a
+  final polish stage; reported and acknowledged.
+- **N5:** the oracle 5 comparator did not exist → step-3 snapshot oracle;
+  explicit-override reading stated.
+- **N6:** rule A pooling incomplete → defined.
+- **N7:** V1 wording → fixed.
+- **N8:** workplan records, the tracked `.pyc`, the w/w_s notation → fixed.
+
+**Partial closures addressed:**
+- R-1 is now stated as a narrowing that needs D1-owner confirmation;
+- the tier-1 objective and shared capacity are defined;
+- the dead-zone cusp is added to the smoothness note;
+- the seed = None semantics are stated;
+- single-attempt reproduction is a D3 obligation;
+- the register is completed;
+- the precondition cut-off is population-dependent, with the reason
+  nearest-centre stays exact;
+- the D1 §16 deviation is recorded.
