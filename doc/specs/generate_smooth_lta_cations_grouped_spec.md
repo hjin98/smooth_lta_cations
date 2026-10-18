@@ -409,3 +409,16 @@ structure assembly.
 
 Occlusion is rejected at this public CLI boundary with maximum-symmetry mode,
 `--unique-batch-size > 1`, ratio allocations, or auto-rebalance.
+
+## v7.16 cage-salt smoothing order
+
+With `--occlusion-model cage-salt` (the default) and salt options given, the
+script resolves the mode once, runs `validate_cage_salt_request` once on sites
+loaded with its own options, and runs every attempt with
+`_defer_cage_salt=True` at volume factor 1. Density analysis and greedy repair
+see ring cations only. `finalize_cage_salt` is called once, on the selected
+attempt, with that attempt's seed, the explicit `--volume-factor` (or `None`
+for f_V) and the script's density settings. `--attempt-seed N` replaces the
+master seed stream with exactly one attempt of seed N, so a logged attempt is
+reproduced byte for byte. Legacy flags need `--occlusion-model sparse-v715`;
+the dry path finalizes nothing.

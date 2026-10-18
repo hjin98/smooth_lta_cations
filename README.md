@@ -1,6 +1,6 @@
 # Smooth grouped-site LTA cation generator
 
-This package generates Group-I/II-cation-substituted Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and grouped cation-template positions. Version 7.15.0 adds a bounded random-mode sparse chloride-occlusion initialization path while preserving the qualified v7.14.2 dry behavior when occlusion is absent. The existing MS0-MS7 maximum-symmetry certificate remains cation-only and explicitly rejects occluded cases.
+This package generates Group-I/II-cation-substituted Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and grouped cation-template positions. Version 7.16.0 adds a per-cage, variable-loading molten-salt occlusion model (`--occlusion-model cage-salt`, the default): 0-12 Cl per alpha-cage and 0-1 per beta-cage with their cations, built against data-sourced pair minima and density-reduced coordination floors in a contracted cell. The v7.15 sparse cage-centre chloride model remains available as `--occlusion-model sparse-v715`. Dry output is byte-identical to v7.15.0. The MS0-MS7 maximum-symmetry certificate remains cation-only and rejects occluded cases.
 
 ## Entry points
 
@@ -13,12 +13,15 @@ This package generates Group-I/II-cation-substituted Al24Si24O96 LTA initial str
 - `lta_cation_maxsym.py` - maximum-order occupation and exact-coordinate optimization with forced-variant lifting, subgroup-orbit realization catalogs, and explicit certificates.
 - `lta_cation_maxsym_io.py` - MS4 assembly, secondary ranking, hard filters, subgroup diagnostics, reports, serialization, and post-write verification.
 - `lta_cation_symmetry_smoothing.py` - MS5 complete-orbit relocation, species exchange, equivariant variant reorientation, and required-subgroup verification.
+- `lta_cage_salt.py` - v7.16 cage-salt domain rules: request validation, pair tables, window charges and exact rebalancing, effective volume and coordination floors, verification V1-V6, streams and the run record.
+- `lta_cage_salt_build.py` - v7.16 cage-salt construction numerics: random insertion, L-BFGS-B penalty continuation, ring relocation and restarts.
+- `lta_cage_salt_data.py` - generated projection of the bound evidence CSV and the canonical window table (`validation/regenerate_cage_salt_data.py`; never hand-edited).
 - MS7 acceleration - provenance framework actions, generator-orbit variant completion, bit-mask subgroup closure, and exact direct enumeration for small occupation spaces.
 
 Dependencies:
 
 ```bash
-pip install numpy pymatgen
+pip install numpy scipy pymatgen
 # Optional explicit symmetry-detection backend:
 pip install spglib
 ```
@@ -47,7 +50,8 @@ Module specifications:
 - `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current framework-compensation chemistry/charge authority for v7.15; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
 - `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization (the legacy model once v7.16 is implemented).
-- `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified (2026-10-17) D1 scientific contract for the variable-loading cage-salt occlusion model. It is **not yet implemented**: D2 method, D3 design and D4 implementation follow under `workplans/V7.16-MOLTEN-SALT-OCCLUSION.md`. Its PDF is produced at release qualification.
+- `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified (2026-10-17) D1 scientific contract for the variable-loading cage-salt occlusion model. Its PDF is produced at release qualification.
+- `doc/specs/v7_16_cage_salt_numerical_method.md` - accepted-current D2 numerical method for the cage-salt build (charge rebalancing, effective volume, penalty relaxation, exact verification). The D3 design is the "v7.16 architecture delta" section of the architecture manual; the D4 workplan is `workplans/V7.16-D4-IMPLEMENTATION.md`.
 - `doc/evidence/` - stakeholder-supplied, non-authoritative evidence package (rev 3) for v7.16: occlusion literature, molten-salt pair distances, coordination numbers and lattice contraction, with CSVs and generator scripts.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
@@ -69,7 +73,7 @@ The current source hierarchy is intentionally explicit:
 - **Scientific chemistry/charge authority:** `doc/specs/v7_13_group_i_ii_cation_extension.md`.
 - **Scientific/numerical volume authority:** `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`.
 - **Sparse chloride-occlusion authority:** `doc/specs/v7_15_chloride_occlusion_extension.md`.
-- **Cage-salt occlusion D1 authority (ratified, not yet implemented):** `doc/specs/v7_16_molten_salt_occlusion_extension.md`.
+- **Cage-salt occlusion authorities:** D1 `doc/specs/v7_16_molten_salt_occlusion_extension.md`, D2 `doc/specs/v7_16_cage_salt_numerical_method.md`, D3 "v7.16 architecture delta" in the architecture manual.
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.
@@ -305,3 +309,50 @@ initialization informed by salt-occlusion literature. Beta-cage Cl is a
 deliberately sampled trapped/configurational training hypothesis, not a
 demonstrated equilibrium LTA chloride site. See
 `doc/specs/v7_15_chloride_occlusion_extension.md`.
+
+## v7.16 cage-salt occlusion
+
+The default occlusion model fills each cage with an amorphous LiCl-KCl-like
+salt: up to 12 Cl per alpha-cage and up to 1 per beta-cage, with the cations
+you specify. Ions never cross between alpha- and beta-cages.
+
+```bash
+python lta_cation_population_grouped.py tests/real_lta_primitive.cif out.cif \
+    --n4 Na:2 --n6 Na:16 --n8 Na:6 \
+    --alpha-salt Cl:12,Li:7,K:5 --beta-salt Cl:1,Li:1 --seed 3 --report out.txt
+```
+
+- `--alpha-salt` / `--beta-salt` set both cages of a type; `--alpha0-salt`,
+  `--alpha1-salt`, `--beta0-salt`, `--beta1-salt` override one cage. Salt
+  species are Li, Na, K, Rb, Cs, Sr and Ba.
+- `--salt-counterion-n4/n6/n8` add excess-charge cations on empty ring sites.
+  They are rebalanced exactly so no cage carries more than z_max e of net
+  charge (window weights: 4R to the nearest alpha-cage, 6R half to each
+  adjoining cage, 8R half to each alpha-cage).
+- Excess charge must balance: sum of salt and counterion cation charge = N_Cl.
+- `--volume-factor` defaults to the modelled contraction
+  f_V = 1 - 0.03 min(n_bar/10.5, 1), n_bar = N_Cl/2; an explicit value overrides it.
+- `--salt-max-starts N` (default 20) bounds the build restarts.
+- `generate_smooth_lta_cations_grouped.py` accepts the same options; it smooths
+  the ring cations first and builds the salt once on the selected attempt.
+  `--attempt-seed N` reruns exactly the logged attempt with seed N.
+
+Each structure comes with `<output>.salt.json`: the run record (inventory,
+volume, floors, rebalancing, starts, verification V1-V6, histograms, streams,
+software stack) plus one row per written atom, in written order, with its role
+(`framework_atom`, `framework`, `occlusion_counterion`, `cage_salt`), ion id,
+cage and site. CIF, POSCAR and LAMMPS cannot carry roles, so use the sidecar to
+tell salt cations from ring cations of the same element. The sidecar records the
+structure file's SHA-256. If the build fails, only the `.salt.json` is written
+(`status: failed`) and the exit code is non-zero; an input error exits with
+code 2 and writes nothing.
+
+When re-reading a CIF, use a non-snapping reader such as
+`CifParser(path, frac_tolerance=0)`; the default pymatgen reader snaps
+near-special fractions and moves framework O by about 1e-4 Angstrom.
+
+The coordination floors use rule B (per ion, a = 0.4) pending the S-12
+qualification census. The salt is an MD initial structure: it makes no claim of
+equilibrium structure, g(r) or siting. The legacy flags `--alpha-cl`,
+`--beta-cl`, `--occlusion-n4/6/8` and `--occlusion-min-distance` now require
+`--occlusion-model sparse-v715`.

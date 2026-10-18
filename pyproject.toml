@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "lta-cation-generator"
-version = "7.15.0"
+version = "7.16.0"
 description = "Grouped-site LTA cation population and symmetry tools"
 requires-python = ">=3.10"
-dependencies = ["numpy", "pymatgen"]
+dependencies = ["numpy", "scipy", "pymatgen"]
 
 [project.optional-dependencies]
 symmetry = ["spglib>=2.0"]
@@ -24,6 +24,9 @@ py-modules = [
   "lta_cation_maxsym",
   "lta_cation_maxsym_io",
   "lta_cation_symmetry_smoothing",
+  "lta_cage_salt",
+  "lta_cage_salt_build",
+  "lta_cage_salt_data",
 ]
 
 [tool.pytest.ini_options]
