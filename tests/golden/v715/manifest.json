@@ -1,0 +1,362 @@
+{
+  "pop_dry_s0.POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0"
+    ],
+    "sha256": "b884c9cff1b2036747c051d415c53f71f36d77d4cae144d033699bb79a41bae7"
+  },
+  "pop_dry_s0.cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0"
+    ],
+    "sha256": "9edd9303660e985364003db84e02ed57928af1f6136399bd1ad7eb73edabb03d"
+  },
+  "pop_dry_s0.data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0"
+    ],
+    "sha256": "13cb857c8f614fc089ac48da8be1947f48b3d3661b31f0e86f743924c257a12e"
+  },
+  "pop_dry_s1.POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1"
+    ],
+    "sha256": "95829b5db98873b43a3691535f7a02868d861125153be5c9307abaa92a964bd7"
+  },
+  "pop_dry_s1.cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1"
+    ],
+    "sha256": "51a4491596b727cf33599680fa76295dd98e9e201f80a0e24aa93ae11597daff"
+  },
+  "pop_dry_s1.data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1"
+    ],
+    "sha256": "f04ddc8e7e3189968718b3da848fef1fed76583cbfa5ddad8bd583dc7a9b0cc9"
+  },
+  "pop_dry_s2.POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2"
+    ],
+    "sha256": "32e02bf3f166ac753dfdb14400646c4ccf64d5f653c2a94b2a24e8a10418e815"
+  },
+  "pop_dry_s2.cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2"
+    ],
+    "sha256": "32251e06c2b20f85f2af8e279e87160c029cd49dc58eff99f00e254e54dce3e9"
+  },
+  "pop_dry_s2.data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2"
+    ],
+    "sha256": "cbf83da87f3497f9f5ab7e4f7be7468f095c675272b2e117d23ff9aab9b0ba79"
+  },
+  "pop_sparse_s0.POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0"
+    ],
+    "sha256": "5c18c871de71bee021f60b2c9f9a5f5ba6e849c68ca3807aea58a53c0ff7238a"
+  },
+  "pop_sparse_s0.cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0"
+    ],
+    "sha256": "55d32f3bcebbdb91e95e17eaed3cbfc81084eb8d27841c9855141623223d9276"
+  },
+  "pop_sparse_s0.data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0"
+    ],
+    "sha256": "b6592b154f474b17f7664b84ed04bcb157c57403e2065e5f0fb12e162b705d5b"
+  },
+  "pop_sparse_s1.POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1"
+    ],
+    "sha256": "38337777e346bdccda4dd41719c42d0dc5273ade629b9b5bdb83e225bfbb2b1f"
+  },
+  "pop_sparse_s1.cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1"
+    ],
+    "sha256": "4bab410d3d7bd986f400775a4f947f9792256965f0e11994c2e744c46197de94"
+  },
+  "pop_sparse_s1.data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1"
+    ],
+    "sha256": "77c867132f86e12f0624b2a97304d4c06f4f4bb2bd34b8a83fcc0ab2feadbc54"
+  },
+  "smooth_dry_s0.cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s0.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "sha256": "62ede6abbe34794f00973cbfbaaca3833b3a26b9b6e3bd25885072aabc8c1afe"
+  },
+  "smooth_dry_s1.cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s1.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "sha256": "f53113ef6b965fef02bb8e03841ea270e90a486111e308b9a0226526ecceac0b"
+  },
+  "smooth_sparse_s0.cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s0.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "sha256": "07c27d8c4102e9c55ff1b7db072bf9abda2770a1115a113bf75e705204d76ec4"
+  },
+  "smooth_sparse_s1.cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s1.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "sha256": "5ce39b7c27de08cecb3751713fbdc0bb0f39b8f387393ea6dbc4841f062ae2e7"
+  }
+}
