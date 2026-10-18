@@ -1,0 +1,235 @@
+{
+ "by_group": {
+  "K/Li5K3Sr1": {
+   "max_seconds": 14.15,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/Li5K4Cs1": {
+   "max_seconds": 15.94,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/Li6K4Ba1": {
+   "max_seconds": 17.92,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    2,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/n10": {
+   "max_seconds": 16.43,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/n12": {
+   "max_seconds": 16.84,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/n2": {
+   "max_seconds": 14.22,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    2,
+    3,
+    1,
+    1,
+    3
+   ]
+  },
+  "K/n4": {
+   "max_seconds": 13.63,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "K/n6": {
+   "max_seconds": 15.5,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    2,
+    1,
+    3
+   ]
+  },
+  "K/n8": {
+   "max_seconds": 16.62,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    3,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "Na/Li5K3Sr1": {
+   "max_seconds": 13.38,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "Na/Li5K4Cs1": {
+   "max_seconds": 15.06,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "Na/Li6K4Ba1": {
+   "max_seconds": 16.48,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    2,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "Na/n10": {
+   "max_seconds": 15.02,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    1
+   ]
+  },
+  "Na/n12": {
+   "max_seconds": 17.78,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    1,
+    1,
+    2
+   ]
+  },
+  "Na/n2": {
+   "max_seconds": 18.13,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    2,
+    3,
+    1,
+    1,
+    6
+   ]
+  },
+  "Na/n4": {
+   "max_seconds": 13.65,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    2,
+    1,
+    2,
+    1,
+    1
+   ]
+  },
+  "Na/n6": {
+   "max_seconds": 15.79,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    1,
+    1,
+    2,
+    1,
+    3
+   ]
+  },
+  "Na/n8": {
+   "max_seconds": 16.13,
+   "passed": 5,
+   "ran": 5,
+   "starts_used": [
+    3,
+    1,
+    1,
+    1,
+    1
+   ]
+  }
+ },
+ "commit": "79923030db421a597754adabeb75237ccf790706",
+ "decision": "retain",
+ "failed": 0,
+ "failures": [],
+ "pass_rate": 1.0,
+ "passed": 90,
+ "plan": "qualification/v716/census-plan.json",
+ "ran": 90,
+ "rule": "B",
+ "unrun": 0,
+ "wall_s": 355.2,
+ "wilson_95": [
+  0.9591,
+  1.0
+ ]
+}
