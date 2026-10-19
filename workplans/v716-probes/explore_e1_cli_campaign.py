@@ -173,7 +173,7 @@ def analyse(path, rec):
 def main():
     outdir = Path(sys.argv[1]).resolve()
     outdir.mkdir(parents=True, exist_ok=True)
-    log = REPO / "workplans" / "v716-probes" / "results" / "e1_cli_campaign.jsonl"
+    log = Path(os.environ.get("E1_LOG", REPO / "workplans" / "v716-probes" / "results" / "e1_cli_campaign.jsonl"))
     log.write_text("")
     with ThreadPoolExecutor(max_workers=4) as pool:
         for row in pool.map(lambda c: run_case(c, outdir), CASES):
