@@ -26,6 +26,7 @@ Status: evidence and coordination, not authority.
 | Focused amendment review D1 r8 / D2 r3 | specs; code read for feasibility only | Acceptable with fixes; fixed in `74b406e` |
 | **Closeout part A** (independent): authority-to-code traceability | `e4e42d8`, which includes the S-13 code `11ac4c6` | **Pass with recorded residuals**: no SC/blocker/major; minors F1-F8 |
 | **Closeout part B** (independent): documents, records, drift | `e4e42d8` | **No-Pass** on stale coordination records (B-1, M-1 to M-5, m-1 to m-14); all documentation-only |
+| **Closeout delta check** (independent): of the fixes above | `a9c2c06` | **Pass with recorded residuals**: no blocker/major; minors N-1 to N-7, trivia T-1 to T-6 |
 
 Closeout part A is also the independent review of the S-13 code delta
 (`11ac4c6`). That delta had no separate code review before.
@@ -69,6 +70,45 @@ Closeout part A is also the independent review of the S-13 code delta
 - `VOID.md` beside each voided census run (m-10);
 - architecture manual front matter (m-13).
 
+**Final pass after the delta check** (commit listed under Evidence):
+- **N-2:** the population module's v7.16 header cites D1 r8 / D2 r3.
+- **N-4:** count types are validated when a `CageSaltRequest` is constructed,
+  so an API counterion count of `None` is an input error.
+- **T-1:** the capacity-only rejection no longer prints "0.00 e".
+- **N-5:** the relocation charge-effect test checks the chained values.
+- **N-1:** the D2 r3 record lists the closeout clarification.
+- **N-6:** CHANGELOG note on the record changes under `schema_version` 1.
+- **N-7:** the hand-off asks the stakeholder about R3.
+- **T-2 to T-6:** wording fixes.
+
+## Finding dispositions
+
+The review reports themselves are not committed; this table is their durable
+trace. Each review is identified by its row in the review history above.
+
+| Finding | Short form | Disposition |
+|---|---|---|
+| A-F1 | Independent verifier lacked the x_M fallback | Fixed (`2165d33`), with a test |
+| A-F2 | API accepted fractional, negative or unknown-key requests | Fixed (`2165d33`, final pass N-4) |
+| A-F3 | Up-front rejection did not name cages | Fixed (`2165d33`, final pass T-1) |
+| A-F4 | Two-phase realization not in D2 §5 | D2 r3 clarification (`6164d80`); residual R3 |
+| A-F5 | Relocation moves lacked charge effect | Fixed (`2165d33`, test strengthened N-5) |
+| A-F6 | V1 ring counts came from the realized placement | Fixed (`2165d33`), with a test |
+| A-F7 | Verifier rule-B-only; implicit `cage_floors` rule | Rule passed explicitly; verifier limit is residual R9 |
+| A-F8 | Trivia (non-canonical writer coords, messages, record gaps) | Residuals R10, R11 |
+| A-D3 | D3 drift (D1_BOUND list, locators, streams, failure table, linkage, resources) | D3 post-D4 note (`6164d80`); locators added; R4, R5 |
+| B-1 | Parent workplan stale | Fixed (`6164d80`) |
+| B-M1 | Hand-off stale | Fixed (`a0bf2df`) |
+| B-M2 | CHANGELOG r7/r2, review coverage | Fixed (`a0bf2df`) |
+| B-M3 | No S-13 code review; no D4 acceptance after the census | Part A covers `11ac4c6`; verdict below |
+| B-M4 | Stale and missing PDFs | Residual R1; README PDF status |
+| B-M5 | D3 not reconciled | Fixed (`6164d80`) |
+| B-m1 to m-8, m-10, m-11, m-13 | Stale statements across specs, README, workplans, E1 driver, void markers, D2 routing, manual front matter | Fixed (`6164d80`, `4e42bad`, `a0bf2df`) |
+| B-m9 | Census guard covers six files only | Residual R7 |
+| B-m12 | Inferred τ_w/δ_b acknowledgement for T_min | Residual R3 (stakeholder asked in the hand-off) |
+| B-m14 | Stale revision strings in code | Fixed (`2165d33`, final pass N-2) |
+| Delta N-1 to N-7, T-1 to T-6 | See the final-pass list above | Fixed in the final pass; N-3 is this table |
+
 ## Evidence at closeout
 
 All on the shipped code: `2165d33` code, which is identical in code to HEAD.
@@ -93,7 +133,7 @@ All on the shipped code: `2165d33` code, which is identical in code to HEAD.
 | R4 | A ring `ion_id` changes when a ring cation moves; moves carry `ion` and `to_ion_id` | D3 | Recorded drift in the D3 note; a stable ring id would be a D3 change. |
 | R5 | Peak memory is about 1.7 GB per process for the G = 192 V_eff field | D3 | Noted in the README and D3; a coarser grid is a D2 change. |
 | R6 | Neither the census nor E1 r8 exercises the D-12 relocation path or a construction failure; only tests cover them | D4 | Tests cover both with an independent oracle; the stakeholder's runs may add evidence. |
-| R7 | The census run guard hashes six code files; other imported modules (template, maxsym_io, symmetry) and the fixture CIF are pinned by commit only | D4 | Commit ancestry plus `git diff` checks; low risk. |
+| R7 | The census run guard hashes and `git diff`-checks six code files only; other imported modules (template, maxsym_io, symmetry) and the fixture CIF are pinned by commit ancestry only (the delta check found no change to them since the freeze) | D4 | Low risk; widen the guard when the census script next changes. |
 | R8 | The stack record reports the pymatgen-core version, and the thread count only from environment variables | D4 | Informational fields. |
 | R9 | The independent verifier takes the per-ion floors from the record, implements rule B only, and does not check V1 ring species counts | D4 test | The floors rest on the V_eff oracle (oracle 1). Rule A is not adopted (S-12). Production V1 checks ring counts against the inputs (F6). |
 | R10 | Writers serialize framework and ring coordinates that differ from the canonical ones by ≤ 5e-11 fractional | D4 | Far inside τ_w = 1e-5 Å. |

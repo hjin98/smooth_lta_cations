@@ -15,7 +15,8 @@ header-includes:
 # v7.16 cage-salt construction: numerical method (D2)
 
 **Lifecycle: ACCEPTED-CURRENT D2 (r2; human acknowledgement 2026-10-18; r3
-amendment 2026-10-19 concretizes D1 r8 S-13, the salt-ion–T minimum).**
+amendment 2026-10-19 concretizes D1 r8 S-13, the salt-ion–T minimum, and at
+closeout records the §5 cross-group realization order).**
 The stakeholder acknowledged the §12 items and the D1 readings in chat:
 "Sounds ok. These are very specific items. I'll need to run the program later
 myself in order to figure out the problems." An AI agent recorded this.
@@ -714,8 +715,10 @@ addressed below.
 
 **r3 amendment (2026-10-19, AI agent).** This amendment concretizes D1 r8
 S-13. It adds the T_min term to E_W, the T_min condition to insertion, the
-salt–T clause to V2, and the salt–T slack class to the report. Nothing else
-changes. Relocation is unaffected because it moves ring cations, to which
+salt–T clause to V2, and the salt–T slack class to the report. At closeout
+(2026-10-19, `6164d80`) it also records the §5 cross-group realization order,
+a clarification of the already-implemented behaviour, which is agent-adopted
+and open to stakeholder objection. Nothing else changes. Relocation is unaffected because it moves ring cations, to which
 T_min does not apply. An independent focused review is recorded in D1 §17.
 - The S-12 census recorded under r2 is void for r3 (the code changed). It was
   re-run under new freezes: run 3, then run 4 on the closeout code, both 90/90,

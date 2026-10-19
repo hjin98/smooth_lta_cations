@@ -23,6 +23,11 @@
 - Every cage-salt ion is kept at least 3.0 Angstrom from framework Si/Al
   (D1 r8, stakeholder decision S-13), after an exploratory campaign found small
   cations in framework wall pockets.
+- The `.salt.json` record grew during the 7.16.0 cycle under `schema_version` 1.
+  Before the closeout fixes, the salt-T histogram key was
+  `d_minus_r_cut/salt-T`; it is now `d_minus_T_min/salt-T`. The `traceback`
+  field and the relocation charge fields are new. Records from the earlier
+  development commits are therefore not fully comparable.
 - Added SciPy as a declared dependency (L-BFGS-B, KD-tree); dry and legacy runs
   do not import the cage-salt modules.
 - Authorities: D1 `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r8),
@@ -33,7 +38,9 @@
   - D4 review and delta review, covering code to `fedfc2d`;
   - a focused D1 r8 / D2 r3 amendment review;
   - the closeout integration review in two parts, covering `e4e42d8`, which
-    includes the S-13 code. Its findings are fixed in `2165d33`/`6164d80`.
+    includes the S-13 code. Its findings are fixed in `2165d33`, `6164d80`,
+    `4e42bad` and `a0bf2df`, plus a final small pass after the closeout delta
+    check.
 
   See `qualification/v716/CLOSEOUT.md`.
 
