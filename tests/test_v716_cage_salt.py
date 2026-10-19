@@ -1,7 +1,7 @@
 """v7.16 cage-salt model: D4 stages S1-S4 and D2 §9 oracles 1-7.
 
-Authorities: D1 doc/specs/v7_16_molten_salt_occlusion_extension.md (r7), D2
-doc/specs/v7_16_cage_salt_numerical_method.md (r2), D3 "v7.16 architecture delta"
+Authorities: D1 doc/specs/v7_16_molten_salt_occlusion_extension.md (r8), D2
+doc/specs/v7_16_cage_salt_numerical_method.md (r3), D3 "v7.16 architecture delta"
 (r3). The independent verifier at the end of this file is written from D1/D2 and the
 evidence CSV directly; it does not call ``lta_cage_salt``.
 """
@@ -284,6 +284,66 @@ def test_upfront_charge_check_rejects_unbalanceable_requests():
     with pytest.raises(S.CageSaltInputError, match=r"rejected up front") as exc:
         S.upfront_charge_check(req, P.CATION_CHARGES)
     assert "best excess 0.00" not in str(exc.value)
+
+
+def test_upfront_rejection_names_the_cages():
+    req = S.CageSaltRequest.from_specs(alpha0="Cl:12,Li:2", alpha1="Cl:0", counterion_n8="Li:6",
+                                       counterion_n4="Li:4")
+    with pytest.raises(S.CageSaltInputError, match=r"in alpha-0"):
+        S.upfront_charge_check(req, P.CATION_CHARGES)
+
+
+@pytest.mark.parametrize("cages,needle", [
+    ({"alpha-0": {"Cl": 2.7, "Li": 1, "K": 1.9}}, "nonnegative integer"),
+    ({"alpha-0": {"Cl": 2, "Li": 3, "K": -1}}, "nonnegative integer"),
+    ({"alpha-0": {"Cl": True, "Li": 1}}, "nonnegative integer"),
+])
+def test_api_requests_must_carry_nonnegative_integer_counts(cages, needle):
+    with pytest.raises(S.CageSaltInputError, match=needle):
+        S.validate_request(S.CageSaltRequest(cages=cages), P.CATION_CHARGES, ["Na"])
+    with pytest.raises(S.CageSaltInputError, match=needle):
+        generate(S.CageSaltRequest(cages=cages))
+
+
+def test_unknown_cage_or_ring_keys_are_rejected_at_construction():
+    with pytest.raises(S.CageSaltInputError, match="Unknown cage"):
+        S.CageSaltRequest(cages={"gamma-0": {"Cl": 1, "Li": 1}})
+    with pytest.raises(S.CageSaltInputError, match="Unknown ring family"):
+        S.CageSaltRequest(cages={}, counterions={"5": {"Li": 1}})
+
+
+def test_v1_compares_ring_counts_with_the_input_allocations(salt_result, ref_cell):
+    """D1 §4: an equal-charge species swap on a ring site fails V1 (and only V1)."""
+    M, F, atoms, req, kw = _verify_inputs(salt_result, ref_cell[0])
+    exp = {("framework", "4", "Na"): 2, ("framework", "6", "Na"): 16, ("framework", "8", "Na"): 6}
+    assert S.verify(M, F, atoms, req, **{**kw, "expected_ring_counts": exp}).passed
+    swapped = dict(exp)
+    swapped[("framework", "8", "Na")] = 5
+    swapped[("framework", "8", "K")] = 1
+    assert S.verify(M, F, atoms, req, **{**kw, "expected_ring_counts": swapped}).failing == ["V1_inventory"]
+
+
+def test_cl_only_cages_round_trip_through_the_independent_verifier(tmp_path):
+    """x_M falls back to all cations when the cell has no cage-salt cation (D1 §6)."""
+    r = P.generate_lta_cation_structure_from_specs(
+        REAL, cage_salt=request(alpha="Cl:4", beta=None, counterion_n4="Li:8"), seed=6, **FW)
+    path = tmp_path / "clonly.cif"
+    r.write(path)
+    assert independent_verify(path) == {"V1": True, "V2": True, "V3": True, "V4": True, "V5": True, "V6": True}
+    # a Cl-Cl clash the fallback must catch: move one Cl 2.0 A from another (r_cut ~2.97 A)
+    side = json.loads(Path(str(path) + ".salt.json").read_text())
+    cl = [k for k, row in enumerate(side["atoms"]) if row["element"] == "Cl"]
+    M = np.asarray(r.structure.lattice.matrix)
+    a, b = np.asarray(side["atoms"][cl[0]]["frac"]), np.asarray(side["atoms"][cl[1]]["frac"])
+    side["atoms"][cl[1]]["frac"] = list(a + np.array([2.0, 0, 0]) @ np.linalg.inv(M))
+    from pymatgen.core import Structure
+    st = Structure(r.structure.lattice, [row["element"] for row in side["atoms"]],
+                   [row["frac"] for row in side["atoms"]])
+    bad = tmp_path / "clash.cif"
+    P.write_structure_by_suffix(st, bad)
+    side["structure_sha256"] = hashlib.sha256(bad.read_bytes()).hexdigest()
+    Path(str(bad) + ".salt.json").write_text(json.dumps(side))
+    assert independent_verify(bad)["V2"] is False
 
 
 # ----------------------------------------------------------------------------- S2 volume (oracle 1)
@@ -674,6 +734,9 @@ def test_forced_ring_conflict_is_resolved_by_relocation_end_to_end(monkeypatch, 
     move = rec.relocations[0]
     assert move["from_site"] != move["to_site"] and move["to_site"].startswith("4R")
     assert move["to_ion_id"] == "R" + move["to_site"]
+    # D1 §4: each move reports its charge effect
+    assert set(move["q_before_e"]) == set(move["q_after_e"]) == set(S.CAGE_IDS)
+    assert sum(move["q_after_e"].values()) == pytest.approx(0.0)
     assert any(i.site_id == move["to_site"] for i in r.placed_ions)
     assert not any(i.site_id == move["from_site"] for i in r.placed_ions)
     path = tmp_path / "reloc.cif"
@@ -897,7 +960,9 @@ def independent_verify(path: Path, tau: float = 0.0):
     ring = [i for i, r in enumerate(rows) if r["role"] in ("framework", "occlusion_counterion")]
     fw = [i for i, r in enumerate(rows) if r["role"] == "framework_atom"]
     salt_cat = [rows[i]["element"] for i in salt if rows[i]["element"] != "Cl"]
-    x = {m: salt_cat.count(m) / len(salt_cat) for m in set(salt_cat)}
+    # D1 §6: mole fractions over the cage-salt cations of the cell, else over all cations
+    pool = salt_cat or [rows[i]["element"] for i in ring]
+    x = {m: pool.count(m) / len(pool) for m in set(pool)}
 
     def dist(i, j):
         d = F[j] - F[i]

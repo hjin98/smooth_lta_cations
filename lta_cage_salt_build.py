@@ -1,6 +1,6 @@
 """v7.16 cage-salt construction numerics (D3 r3 "lta_cage_salt_build.py (numerics)").
 
-Implements D2 r2 §6 (doc/specs/v7_16_cage_salt_numerical_method.md): random sequential
+Implements D2 r3 §6 (doc/specs/v7_16_cage_salt_numerical_method.md): random sequential
 insertion, L-BFGS-B penalty continuation with smooth coordination counts, a final
 dead-zone polish, charge-constrained D-12 ring relocation and first-success restarts.
 Acceptance is never decided here: every candidate is passed to the caller's verifier,
@@ -310,10 +310,16 @@ def _relocate(model: _Model, X: np.ndarray, prob: BuildProblem, ring: List[Any])
                 best = (key, trial[k])
         if best is not None:
             new = best[1]
+            q0 = S.cage_charges_quarters(prob.request, ring, prob.charges)
+            after = list(ring)
+            after[k] = new
+            q1 = S.cage_charges_quarters(prob.request, after, prob.charges)
             moves.append({"ion": f"R{r.site_id}", "to_ion_id": f"R{new.site_id}", "element": r.element, "role": r.role,
                           "from_site": r.site_id, "from_variant": r.variant_id,
                           "to_site": new.site_id, "to_variant": new.variant_id,
-                          "min_slack_after": -best[0][0]})
+                          "min_slack_after": -best[0][0],
+                          "q_before_e": {c: (q0[0][c] + q0[1][c]) / 4 for c in S.CAGE_IDS},
+                          "q_after_e": {c: (q1[0][c] + q1[1][c]) / 4 for c in S.CAGE_IDS}})
             ring[k] = new
     return ring, moves
 

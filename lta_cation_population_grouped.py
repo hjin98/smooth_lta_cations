@@ -2109,7 +2109,8 @@ def _pair_histograms(S: Any, matrix: np.ndarray, fracs: np.ndarray, atoms: Seque
         by_class["salt-O"].extend(float(d) - pairs.r_cut(ei, "O") for d in d_o)
         d_t = np.linalg.norm(S.min_image(fracs[tet] - fracs[i], matrix), axis=1)
         by_class["salt-T"].extend(float(d) - S.T_MIN for d in d_t)
-    out = {f"d_minus_r_cut/{k}": S.histogram([v for v in vals if v < 0.5], 0.0, 0.5, 0.05)
+    out = {(f"d_minus_T_min/{k}" if k == "salt-T" else f"d_minus_r_cut/{k}"):
+           S.histogram([v for v in vals if v < 0.5], 0.0, 0.5, 0.05)
            for k, vals in by_class.items()}
     out["d_minus_r_min1/opposite"] = S.histogram([v for v in band if abs(v) <= 0.5], -0.5, 0.5, 0.01)
     return out
@@ -2178,8 +2179,11 @@ def finalize_cage_salt(
     except S.CageSaltConstructionError:
         raise
     except Exception as exc:  # fail closed with the record (D3 failure table)
+        import traceback as _tb
+
         record.status = "failed"
         record.message = f"internal construction error: {type(exc).__name__}: {exc}"
+        record.traceback = "".join(_tb.format_exception(exc))
         raise S.CageSaltConstructionError(record.message, record) from exc
 
 
@@ -2225,7 +2229,7 @@ def _finalize_cage_salt_steps(result, request, S, B, record, fail, vf, overridde
 
     # step 6: V_eff and floors on the V_ref cell, scaled by the D2 identity
     o_fracs = np.array([a.frac for a in result.framework_atoms if a.element == "O"], float)
-    floors = S.cage_floors(request, ref_matrix, o_fracs, centres, s_rel)
+    floors = S.cage_floors(request, ref_matrix, o_fracs, centres, s_rel, rule=S.COORDINATION_RULE)
     record.floors = {}
     for c, fl in floors.items():
         row = fl.to_dict()
@@ -2255,10 +2259,13 @@ def _finalize_cage_salt_steps(result, request, S, B, record, fail, vf, overridde
         site.site_id: [v.frac for v in site.variants]
         for r in RING_CLASSES for site in result.physical_sites_by_ring[r]
     }
+    # D1 §4: ring counts per (role, family, species) must equal the *input* allocations
     expected: Dict[Tuple[str, str, str], int] = {}
-    for ion in ring:
-        key = (ion.role, ion.ring_class, ion.element)
-        expected[key] = expected.get(key, 0) + 1
+    for role, alloc in (("framework", result.allocations), ("occlusion_counterion", result.occlusion_allocations)):
+        for fam in RING_CLASSES:
+            for el, n in (alloc or {}).get(fam, {}).items():
+                if int(n):
+                    expected[(role, fam, el)] = expected.get((role, fam, el), 0) + int(n)
     verify_kw = dict(pairs=pairs, floors=floors, centres=centres, charges=charges,
                      expected_ring_counts=expected, site_variants=site_variants, rule=S.COORDINATION_RULE)
     fw_atoms = [S.Atom(e, "framework_atom", f"F{k}") for k, e in enumerate(fw_el)]
@@ -3506,7 +3513,7 @@ def main() -> None:
     p = argparse.ArgumentParser(
         description=(
             "Populate Group I/II cations in the supported Al24Si24O96 LTA "
-            "framework; non-24-Al and other Si:Al cases are outside v7.15 scope."
+            "framework; non-24-Al and other Si:Al cases are outside v7.16 scope."
         )
     )
     p.add_argument("input_cif")

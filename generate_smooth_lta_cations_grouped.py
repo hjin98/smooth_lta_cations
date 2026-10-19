@@ -384,7 +384,7 @@ def main() -> None:
     p = argparse.ArgumentParser(
         description=(
             "Generate a smooth grouped-site cation configuration for the supported "
-            "Al24Si24O96 LTA framework; non-24-Al cases are outside v7.15 scope."
+            "Al24Si24O96 LTA framework; non-24-Al cases are outside v7.16 scope."
         )
     )
     p.add_argument(

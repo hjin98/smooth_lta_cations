@@ -1,7 +1,7 @@
 """v7.16 cage-salt occlusion: domain rules (D3 r3 "lta_cage_salt.py (domain)").
 
-Scientific authority: doc/specs/v7_16_molten_salt_occlusion_extension.md (D1 r7).
-Numerical authority: doc/specs/v7_16_cage_salt_numerical_method.md (D2 r2).
+Scientific authority: doc/specs/v7_16_molten_salt_occlusion_extension.md (D1 r8).
+Numerical authority: doc/specs/v7_16_cage_salt_numerical_method.md (D2 r3).
 Architecture: doc/archs/lta_cation_generator_architecture.md, "v7.16 architecture delta".
 
 This module owns request validation, the D1/D2 constants, the window table semantics,
@@ -15,6 +15,7 @@ import hashlib
 import itertools
 import json
 import math
+import numbers
 import platform
 from dataclasses import dataclass, field, replace
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
@@ -75,35 +76,35 @@ T_ELEMENTS = ("Si", "Al")
 COORDINATION_RULE = "B"
 
 # --------------------------------------------------------------------------------------
-# D2-bound constants (D2 r2 §10 register unless noted).
+# D2-bound constants: the D2 r3 §10 register; each line names its D2 section.
 # --------------------------------------------------------------------------------------
 
-DELTA_B = 0.01
-TAU_W = 1.0e-5
-EPS_M = 0.05
-DELTA_CN = 0.05
-W_S = 0.12
-MU = 0.3
-W_STAGES = (10.0, 100.0, 1000.0)
-W_DZ_POLISH = 10.0
-LBFGS_OPTIONS = {"maxiter": 6000, "maxfun": 15000, "maxcor": 10, "ftol": 2.2e-9, "gtol": 1e-5, "maxls": 20}
-M_INS = 2000
-K_MAX_DEFAULT = 20
-R_RELOC = 4
-V_EFF_GRID = 192
-TIE_TOL = 1.0e-9
-CEIL_GUARD = 1.0e-9
-CANONICAL_DECIMALS = 10
-GUARD_DISTANCE = 1.5
-SINGLE_IMAGE_MARGIN = 0.1
+DELTA_B = 0.01  # D2 §6.1 build margin
+TAU_W = 1.0e-5  # D2 §7 writer band
+EPS_M = 0.05  # D2 §6.1 membership margin
+DELTA_CN = 0.05  # D2 §6.1 count dead zone
+W_S = 0.12  # D2 §6.1 smooth-count width
+MU = 0.3  # D2 §6.1 count margin
+W_STAGES = (10.0, 100.0, 1000.0)  # D2 §6.3 continuation
+W_DZ_POLISH = 10.0  # D2 §6.3 polish dead-zone weight
+LBFGS_OPTIONS = {"maxiter": 6000, "maxfun": 15000, "maxcor": 10, "ftol": 2.2e-9, "gtol": 1e-5, "maxls": 20}  # D2 §6.3
+M_INS = 2000  # D2 §6.2 insertion candidates
+K_MAX_DEFAULT = 20  # D2 §6.5 restarts
+R_RELOC = 4  # D2 §6.4 relocation rounds
+V_EFF_GRID = 192  # D2 §4.2 grid
+TIE_TOL = 1.0e-9  # D2 §4.2 tie sharing
+CEIL_GUARD = 1.0e-9  # D2 §2 ceiling guard
+CANONICAL_DECIMALS = 10  # D2 §7 canonical coordinates
+GUARD_DISTANCE = 1.5  # D1 §6 catastrophic guard (D2 §6.1)
+SINGLE_IMAGE_MARGIN = 0.1  # D2 §2 single-image precondition
 Z_MAX_NO_CONTRIBUTOR = 1  # D2 §4.3
 EIGHTR_EQUIDISTANCE_TOL = 1.0e-6
 VARIANT_KEY_DECIMALS = 6
 VARIANT_MATCH_TOL = 1.0e-8  # fractional; canonical coordinates carry 10 decimals
-REPORT_TOP_ALTERNATIVES = 5
+REPORT_TOP_ALTERNATIVES = 5  # D2 §5 report
 
-STREAM_TAG_REBALANCE = "v7.16-charge-rebalance:{seed}"
-STREAM_TAG_START = "v7.16-cage-salt:{seed}:start{k}"
+STREAM_TAG_REBALANCE = "v7.16-charge-rebalance:{seed}"  # D2 §3 streams
+STREAM_TAG_START = "v7.16-cage-salt:{seed}:start{k}"  # D2 §3 per-start substreams
 
 CAGE_IDS = ("alpha-0", "alpha-1", "beta-0", "beta-1")
 ALPHA_IDS = ("alpha-0", "alpha-1")
@@ -165,6 +166,16 @@ class CageSaltRequest:
 
     cages: Mapping[str, Mapping[str, int]]
     counterions: Mapping[str, Mapping[str, int]] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        # Unknown keys would otherwise be ignored by cage()/is_active and a request
+        # could silently resolve to a dry run.
+        for c in self.cages:
+            if c not in CAGE_IDS:
+                raise CageSaltInputError(f"Unknown cage {c!r}; cages are {CAGE_IDS}")
+        for r in self.counterions:
+            if r not in RINGS:
+                raise CageSaltInputError(f"Unknown ring family {r!r} for salt counterions; families are {RINGS}")
 
     @classmethod
     def from_specs(
@@ -233,6 +244,17 @@ class CageSaltRequest:
 def validate_request(request: CageSaltRequest, charges: Mapping[str, int],
                      framework_species: Iterable[str]) -> None:
     """D1 §4-§5 domain checks that need no geometry (raise CageSaltInputError)."""
+    for c in request.cages:
+        if c not in CAGE_IDS:
+            raise CageSaltInputError(f"Unknown cage {c!r}; cages are {CAGE_IDS}")
+    for r in request.counterions:
+        if r not in RINGS:
+            raise CageSaltInputError(f"Unknown ring family {r!r} for salt counterions; families are {RINGS}")
+    for where, table in [*((c, request.cages[c]) for c in request.cages),
+                         *((f"{r}R counterions", request.counterions[r]) for r in request.counterions)]:
+        for el, n in table.items():
+            if isinstance(n, bool) or not isinstance(n, numbers.Integral) or n < 0:
+                raise CageSaltInputError(f"{where}: count for {el} must be a nonnegative integer, got {n!r}")
     if not request.is_active:
         if request.counterion_total:
             raise CageSaltInputError("Salt counterions were given but every salt count is zero")
@@ -551,6 +573,7 @@ def _search(request: CageSaltRequest, counter_groups: Mapping[Tuple[str, int], i
     best = None
     ranked: List[Tuple] = []
     best_violation = None
+    worst_cages: List[str] = []
     for choice in itertools.product(*(per_family[f] for f in RINGS)):
         q = dict(base_q)
         z = dict(base_z)
@@ -565,6 +588,7 @@ def _search(request: CageSaltRequest, counter_groups: Mapping[Tuple[str, int], i
         viol = max(abs(q[c]) - 4 * z[c] for c in CAGE_IDS)
         if best_violation is None or viol < best_violation:
             best_violation = viol
+            worst_cages = [c for c in CAGE_IDS if abs(q[c]) - 4 * z[c] > 0]
         if viol > 0:
             continue
         moved = 0
@@ -579,7 +603,7 @@ def _search(request: CageSaltRequest, counter_groups: Mapping[Tuple[str, int], i
         if best is None or key < best[0]:
             best = (key, splits, q)
     ranked.sort(key=lambda t: t[0])
-    return best, ranked, max(0, best_violation if best_violation is not None else 0)
+    return best, ranked, max(0, best_violation if best_violation is not None else 0), worst_cages
 
 
 def upfront_charge_check(request: CageSaltRequest, charges: Mapping[str, int]) -> None:
@@ -600,11 +624,13 @@ def upfront_charge_check(request: CageSaltRequest, charges: Mapping[str, int]) -
     base_q = {c: 4 * (sum(charges[e] * n for e, n in request.salt_cations(c).items())
                       - request.cage(c).get("Cl", 0)) for c in CAGE_IDS}
     base_z = {c: max([charges[e] for e in request.salt_cations(c)] or [0]) for c in CAGE_IDS}
-    best, _, viol = _search(request, groups, capacity, base_q, base_z, {}, charges)
+    best, _, viol, cages = _search(request, groups, capacity, base_q, base_z, {}, charges)
     if best is None:
+        where = (f" in {', '.join(cages)}" if cages else
+                 " (no class vector fits the ring-site capacity)")
         raise CageSaltInputError(
             "No placement of the requested salt counterions can keep every cage charge within "
-            f"q_max (best excess {viol / 4:.2f} e); rejected up front (D1 §4, D2 §5)")
+            f"q_max (best excess {viol / 4:.2f} e{where}); rejected up front (D1 §4, D2 §5)")
 
 
 def rebalance(
@@ -640,7 +666,7 @@ def rebalance(
     for ion in fw_only:
         for c in site_weights(ion.site_id):
             base_z[c] = max(base_z[c], charges[ion.element])
-    best, ranked, viol = _search(request, groups, capacity, base_q, base_z, n0, charges)
+    best, ranked, viol, _ = _search(request, groups, capacity, base_q, base_z, n0, charges)
     if best is None:
         # framework-held sites of the counterion families: freeing any of them widens the search
         families = {g[0] for g in groups}
@@ -1109,6 +1135,7 @@ class CageSaltRecord:
     stack: Dict[str, Any] = field(default_factory=dict)
     evidence_sha256: Dict[str, str] = field(default_factory=dict)
     message: str = ""
+    traceback: Optional[str] = None
     schema_version: int = 1
 
     def to_json(self, atom_rows: Optional[List[Dict[str, Any]]] = None,
