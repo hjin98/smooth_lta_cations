@@ -20,12 +20,15 @@
 - The v7.15 sparse model is kept as `--occlusion-model sparse-v715`; its flags
   are rejected without that selector. Dry and legacy outputs are byte-identical
   to v7.15.0 (68 golden comparisons).
+- Every cage-salt ion is kept at least 3.0 Angstrom from framework Si/Al
+  (D1 r8, stakeholder decision S-13), after an exploratory campaign found small
+  cations in framework wall pockets.
 - Added SciPy as a declared dependency (L-BFGS-B, KD-tree); dry and legacy runs
   do not import the cage-salt modules.
 - Authorities: D1 `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7),
   D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r2), D3 "v7.16
-  architecture delta" (r3). The S-12 qualification census and the
-  independent D4 review are pending.
+  architecture delta" (r3). The S-12 census retained rule B (90/90,
+  run 3); the independent D4 review and delta review passed.
 
 ## v7.15.0 - sparse chloride-occlusion initialization
 

@@ -330,6 +330,9 @@ python lta_cation_population_grouped.py tests/real_lta_primitive.cif out.cif \
   charge (window weights: 4R to the nearest alpha-cage, 6R half to each
   adjoining cage, 8R half to each alpha-cage).
 - Excess charge must balance: sum of salt and counterion cation charge = N_Cl.
+- Every salt ion is kept at least 3.0 Angstrom from framework Si/Al (interim
+  minimum, stakeholder decision S-13; the template's own cation sites are at
+  3.05 Angstrom or more), in addition to the bound O and pair minima.
 - `--volume-factor` defaults to the modelled contraction
   f_V = 1 - 0.03 min(n_bar/10.5, 1), n_bar = N_Cl/2; an explicit value overrides it.
 - `--salt-max-starts N` (default 20) bounds the build restarts.
@@ -355,8 +358,8 @@ When re-reading a CIF, use a non-snapping reader such as
 `CifParser(path, frac_tolerance=0)`; the default pymatgen reader snaps
 near-special fractions and moves framework O by about 1e-4 Angstrom.
 
-The coordination floors use rule B (per ion, a = 0.4) pending the S-12
-qualification census. The salt is an MD initial structure: it makes no claim of
+The coordination floors use rule B (per ion, a = 0.4), retained by the S-12
+qualification census (90/90, `qualification/v716/census-record.md`). The salt is an MD initial structure: it makes no claim of
 equilibrium structure, g(r) or siting. The legacy flags `--alpha-cl`,
 `--beta-cl`, `--occlusion-n4/6/8` and `--occlusion-min-distance` now require
 `--occlusion-model sparse-v715`.
