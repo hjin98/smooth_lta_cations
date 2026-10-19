@@ -1,0 +1,711 @@
+{
+ "budget_s": 43200,
+ "code_sha256": {
+  "lta_cage_salt.py": "c9c4d5986e52f5a83287e89efbdefc85bd1baa120bed524898d320fc60283e13",
+  "lta_cage_salt_build.py": "c3919e085e38266f758768040c9695289a2770ca7d0ec006cf4686d0c3d2475a",
+  "lta_cage_salt_data.py": "8430cd512ad5e8e9ff1c676a656dcdc61bf7b415a55a5fc48a40ec85a5fa48de",
+  "lta_cation_density_grouped.py": "2e6e9e4e48801fa919706c23ad3bca3ce800c80f7fe31c57de70aa1498bce37f",
+  "lta_cation_population_grouped.py": "11df639668adb2e3946b7ea46b6496c273258afc86e9c3c68a9a63203a15644d",
+  "validation/v716_s12_census.py": "90e71af3d3871e696d8789a085e0481b90d2e4ea702d3461f710b5d130c07289"
+ },
+ "commit": "4e42bad9ff97c1bf628443e6fd2e1d80e10e65b4",
+ "d2_parameters": {
+  "a_rule_a": 0.7,
+  "a_rule_b": 0.4,
+  "delta_b": 0.01,
+  "delta_cn": 0.05,
+  "eps_m": 0.05,
+  "f_ref": 0.97,
+  "k_max": 20,
+  "lbfgs": {
+   "ftol": 2.2e-09,
+   "gtol": 1e-05,
+   "maxcor": 10,
+   "maxfun": 15000,
+   "maxiter": 6000,
+   "maxls": 20
+  },
+  "m_ins": 2000,
+  "mu": 0.3,
+  "n_ref": 10.5,
+  "r_reloc": 4,
+  "t_min": 3.0,
+  "tau_w": 1e-05,
+  "v_eff_grid": 192,
+  "w_dz_polish": 10.0,
+  "w_s": 0.12,
+  "w_stages": [
+   10.0,
+   100.0,
+   1000.0
+  ]
+ },
+ "decision_rule": "retain the rule iff at most 4 of the 90 requests fail (D2 \u00a79)",
+ "entry_point": "lta_cation_population_grouped.generate_lta_cation_structure_from_specs",
+ "frozen_utc": "2026-10-19T02:07:58Z",
+ "k_max": 20,
+ "kind": "v7.16 S-12 qualification census plan",
+ "per_request_cap_s": 5400,
+ "requests": [
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n2/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n2/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n2/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n2/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n2/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n4/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n4/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n4/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n4/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n4/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n6/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n6/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n6/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n6/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n6/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n8/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n8/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n8/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n8/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n8/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n10/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n10/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n10/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n10/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n10/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n12/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n12/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n12/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n12/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/n12/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K4Cs1/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K4Cs1/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K4Cs1/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K4Cs1/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K4Cs1/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K3Sr1/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K3Sr1/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K3Sr1/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K3Sr1/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li5K3Sr1/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li6K4Ba1/s0",
+   "ring": "Na",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li6K4Ba1/s1",
+   "ring": "Na",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li6K4Ba1/s2",
+   "ring": "Na",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li6K4Ba1/s3",
+   "ring": "Na",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "Na/Li6K4Ba1/s4",
+   "ring": "Na",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n2/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n2/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n2/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n2/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:2,Li:1,K:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n2/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n4/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n4/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n4/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n4/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:4,Li:2,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n4/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n6/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n6/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n6/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n6/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:6,Li:4,K:2",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n6/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n8/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n8/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n8/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n8/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:8,Li:5,K:3",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n8/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n10/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n10/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n10/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n10/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:6,K:4",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n10/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n12/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n12/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n12/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n12/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:12,Li:7,K:5",
+   "beta": "Cl:1,Li:1",
+   "id": "K/n12/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K4Cs1/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K4Cs1/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K4Cs1/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K4Cs1/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:4,Cs:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K4Cs1/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K3Sr1/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K3Sr1/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K3Sr1/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K3Sr1/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:10,Li:5,K:3,Sr:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li5K3Sr1/s4",
+   "ring": "K",
+   "seed": 4
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li6K4Ba1/s0",
+   "ring": "K",
+   "seed": 0
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li6K4Ba1/s1",
+   "ring": "K",
+   "seed": 1
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li6K4Ba1/s2",
+   "ring": "K",
+   "seed": 2
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li6K4Ba1/s3",
+   "ring": "K",
+   "seed": 3
+  },
+  {
+   "alpha": "Cl:12,Li:6,K:4,Ba:1",
+   "beta": "Cl:1,Li:1",
+   "id": "K/Li6K4Ba1/s4",
+   "ring": "K",
+   "seed": 4
+  }
+ ],
+ "rule": "B",
+ "stack": {
+  "blas": {
+   "detection method": "pkgconfig",
+   "found": true,
+   "include directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/include",
+   "lib directory": "/opt/_internal/cpython-3.13.14/lib/python3.13/site-packages/scipy_openblas64/lib",
+   "name": "scipy-openblas",
+   "openblas configuration": "OpenBLAS 0.3.34.106.0  USE64BITINT DYNAMIC_ARCH NO_AFFINITY SkylakeX MAX_THREADS=64",
+   "pc file directory": "/project/.openblas",
+   "version": "0.3.34.106.0"
+  },
+  "numpy": "2.5.4",
+  "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+  "pymatgen": "2026.10.16",
+  "python": "3.13.16",
+  "scipy": "1.18.1",
+  "threads": {
+   "MKL_NUM_THREADS": "1",
+   "OMP_NUM_THREADS": "1",
+   "OPENBLAS_NUM_THREADS": "1"
+  }
+ },
+ "thread_env": {
+  "MKL_NUM_THREADS": "1",
+  "OMP_NUM_THREADS": "1",
+  "OPENBLAS_NUM_THREADS": "1"
+ },
+ "volume_factor": "modelled f_V (None)",
+ "workers": 4
+}
