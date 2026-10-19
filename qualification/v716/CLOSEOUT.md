@@ -70,7 +70,7 @@ Closeout part A is also the independent review of the S-13 code delta
 - `VOID.md` beside each voided census run (m-10);
 - architecture manual front matter (m-13).
 
-**Final pass after the delta check** (commit listed under Evidence):
+**Final pass after the delta check** (`cc4a88e` code, `083a0e9` records):
 - **N-2:** the population module's v7.16 header cites D1 r8 / D2 r3.
 - **N-4:** count types are validated when a `CageSaltRequest` is constructed,
   so an API counterion count of `None` is an input error.
@@ -103,7 +103,7 @@ trace. Each review is identified by its row in the review history above.
 | B-M3 | No S-13 code review; no D4 acceptance after the census | Part A covers `11ac4c6`; verdict below |
 | B-M4 | Stale and missing PDFs | Residual R1; README PDF status |
 | B-M5 | D3 not reconciled | Fixed (`6164d80`) |
-| B-m1 to m-8, m-10, m-11, m-13 | Stale statements across specs, README, workplans, E1 driver, void markers, D2 routing, manual front matter | Fixed (`6164d80`, `4e42bad`, `a0bf2df`) |
+| B-m1 to m-8, m-10, m-11, m-13 | Stale statements across specs, README, workplans, E1 driver, void markers, D2 routing, manual front matter | Fixed (`6164d80`, `4e42bad`, `a0bf2df`, `083a0e9`) |
 | B-m9 | Census guard covers six files only | Residual R7 |
 | B-m12 | Inferred τ_w/δ_b acknowledgement for T_min | Residual R3 (stakeholder asked in the hand-off) |
 | B-m14 | Stale revision strings in code | Fixed (`2165d33`, final pass N-2) |
@@ -111,16 +111,16 @@ trace. Each review is identified by its row in the review history above.
 
 ## Evidence at closeout
 
-All on the shipped code: `2165d33` code, which is identical in code to HEAD.
+All on the shipped code: the product code at `cc4a88e`, unchanged since. Later commits touch records only (and earlier, `6164d80`, the E1 probe driver).
 
 | Evidence | Result |
 |---|---|
-| Full test suite (`pytest -q`) | **283 passed** (10 min). The closeout baseline at `e4e42d8` before the fixes: 276 passed. |
+| Full test suite (`pytest -q`) | **284 passed** (10 min) on the final code. Before the final pass: 283. Closeout baseline at `e4e42d8`: 276. |
 | Dry/legacy byte identity (`tests/test_v716_golden_identity.py`) | 68/68 comparisons identical to the captured v7.15.0 outputs (in the suite) |
 | D2 §9 oracles 1-7 and the independent re-parse verifier (CIF `frac_tolerance=0`, POSCAR, LAMMPS) | pass (in the suite) |
 | Generated data module (`validation/regenerate_cage_salt_data.py --check`) | byte-identical; evidence CSV SHA-256s match D1 §1 |
 | Package build | `lta_cation_generator-7.16.0-py3-none-any.whl` builds with the three cage-salt modules and SciPy |
-| S-12 census, run 4 (plan frozen at `4e42bad`, committed `e00b5a6`) | **90/90**, all on start 1; Wilson 95 % [0.959, 1.0]; rule B retained (`census-record.md`) |
+| S-12 census, run 5 (plan frozen at `2acf27b`, committed `496d62c`) | **90/90**, all on start 1; Wilson 95 % [0.959, 1.0]; rule B retained. Runs 3, 4 and 5 are identical in every recorded field except timings (`census-record.md`). |
 | Exploratory campaign E1 on D1 r8 code (`11ac4c6`; the closeout fixes do not change construction) | 54/54 cases as expected; 40 structures, all independently verified; minimum salt–T 3.01 Å |
 
 ## Residual register (accepted, recorded; none blocks closeout)
@@ -142,4 +142,18 @@ All on the shipped code: `2165d33` code, which is identical in code to HEAD.
 
 ## Verdict
 
-<!-- filled after the final census run and the delta check -->
+**Closeout: PASS with recorded residuals (2026-10-19).**
+
+- **Implementation.** Every normative requirement of D1 r8, D2 r3 and D3 r3 is
+  implemented and traced to code and tests (part A). Package 7.16.0 is
+  accepted as the D4 concretization.
+- **Records.** No stale or contradictory coordination record remains that the
+  reviews identified (part B, the delta check and the final pass).
+- **Census.** Rule B is qualified on the shipped code by census run 5.
+- **Residuals.** R1-R12 are recorded and none blocks. The open stakeholder
+  item is optional: object to R3 if wished.
+- **Review of the final pass.** It was checked by the implementing agent, not
+  re-reviewed independently. It consists of the N-1 to N-7 and T-1 to T-6
+  items the independent delta check named, verified by the full suite (284)
+  and census run 5.
+- **Merge.** Merging the branch to `main` is the stakeholder's decision.

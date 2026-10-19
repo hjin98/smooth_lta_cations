@@ -25,7 +25,7 @@ ratification and the decision; it does not supply them.
   ("Keep V_eff O-defined, I acknowledge.", S-14, §15).
 - **Census.** The S-12 census recorded under r7 is void for r8, because the
   frozen code changed. Rule B was re-qualified on the r8 code: census run 3,
-  then run 4 on the closeout code, both 90/90
+  then runs 4 and 5 on the closeout code, each 90/90
   (`qualification/v716/census-record.md`).
 
 Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
@@ -1025,8 +1025,8 @@ certainty.
   defined by the O distance alone under S-13 (§7): "Keep V_eff O-defined, I
   acknowledge." (chat, 2026-10-19).
 
-**Re-qualification.** Census runs 3 and 4 on the r8 code retained rule B
-(90/90 each; run 4 qualifies the shipped code).
+**Re-qualification.** Census runs 3, 4 and 5 on the r8 code retained rule B
+(90/90 each; runs 4 and 5 on the closeout code, run 5 qualifies the shipped code).
 
 **Open.** None.
 

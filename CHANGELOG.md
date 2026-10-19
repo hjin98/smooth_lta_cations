@@ -33,7 +33,7 @@
 - Authorities: D1 `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r8),
   D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r3), D3 "v7.16
   architecture delta" (r3, with a post-D4 reconciliation note).
-- Qualification: the S-12 census retained rule B (run 4, 90/90 on the shipped
+- Qualification: the S-12 census retained rule B (run 5, 90/90 on the shipped
   code). The independent reviews were:
   - D4 review and delta review, covering code to `fedfc2d`;
   - a focused D1 r8 / D2 r3 amendment review;
