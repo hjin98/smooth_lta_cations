@@ -305,6 +305,13 @@ def test_api_requests_must_carry_nonnegative_integer_counts(cages, needle):
         generate(S.CageSaltRequest(cages=cages))
 
 
+def test_counterion_counts_are_validated_at_construction():
+    for bad in (None, 1.5, -1, True):
+        with pytest.raises(S.CageSaltInputError, match="nonnegative integer"):
+            S.CageSaltRequest(cages={"alpha-0": {"Cl": 2, "Li": 1}}, counterions={"4": {"Li": bad}})
+    assert S.CageSaltRequest(cages={"alpha-0": {"Cl": np.int64(2), "Li": np.uint8(2)}}).n_cl() == 2
+
+
 def test_unknown_cage_or_ring_keys_are_rejected_at_construction():
     with pytest.raises(S.CageSaltInputError, match="Unknown cage"):
         S.CageSaltRequest(cages={"gamma-0": {"Cl": 1, "Li": 1}})
@@ -734,9 +741,16 @@ def test_forced_ring_conflict_is_resolved_by_relocation_end_to_end(monkeypatch, 
     move = rec.relocations[0]
     assert move["from_site"] != move["to_site"] and move["to_site"].startswith("4R")
     assert move["to_ion_id"] == "R" + move["to_site"]
-    # D1 §4: each move reports its charge effect
+    # D1 §4: each move reports its charge effect, chained from the rebalanced
+    # placement to the final one
     assert set(move["q_before_e"]) == set(move["q_after_e"]) == set(S.CAGE_IDS)
-    assert sum(move["q_after_e"].values()) == pytest.approx(0.0)
+    assert move["q_before_e"] == rec.rebalance["q_after_e"]
+    for m0, m1 in zip(rec.relocations, rec.relocations[1:]):
+        assert m1["q_before_e"] == m0["q_after_e"]
+    q_exc, q_fw, _ = S.cage_charges_quarters(
+        S.CageSaltRequest(cages=rec.request["cages"], counterions=rec.request["counterions"]),
+        r.placed_ions, P.CATION_CHARGES)
+    assert rec.relocations[-1]["q_after_e"] == {c: (q_exc[c] + q_fw[c]) / 4 for c in S.CAGE_IDS}
     assert any(i.site_id == move["to_site"] for i in r.placed_ions)
     assert not any(i.site_id == move["from_site"] for i in r.placed_ions)
     path = tmp_path / "reloc.cif"

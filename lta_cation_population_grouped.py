@@ -1895,8 +1895,8 @@ def finalize_occluded_chlorides(
 
 # ------------------------- v7.16 cage-salt occlusion ------------------------- #
 #
-# D1 doc/specs/v7_16_molten_salt_occlusion_extension.md (r7), D2
-# doc/specs/v7_16_cage_salt_numerical_method.md (r2), D3 "v7.16 architecture
+# D1 doc/specs/v7_16_molten_salt_occlusion_extension.md (r8), D2
+# doc/specs/v7_16_cage_salt_numerical_method.md (r3), D3 "v7.16 architecture
 # delta" in doc/archs/lta_cation_generator_architecture.md (r3). The cage-salt
 # modules are imported lazily so dry and legacy runs need neither them nor SciPy.
 

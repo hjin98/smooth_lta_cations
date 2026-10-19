@@ -176,6 +176,11 @@ class CageSaltRequest:
         for r in self.counterions:
             if r not in RINGS:
                 raise CageSaltInputError(f"Unknown ring family {r!r} for salt counterions; families are {RINGS}")
+        for where, table in [*((c, self.cages[c]) for c in self.cages),
+                             *((f"{r}R counterions", self.counterions[r]) for r in self.counterions)]:
+            for el, n in table.items():
+                if isinstance(n, bool) or not isinstance(n, numbers.Integral) or n < 0:
+                    raise CageSaltInputError(f"{where}: count for {el} must be a nonnegative integer, got {n!r}")
 
     @classmethod
     def from_specs(
@@ -250,11 +255,6 @@ def validate_request(request: CageSaltRequest, charges: Mapping[str, int],
     for r in request.counterions:
         if r not in RINGS:
             raise CageSaltInputError(f"Unknown ring family {r!r} for salt counterions; families are {RINGS}")
-    for where, table in [*((c, request.cages[c]) for c in request.cages),
-                         *((f"{r}R counterions", request.counterions[r]) for r in request.counterions)]:
-        for el, n in table.items():
-            if isinstance(n, bool) or not isinstance(n, numbers.Integral) or n < 0:
-                raise CageSaltInputError(f"{where}: count for {el} must be a nonnegative integer, got {n!r}")
     if not request.is_active:
         if request.counterion_total:
             raise CageSaltInputError("Salt counterions were given but every salt count is zero")
@@ -626,11 +626,13 @@ def upfront_charge_check(request: CageSaltRequest, charges: Mapping[str, int]) -
     base_z = {c: max([charges[e] for e in request.salt_cations(c)] or [0]) for c in CAGE_IDS}
     best, _, viol, cages = _search(request, groups, capacity, base_q, base_z, {}, charges)
     if best is None:
-        where = (f" in {', '.join(cages)}" if cages else
-                 " (no class vector fits the ring-site capacity)")
+        if cages:
+            detail = f"best excess {viol / 4:.2f} e in {', '.join(cages)}"
+        else:
+            detail = "no class vector fits the ring-site capacity"
         raise CageSaltInputError(
             "No placement of the requested salt counterions can keep every cage charge within "
-            f"q_max (best excess {viol / 4:.2f} e{where}); rejected up front (D1 §4, D2 §5)")
+            f"q_max ({detail}); rejected up front (D1 §4, D2 §5)")
 
 
 def rebalance(
