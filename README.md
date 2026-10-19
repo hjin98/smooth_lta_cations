@@ -51,7 +51,7 @@ Module specifications:
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
 - `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization (since 7.16.0 the legacy model, `--occlusion-model sparse-v715`).
 - `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified D1 scientific contract for the variable-loading cage-salt occlusion model (r7 ratified 2026-10-17; r8 adds stakeholder decisions S-13, the 3.0 Angstrom salt-ion-Si/Al minimum, and S-14, 2026-10-19). No PDF yet (see below).
-- `doc/specs/v7_16_cage_salt_numerical_method.md` - accepted-current D2 (r3) numerical method for the cage-salt build (charge rebalancing, effective volume, penalty relaxation, exact verification). The D3 design is the "v7.16 architecture delta" section of the architecture manual; the D4 workplan is `workplans/V7.16-D4-IMPLEMENTATION.md`.
+- `doc/specs/v7_16_cage_salt_numerical_method.md` - accepted-current D2 (r3) numerical method for the cage-salt build (charge rebalancing, effective volume, penalty relaxation, exact verification). The D3 design is the "v7.16 architecture delta" section of the architecture manual; the D4 workplan is `workplans/archive/V7.16-D4-IMPLEMENTATION.md`.
 - `doc/evidence/` - stakeholder-supplied, non-authoritative evidence package (rev 3) for v7.16: occlusion literature, molten-salt pair distances, coordination numbers and lattice contraction, with CSVs and generator scripts.
 
 **PDF status (v7.16).** The Markdown files are canonical. The v7.16 D1 and D2 have no PDF yet. These PDFs predate v7.16 edits to their Markdown sources and are stale until re-rendered: the architecture manual, `lta_cation_population_grouped_spec`, `generate_smooth_lta_cations_grouped_spec`, and the v7.13, v7.14 and v7.15 extensions. Rendering needs a LaTeX engine; the residual is recorded in `qualification/v716/CLOSEOUT.md`.
@@ -65,6 +65,10 @@ Qualification and implementation-history evidence:
 - `qualification/v715/POST-IMPLEMENTATION-REVIEW.md` - independent SSDP 6.6.0 post-implementation PASS assessment of evidence head `b7101a29261b48a18c5358c62c766099c9232995`; it is review/evidence, not scientific authority.
 - `qualification/v715/CLOSEOUT.md` - terminal merge-readiness record for the completed v7.15 cycle, including the required non-squash lineage-preservation constraint.
 - `workplans/archive/V7.15-CHLORIDE-OCCLUSION.md` - completed historical implementation workplan. Current scientific/numerical meaning remains owned by the accepted specifications above.
+- `qualification/v716/CLOSEOUT.md` - v7.16 closeout integration review record: terminal identities, review history, finding dispositions, evidence, residual register R1-R12 and verdict (PASS with recorded residuals; merge ready).
+- `qualification/v716/census-record.md` - qualifying S-12 census (run 5, 90/90, rule B retained); voided earlier runs are kept beside it with `VOID.md`.
+- `workplans/archive/V7.16-MOLTEN-SALT-OCCLUSION.md`, `workplans/archive/V7.16-D4-IMPLEMENTATION.md`, `workplans/archive/V7.16-HANDOFF.md` - completed historical v7.16 change plan, D4 workplan and hand-off. Current meaning is owned by the accepted v7.16 specifications.
+- `workplans/v716-probes/` - exploratory feasibility probes (P1-P8) and the CLI campaign E1 cited by the v7.16 D1 §12; exploratory evidence, not acceptance evidence.
 
 The one-shot v7.15 qualification workflow and temporary documentation render mosaics were retired after source-bound qualification. Git history preserves the exact workflow implementation; the candidate/run-bound records above preserve the material observations and assessment.
 

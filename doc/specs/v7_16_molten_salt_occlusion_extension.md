@@ -870,7 +870,7 @@ recorded tension against v7.13 was found.
 | T20 | The r3 q_c excluded framework cations, hiding a ±1 e local imbalance (review 2) | **Resolved:** q_c^fw added (§4). |
 | T21 | The dividing surface d_wall (E-pair derived) and its ±0.3 Å range are agent choices. The interfacial structure is unknown (S-8). Rb- and Cs-rich cages are extrapolated | **Applicable.** Reopen with MD density profiles of salt in LTA. |
 | T22 | Whether the S-7 minimum applies to the mean (A) or to each ion (B). The basis of a = 0.7 is the spread between definitions, a stand-in (review 3) | **Resolved by S-11:** per ion, a = 0.4, stakeholder-set. |
-| T23 | F-E1-1 (AI agent, exploratory CLI campaign E1, 2026-10-18): with no T minimum, salt cations (mostly Li) sat 1.5–2.6 Å from Si/Al in 28 of 39 structures, satisfying every O minimum (`workplans/V7.16-D4-IMPLEMENTATION.md`, E1 findings) | **Resolved by S-13:** T_min = 3.0 Å for every `cage_salt` ion (§6), stakeholder-set, interim. |
+| T23 | F-E1-1 (AI agent, exploratory CLI campaign E1, 2026-10-18): with no T minimum, salt cations (mostly Li) sat 1.5–2.6 Å from Si/Al in 28 of 39 structures, satisfying every O minimum (`workplans/archive/V7.16-D4-IMPLEMENTATION.md`, E1 findings) | **Resolved by S-13:** T_min = 3.0 Å for every `cage_salt` ion (§6), stakeholder-set, interim. |
 
 No SERIOUS CHALLENGE against v7.13, v7.14 or the retained parts of v7.15 is
 raised. v7.15's sparse semantics are superseded only by explicit model

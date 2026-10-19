@@ -3,6 +3,46 @@
 Asserter: AI agent (Claude Code session https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi), 2026-10-19.
 Status: evidence and coordination, not authority.
 
+**Closeout status: MERGE READY** (pending the stakeholder's decision to merge
+and promote).
+
+## Terminal identities
+
+- Base `main` (v7.15.0): `4228470e274afb3d55ca321f29c1ce9a0504b34d`.
+- D3 r3 acceptance: `7ce7ec3`. D1 r8 / D2 r3 (S-13): `11ac4c6`. S-14: `e4e42d8`.
+- Final product code: `cc4a88e`. It is unchanged in every later commit; later
+  commits touch records only.
+- Qualifying census: run 5, plan frozen at `2acf27b`, plan committed in `496d62c`.
+- Closeout verdict head: `3b9b9d4`. The repository-hygiene commit that archives
+  the workplans follows it.
+- Package version: `7.16.0`.
+
+This record is a descendant closeout record. It does not self-bind to the
+commit that contains it.
+
+## Closure state
+
+The v7.16 cycle has no active workplan and no unresolved implementation
+obligation. The workplans and hand-off are archived in `workplans/archive/`
+(`V7.16-MOLTEN-SALT-OCCLUSION.md`, `V7.16-D4-IMPLEMENTATION.md`,
+`V7.16-HANDOFF.md`). Their still-current content now lives in the authorities
+below, this record and the README.
+
+Persistent evidence stays where it is cited:
+- `qualification/v716/`: the census and the voided runs with `VOID.md`;
+- `workplans/v716-probes/`: probes P1-P8 and campaign E1, cited by D1 §12;
+- `tests/golden/v715/`: dry and legacy byte identity.
+
+**Next actions after closure (for the stakeholder):**
+1. Merge `claude/awesome-fermat-5eug9n` into `main`. It is a fast-forward:
+   the branch is ahead of `4228470` and not behind it. The decision is yours.
+2. Optional, needing separate explicit authorization: tag the release
+   `v7.16.0`; delete the feature branch after the merge.
+3. Your own runs. Route each finding to its earliest owner (D1/D2/D3/D4).
+4. If wished, object to residual R3: the D2 §5 cross-group order, and the
+   margin acknowledgement treated as covering T_min.
+5. Render the PDFs at release (R1). Rerun the S-12 census on any stack change.
+
 ## Scope and authorities
 
 - **D1:** `doc/specs/v7_16_molten_salt_occlusion_extension.md` r8. It covers
@@ -15,7 +55,7 @@ Status: evidence and coordination, not authority.
   reconciliation note.
 - **D4:** package 7.16.0 (`lta_cage_salt*.py` plus the integration in the
   population, smoothing and maxsym_io modules), with
-  `workplans/V7.16-D4-IMPLEMENTATION.md`.
+  `workplans/archive/V7.16-D4-IMPLEMENTATION.md`.
 
 ## Review history
 
