@@ -71,7 +71,17 @@ Closeout part A is also the independent review of the S-13 code delta
 
 ## Evidence at closeout
 
-<!-- filled after the final census run -->
+All on the shipped code: `2165d33` code, which is identical in code to HEAD.
+
+| Evidence | Result |
+|---|---|
+| Full test suite (`pytest -q`) | **283 passed** (10 min). The closeout baseline at `e4e42d8` before the fixes: 276 passed. |
+| Dry/legacy byte identity (`tests/test_v716_golden_identity.py`) | 68/68 comparisons identical to the captured v7.15.0 outputs (in the suite) |
+| D2 §9 oracles 1-7 and the independent re-parse verifier (CIF `frac_tolerance=0`, POSCAR, LAMMPS) | pass (in the suite) |
+| Generated data module (`validation/regenerate_cage_salt_data.py --check`) | byte-identical; evidence CSV SHA-256s match D1 §1 |
+| Package build | `lta_cation_generator-7.16.0-py3-none-any.whl` builds with the three cage-salt modules and SciPy |
+| S-12 census, run 4 (plan frozen at `4e42bad`, committed `e00b5a6`) | **90/90**, all on start 1; Wilson 95 % [0.959, 1.0]; rule B retained (`census-record.md`) |
+| Exploratory campaign E1 on D1 r8 code (`11ac4c6`; the closeout fixes do not change construction) | 54/54 cases as expected; 40 structures, all independently verified; minimum salt–T 3.01 Å |
 
 ## Residual register (accepted, recorded; none blocks closeout)
 
