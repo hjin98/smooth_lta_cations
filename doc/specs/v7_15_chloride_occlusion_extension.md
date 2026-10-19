@@ -206,3 +206,25 @@ demonstrated equilibrium chloride site.
 All existing v7.14 chemistry, crystallography, dry-volume, pymatgen, LAMMPS,
 symmetry, and algorithmic references remain applicable within their prior
 scopes.
+
+## v7.16 boundary (added on v7.16 D1 ratification, 2026-10-17)
+
+`v7_16_molten_salt_occlusion_extension.md` (accepted-current D1) adds a
+default *cage-salt* occlusion model and retains this sparse model unchanged
+as an explicitly selected legacy model. The legacy model must give
+byte-identical output to v7.15.0 for the same inputs and seed. Its v7.15 flags
+are accepted only with the legacy selector.
+
+For the cage-salt model, the v7.16 document supersedes these sections of this
+one:
+- "Sparse chloride domain and canonical setting";
+- "Collision guard";
+- "Dry-volume compatibility boundary";
+- "Smoothing and assembly";
+- "Epistemic scope of the literature".
+
+This document's charge-partition invariants (generalised in v7.16 §4), Al24
+scope, template gating and maximum-symmetry and unique-batch rejection
+continue to apply. Since package 7.16.0 this model ships as the explicitly
+selected legacy mode `--occlusion-model sparse-v715`, with output byte-identical
+to v7.15.0.

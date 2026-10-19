@@ -1,0 +1,1001 @@
+{
+  "_base_commit": "769d999 (v7.15.0 code)",
+  "_stack": {
+    "numpy": "2.5.4",
+    "platform": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+    "pymatgen": "2026.10.16",
+    "python": "3.13.16",
+    "scipy": "1.18.1"
+  },
+  "pop_dry_candidate_s0": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_candidate_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--write-candidate",
+      "tests/golden/v715/pop_dry_candidate_s0/candidate.cif",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_candidate_s0/report.txt"
+    ],
+    "files": {
+      "candidate.cif": "790a0312414018b210a427f92a70e6bf1eda02795fd30765df9b7e80fb6fe692",
+      "out.cif": "9edd9303660e985364003db84e02ed57928af1f6136399bd1ad7eb73edabb03d",
+      "report.txt": "d572537d28af977eac623092758eabf11f6bc6c0f72f79ccc01717eec8f23f9a",
+      "stdout.txt": "be014279fb71e33647606f9400cc99edab564bc5970bd3ed077d668056339936"
+    }
+  },
+  "pop_dry_s0_POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_s0_POSCAR/report.txt"
+    ],
+    "files": {
+      "out.POSCAR": "b884c9cff1b2036747c051d415c53f71f36d77d4cae144d033699bb79a41bae7",
+      "report.txt": "53f9b4aa2b94f9212cf16622f1eac9da5db2ecc99852d81b58b41688d649af03",
+      "stdout.txt": "0846e9269b96b1741542caae0ce04db501ba15442f96354f5cfbccddbdacde3a"
+    }
+  },
+  "pop_dry_s0_cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_s0_cif/report.txt"
+    ],
+    "files": {
+      "out.cif": "9edd9303660e985364003db84e02ed57928af1f6136399bd1ad7eb73edabb03d",
+      "report.txt": "8356d72cbd3b4067ad0968b7a0b72fb6b1716f98b8d4336c9c25a75cc859ed13",
+      "stdout.txt": "c8eaf8c6715262cfea410502dc16d8972be630be7441b150e4522df268f337b5"
+    }
+  },
+  "pop_dry_s0_data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s0_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_s0_data/report.txt"
+    ],
+    "files": {
+      "out.data": "13cb857c8f614fc089ac48da8be1947f48b3d3661b31f0e86f743924c257a12e",
+      "report.txt": "ea8e2a3aedec2d4bdcad0354ec76ea1b6101e783d02bbdc78dab4d835de58385",
+      "stdout.txt": "2a669852df092b1a2a7e1c24a3e978851686ad43eb4cf608576345ba6ae47b4c"
+    }
+  },
+  "pop_dry_s1_POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_dry_s1_POSCAR/report.txt"
+    ],
+    "files": {
+      "out.POSCAR": "95829b5db98873b43a3691535f7a02868d861125153be5c9307abaa92a964bd7",
+      "report.txt": "e5ffa57a604532ed7744825f89b783ad48e871e6f58ae4cfcd86058d7c9788e5",
+      "stdout.txt": "ecfa8ca1038600532bc3ae0eb101ccba74e23f3f2b4a13f617a968985054377a"
+    }
+  },
+  "pop_dry_s1_cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_dry_s1_cif/report.txt"
+    ],
+    "files": {
+      "out.cif": "51a4491596b727cf33599680fa76295dd98e9e201f80a0e24aa93ae11597daff",
+      "report.txt": "95c3475db08c6366040711881ed402f13903d8bfad10dce20ce321e9850da7e9",
+      "stdout.txt": "d4117261df1b7cbd1febc824934283f9d8ef1d27cd271872b905aa6d019f4c60"
+    }
+  },
+  "pop_dry_s1_data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s1_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_dry_s1_data/report.txt"
+    ],
+    "files": {
+      "out.data": "f04ddc8e7e3189968718b3da848fef1fed76583cbfa5ddad8bd583dc7a9b0cc9",
+      "report.txt": "29622620d9cdf0c0f00ef6ad61a9031f150222df75bbafafcd52d0829a8e2590",
+      "stdout.txt": "959167243d34c7922be48644cf054fef8e46dae23c7ac3bba87c2d1990242e4a"
+    }
+  },
+  "pop_dry_s2_POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2",
+      "--report",
+      "tests/golden/v715/pop_dry_s2_POSCAR/report.txt"
+    ],
+    "files": {
+      "out.POSCAR": "32e02bf3f166ac753dfdb14400646c4ccf64d5f653c2a94b2a24e8a10418e815",
+      "report.txt": "b4f79ac9edf6adf11fe0b97998efc4317d8d69c8ff6cfb8132e2a43eb1a40e0d",
+      "stdout.txt": "0c9c1798ca8bcd5bdd63d36639588cff393d92bc4a4821fea06169ae40242600"
+    }
+  },
+  "pop_dry_s2_cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2",
+      "--report",
+      "tests/golden/v715/pop_dry_s2_cif/report.txt"
+    ],
+    "files": {
+      "out.cif": "32251e06c2b20f85f2af8e279e87160c029cd49dc58eff99f00e254e54dce3e9",
+      "report.txt": "2cb80cce0b8c6d6fe6cbcf33c92c8eb688da2a693ec6ead77070a653355dd189",
+      "stdout.txt": "af2a7a691947cdd6d833a14164725c366903ca20dc324243f9cc3583869133ae"
+    }
+  },
+  "pop_dry_s2_data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_s2_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--seed",
+      "2",
+      "--report",
+      "tests/golden/v715/pop_dry_s2_data/report.txt"
+    ],
+    "files": {
+      "out.data": "cbf83da87f3497f9f5ab7e4f7be7468f095c675272b2e117d23ff9aab9b0ba79",
+      "report.txt": "5ad92a110ffe1c23a83afeeb950ad668da088087aee45459c8986aecb5a36a69",
+      "stdout.txt": "b115a79e6d092d1a1d2749cf7d13e47ac68eebd1152fec06684dcb14f7fa34ae"
+    }
+  },
+  "pop_dry_vf098_s0": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_vf098_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--volume-factor",
+      "0.98",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_dry_vf098_s0/report.txt"
+    ],
+    "files": {
+      "out.cif": "3aeffeb0f57e867a3e0908cbe23d287c61dd65ee1e1ac623f5a9ae7251e83d65",
+      "report.txt": "4b6ad44b286139e4cdaba9d8b4fa55611e40c1cada1f7362bdd0865da44e3e6b",
+      "stdout.txt": "c2cff5a2bb79bccc18a0050536a6af055ad14c05a5750fef8c5b380d2dddbf05"
+    }
+  },
+  "pop_dry_vf098_s1": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_dry_vf098_s1/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--volume-factor",
+      "0.98",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_dry_vf098_s1/report.txt"
+    ],
+    "files": {
+      "out.cif": "f5e4ade5d7340ab6fa550a86fe7696ec430dec3a38087574e833c6f3f98b84e9",
+      "report.txt": "ad699d9ea4fc9e41d1929eee730c517b7f22807988292b013441c1ac027e5882",
+      "stdout.txt": "8771a711944d5b12c51cef70263612aa63f2d3f934e8e900783d177db8ae7b27"
+    }
+  },
+  "pop_maxsym": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_maxsym/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--population-mode",
+      "maximum-symmetry",
+      "--report",
+      "tests/golden/v715/pop_maxsym/report.txt"
+    ],
+    "files": {
+      "out.cif": "ea7614b8f6e552e2eeeafe3538d2f4daa6752188182d280484d599514dde3356",
+      "report.txt": "e6f0ebe2a42e5561f32a907a15403e12b12031328e087595f5979ae065972175",
+      "stdout.txt": "61cdb24f95674a02ea89b0f92aa9d37cbb99758842c49122e51712791a758743"
+    }
+  },
+  "pop_sparse_s0_POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_sparse_s0_POSCAR/report.txt"
+    ],
+    "files": {
+      "out.POSCAR": "5c18c871de71bee021f60b2c9f9a5f5ba6e849c68ca3807aea58a53c0ff7238a",
+      "report.txt": "7e5b314e2260c52032c8b6a855e91bfec398e0b8e07cc06ecf603d1926aff3b2",
+      "stdout.txt": "66716e16481eb588485edfb701e08be41078836aace5b3e3cc139a8071b29d73"
+    }
+  },
+  "pop_sparse_s0_cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_sparse_s0_cif/report.txt"
+    ],
+    "files": {
+      "out.cif": "55d32f3bcebbdb91e95e17eaed3cbfc81084eb8d27841c9855141623223d9276",
+      "report.txt": "9fef2152945fe4e9422eacfc3ae574c9d7fc4df9385a24faf234bb4b7709e343",
+      "stdout.txt": "e914bf65b72dcab6617100becb0b289305ae1b26dae40c36f0f3ccd2ddac00a5"
+    }
+  },
+  "pop_sparse_s0_data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s0_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_sparse_s0_data/report.txt"
+    ],
+    "files": {
+      "out.data": "b6592b154f474b17f7664b84ed04bcb157c57403e2065e5f0fb12e162b705d5b",
+      "report.txt": "d1bc677f4d1ae197efe683552dd3cf47b8a83ef0b798530e2a26e553dc804a08",
+      "stdout.txt": "434ec2d186be24ba25d91e8e4d6f55e9117cf539c95df21cb9a96c5f9f229487"
+    }
+  },
+  "pop_sparse_s1_POSCAR": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_sparse_s1_POSCAR/report.txt"
+    ],
+    "files": {
+      "out.POSCAR": "38337777e346bdccda4dd41719c42d0dc5273ade629b9b5bdb83e225bfbb2b1f",
+      "report.txt": "1b18749299273762a627da9a0b3234cc02403e302f1c5a5590a6c875135cdbdd",
+      "stdout.txt": "cd046cf3a3e2de45147e65537a99d0cb41971473cfa6935aa36fc5b61b291431"
+    }
+  },
+  "pop_sparse_s1_cif": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_sparse_s1_cif/report.txt"
+    ],
+    "files": {
+      "out.cif": "4bab410d3d7bd986f400775a4f947f9792256965f0e11994c2e744c46197de94",
+      "report.txt": "46e756fdb86b13f103f408ff66a9dc441c93100ae55b8a08dbe59f84526ef678",
+      "stdout.txt": "77fc1d5b529f91aa4e9fb438f35d7a366407bb168ffe57eca02ecb26eeabdd5a"
+    }
+  },
+  "pop_sparse_s1_data": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_s1_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_sparse_s1_data/report.txt"
+    ],
+    "files": {
+      "out.data": "77c867132f86e12f0624b2a97304d4c06f4f4bb2bd34b8a83fcc0ab2feadbc54",
+      "report.txt": "75afed04eece11d771998a85fd4d3d94062a6aeeacdf51a919547dbe9fa59275",
+      "stdout.txt": "e33698dd9bab0b40be0ce704350d4b5a91cdf1cff18398f649cd2f4b6cd5033d"
+    }
+  },
+  "pop_sparse_vf098_s0": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_vf098_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--volume-factor",
+      "0.98",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_sparse_vf098_s0/report.txt"
+    ],
+    "files": {
+      "out.cif": "aed56a9d9091b63db7e370f426514dcd1c67e65c5acf04bf2874edc442c01c18",
+      "report.txt": "450327da61bedbdd134a992ea7fab5313ba5d58c5f5805eba57ef624fd97dcd0",
+      "stdout.txt": "478f532a33267ec94d0e390b5df825a0e90f79b248f9578aa1bef138e3907b93"
+    }
+  },
+  "pop_sparse_vf098_s1": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_sparse_vf098_s1/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--volume-factor",
+      "0.98",
+      "--seed",
+      "1",
+      "--report",
+      "tests/golden/v715/pop_sparse_vf098_s1/report.txt"
+    ],
+    "files": {
+      "out.cif": "6bb43cca74e81066e5529465d5ed6e0ba7d3b10ea5311e1632a1354dc3d77f2a",
+      "report.txt": "ea63982ee7e2ed27d1a8012f97eaa0810eb575fb7d0ef280161bf17ce8a69c75",
+      "stdout.txt": "7aec6bbd2342f444c91615dc5f2e85a87f71e6db258a1615c9d427631ed32d1e"
+    }
+  },
+  "pop_unique_batch2_s0": {
+    "argv": [
+      "lta_cation_population_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/pop_unique_batch2_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--unique-batch-size",
+      "2",
+      "--seed",
+      "0",
+      "--report",
+      "tests/golden/v715/pop_unique_batch2_s0/report.txt"
+    ],
+    "files": {
+      "out_001.cif": "62ede6abbe34794f00973cbfbaaca3833b3a26b9b6e3bd25885072aabc8c1afe",
+      "out_002.cif": "3ead6cdfcaa2612a9fec14bfb2fd4cdf93df8b65c9db3144dcdad202770cd5b3",
+      "report.txt": "fb7c120572f8a6a9e42484968ccdb61585e32f1a1b6ce28000f8816b2349fc2d",
+      "stdout.txt": "0e2cd5be054854943387fa97bf543deebd34cd0d280d9c814ea41940cfb4fd74"
+    }
+  },
+  "smooth_dry_move_s0": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_move_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--mode",
+      "move",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.cif": "62ede6abbe34794f00973cbfbaaca3833b3a26b9b6e3bd25885072aabc8c1afe",
+      "stdout.txt": "c42bfd9e8f86f0b766edfd92726dac412a95f3a01182b9d88f9caec5f46eba42"
+    }
+  },
+  "smooth_dry_move_s1": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_move_s1/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--mode",
+      "move",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.cif": "f53113ef6b965fef02bb8e03841ea270e90a486111e308b9a0226526ecceac0b",
+      "stdout.txt": "83260fa476b296d51bfeeab48f0afdbef15e89c48d0e4468f2d983f1e7b627d0"
+    }
+  },
+  "smooth_dry_regenerate_s0": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_regenerate_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--mode",
+      "regenerate",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.cif": "62ede6abbe34794f00973cbfbaaca3833b3a26b9b6e3bd25885072aabc8c1afe",
+      "stdout.txt": "7ee1a3bd797f6fa5bf604ecb8639c61353ae9d61c9e006991553d8ae24585ca4"
+    }
+  },
+  "smooth_dry_regenerate_s1": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_regenerate_s1/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--mode",
+      "regenerate",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.cif": "f53113ef6b965fef02bb8e03841ea270e90a486111e308b9a0226526ecceac0b",
+      "stdout.txt": "464436d1a5f771c38dbe20127868de389ee5f74678c7f9f83723421c4fb6a13a"
+    }
+  },
+  "smooth_dry_s0_POSCAR": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s0_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.POSCAR": "8bbe7f9f37e0502df70d0cb5a44c6f5e63c9ae858488341dcef369b7c15dd80d",
+      "stdout.txt": "8163830c054a62b4d168a50e7421c6bf2397cb56922b01b6fad8f23a109aad7f"
+    }
+  },
+  "smooth_dry_s0_cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s0_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.cif": "62ede6abbe34794f00973cbfbaaca3833b3a26b9b6e3bd25885072aabc8c1afe",
+      "stdout.txt": "fa7d5a04a9abb7a0776da5003f709c657f8c5f665cd94bb61a47ee9cfe40857e"
+    }
+  },
+  "smooth_dry_s0_data": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s0_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.data": "0a13566eec63308687b53ef74e1f46a50b1c4940a00ab15c52db848ff973efef",
+      "stdout.txt": "b892c7ae5932c66ff3ec521ba664e3a05a69ff0f5d3811c742d9c9d99b0eb14c"
+    }
+  },
+  "smooth_dry_s1_POSCAR": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s1_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.POSCAR": "e717d6f7613428dc4a9327bb5632428e750a17cab842d0a044a396a6b6c9e074",
+      "stdout.txt": "a1f240b579563eb1450b01d90082852a561ba8e06cd7f8639ccf04c60c910b7a"
+    }
+  },
+  "smooth_dry_s1_cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s1_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.cif": "f53113ef6b965fef02bb8e03841ea270e90a486111e308b9a0226526ecceac0b",
+      "stdout.txt": "ccbcc00b96c0f4b6256c2bcd21e42369da101b4fd6c47ede54002e47d8cb013d"
+    }
+  },
+  "smooth_dry_s1_data": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_s1_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.data": "e07c02b655d6059cbf9f472a811d3097f96de2a6ccd2e1f8c36a855f758b94bc",
+      "stdout.txt": "b6f1d0bc0532f1d2338c325a1229addd30d5437e11d63b258f59053cb38eae65"
+    }
+  },
+  "smooth_dry_vf098_s0": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_vf098_s0/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--volume-factor",
+      "0.98",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.cif": "3d0d635368840d87ab4285024afd99fe05e2188f1568e9aadf4c01bf4cf81a52",
+      "stdout.txt": "ae51ad8f79a9897308c2b45718dff707776e283573d9ecfb9187607dc95def37"
+    }
+  },
+  "smooth_dry_vf098_s1": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_dry_vf098_s1/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--volume-factor",
+      "0.98",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.cif": "bd8cc18693767c1ef797c4c94f667a1552a5bcd739c1da237a2a922e62e69c92",
+      "stdout.txt": "120c91c41e7ba45e5c15983f3d04ed483b62b4d2ad54403b642bc22b504280b4"
+    }
+  },
+  "smooth_maxsym": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_maxsym/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--population-mode",
+      "maximum-symmetry"
+    ],
+    "files": {
+      "out.cif": "ea7614b8f6e552e2eeeafe3538d2f4daa6752188182d280484d599514dde3356",
+      "stdout.txt": "14b3f355de26d4b38ce764aa1cdfb264a1e32c70016f1810d651f3dbd3253997"
+    }
+  },
+  "smooth_sparse_s0_POSCAR": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s0_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.POSCAR": "818ac1f1fba57a42b26d72bc764d1eb6782eefdd62a90f41c8110188338ea0af",
+      "stdout.txt": "167fa1a8bf9227d9be49a1876411a49928100bef9aa51f079c82981968ba11de"
+    }
+  },
+  "smooth_sparse_s0_cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s0_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.cif": "07c27d8c4102e9c55ff1b7db072bf9abda2770a1115a113bf75e705204d76ec4",
+      "stdout.txt": "165bcfb79615ce5a0f984848ce9e98f28fa4eeb18b9e4a8c32087517ab7b3bd4"
+    }
+  },
+  "smooth_sparse_s0_data": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s0_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "0"
+    ],
+    "files": {
+      "out.data": "34bcdecb3cddb8b90c03f9d517ca5e866eee5267b417ed47dc41e72ce47ff972",
+      "stdout.txt": "ea7007b6fd8745d967986d8cc200db73af98598d629584c425e122d4b5f9cbb3"
+    }
+  },
+  "smooth_sparse_s1_POSCAR": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s1_POSCAR/out.POSCAR",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.POSCAR": "da79c82e9ede79c668b928072868c7c9f9c37bff31ea0d368b1f55f89812a7ea",
+      "stdout.txt": "bc61d044939adf2a647a7e90446b91d09da8e4680a186ef47f4d0f393428daf5"
+    }
+  },
+  "smooth_sparse_s1_cif": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s1_cif/out.cif",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.cif": "5ce39b7c27de08cecb3751713fbdc0bb0f39b8f387393ea6dbc4841f062ae2e7",
+      "stdout.txt": "1289b4c08fca33f666f9f2630b54fb53d067e361c6ed8147d4a76e0cf7706bc5"
+    }
+  },
+  "smooth_sparse_s1_data": {
+    "argv": [
+      "generate_smooth_lta_cations_grouped.py",
+      "tests/real_lta_primitive.cif",
+      "tests/golden/v715/smooth_sparse_s1_data/out.data",
+      "--n4",
+      "Na:2",
+      "--n6",
+      "Na:16",
+      "--n8",
+      "Na:6",
+      "--alpha-cl",
+      "2",
+      "--beta-cl",
+      "2",
+      "--occlusion-n4",
+      "Na:4",
+      "--max-attempts",
+      "5",
+      "--seed",
+      "1"
+    ],
+    "files": {
+      "out.data": "74da8cfe2cf4d56b4c69b55858bf1310209a3884b9a0e15562714ab105f0b344",
+      "stdout.txt": "c5c50d4da02cf432e08dfe1f0640264dca5544aa1d87566cbe11b629a9a7e39d"
+    }
+  }
+}

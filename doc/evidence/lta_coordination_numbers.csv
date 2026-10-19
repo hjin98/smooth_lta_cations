@@ -1,0 +1,216 @@
+centre,neighbour,environment,T_K,composition,CN,CN_uncertainty,cutoff_A,method,grade,source_tag,note
+Li,Cl,pure melt,923,LiCl,4,,,X-ray,"C,M",P1 Table S3,original: Ohno et al. 1978; like-pair is mainly Cl-Cl; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,923,LiCl,12,,,X-ray,"C,M",P1 Table S3,original: Ohno et al. 1978; like-pair is mainly Cl-Cl; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+Li,Cl,pure melt,,LiCl,4,,,X-ray,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,,LiCl,12,,,X-ray,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+Li,Cl,pure melt,893,LiCl,4.1,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,893,LiCl,9,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+Li,Cl,pure melt,958,LiCl,5.5,,,neutron,"C,M",P1 Table S3,original: Howe & McGreevy 1988 / McGreevy & Howe 1989; CN definition varies by study (P1 ESI)
+Li,Li,pure melt,958,LiCl,14,,,neutron,"C,M",P1 Table S3,original: Howe & McGreevy 1988 / McGreevy & Howe 1989; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,958,LiCl,14,,,neutron,"C,M",P1 Table S3,original: Howe & McGreevy 1988 / McGreevy & Howe 1989; CN definition varies by study (P1 ESI)
+Li,Cl,pure melt,,LiCl,3.5,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Li,Li,pure melt,,LiCl,8.3,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,,LiCl,8.3,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Na,Cl,pure melt,1083,NaCl,3.7,,,X-ray,"C,M",P1 Table S3,original: Ohno & Furukawa 1981; CN definition varies by study (P1 ESI)
+Na,Cl,pure melt,1093,NaCl,4.7,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,1093,NaCl,9,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+Na,Cl,pure melt,1148,NaCl,5.8,,,neutron,"C,M",P1 Table S3,original: Edwards et al. 1975; CN definition varies by study (P1 ESI)
+Na,Na,pure melt,1148,NaCl,13,,,neutron,"C,M",P1 Table S3,original: Edwards et al. 1975; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,1148,NaCl,13.3,,,neutron,"C,M",P1 Table S3,original: Edwards et al. 1975; CN definition varies by study (P1 ESI)
+Na,Cl,pure melt,1148,NaCl,4.0,,,neutron,"C,M",P1 Table S3,original: Edwards et al. 1975 data as reinterpreted by Biggin & Enderby 1982; CN definition varies by study (P1 ESI)
+K,Cl,pure melt,,KCl,4.1,,,X-ray,"C,M",P1 Table S3,original: Takagi et al. 1979; CN definition varies by study (P1 ESI)
+K,Cl,pure melt,,KCl,3.7,,,X-ray,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+K,Cl,pure melt,1083,KCl,5.2,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,1083,KCl,10,,,X-ray,"C,M",P1 Table S3,original: Zarzycki 1958; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+K,Cl,pure melt,,KCl,5.8,,,X-ray,"C,M",P1 Table S3,original: Lark & Miller 1937; CN definition varies by study (P1 ESI)
+K,Cl,pure melt,1073,KCl,6.1,,,neutron,"C,M",P1 Table S3,original: Derrien & Dupuy 1975 (two like-pair values given); CN definition varies by study (P1 ESI)
+K,K,pure melt,1073,KCl,12/15.9,,,neutron,"C,M",P1 Table S3,original: Derrien & Dupuy 1975 (two like-pair values given); CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,1073,KCl,12.3/16.2,,,neutron,"C,M",P1 Table S3,original: Derrien & Dupuy 1975 (two like-pair values given); CN definition varies by study (P1 ESI)
+K,Cl,pure melt,,KCl,3.5,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+K,K,pure melt,,KCl,7.4,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,,KCl,7.4,,,neutron,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Rb,Cl,pure melt,,RbCl,4.2,,,X-ray,"C,M",P1 Table S3,original: Levy & Danford 1964; CN definition varies by study (P1 ESI)
+Rb,Cl,pure melt,1023,RbCl,6.9,,,neutron,"C,M",P1 Table S3,"original: Mitchell, Poncet & Stewart 1976; CN definition varies by study (P1 ESI)"
+Rb,Rb,pure melt,1023,RbCl,13,,,neutron,"C,M",P1 Table S3,"original: Mitchell, Poncet & Stewart 1976; CN definition varies by study (P1 ESI)"
+Cl,Cl,pure melt,1023,RbCl,14,,,neutron,"C,M",P1 Table S3,"original: Mitchell, Poncet & Stewart 1976; CN definition varies by study (P1 ESI)"
+Cs,Cl,pure melt,,CsCl,4.6,,,X-ray,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,,CsCl,7.1,,,X-ray,"C,M",P1 Table S3,original: Levy et al. 1960; CN definition varies by study (P1 ESI); X-ray like-pair reflects mainly Cl-Cl
+Cs,Cl,pure melt,968,CsCl,5.8,,,neutron,"C,M",P1 Table S3,original: Locke et al. 1985; CN definition varies by study (P1 ESI)
+Cs,Cs,pure melt,968,CsCl,15.4,,,neutron,"C,M",P1 Table S3,original: Locke et al. 1985; CN definition varies by study (P1 ESI)
+Cl,Cl,pure melt,968,CsCl,16.3,,,neutron,"C,M",P1 Table S3,original: Locke et al. 1985; CN definition varies by study (P1 ESI)
+Cs,Cl,pure melt,973,CsCl,3/5.9,,,neutron,"C,M",P1 Table S3,original: Derrien & Dupuy 1975 (two values given); CN definition varies by study (P1 ESI)
+Li,Cl,pure melt,878.15,LiCl,5.2,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Li,Li,pure melt,878.15,LiCl,14.7,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,878.15,LiCl,14.8,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Li,Cl,pure melt,978.15,LiCl,5.0,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Li,Li,pure melt,978.15,LiCl,14.1,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,978.15,LiCl,14.1,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Na,Cl,pure melt,1074.15,NaCl,5.3,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Na,Na,pure melt,1074.15,NaCl,15.2,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1074.15,NaCl,15.2,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Na,Cl,pure melt,1174.15,NaCl,5.1,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Na,Na,pure melt,1174.15,NaCl,14.5,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1174.15,NaCl,14.7,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+K,Cl,pure melt,1043.15,KCl,5.4,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+K,K,pure melt,1043.15,KCl,15.4,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1043.15,KCl,15.7,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+K,Cl,pure melt,1143.15,KCl,5.2,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+K,K,pure melt,1143.15,KCl,15.2,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1143.15,KCl,15.1,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Rb,Cl,pure melt,991.15,RbCl,5.4,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Rb,Rb,pure melt,991.15,RbCl,15.8,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,991.15,RbCl,15.9,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Rb,Cl,pure melt,1091.15,RbCl,5.3,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Rb,Rb,pure melt,1091.15,RbCl,14.9,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1091.15,RbCl,15.0,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cs,Cl,pure melt,918.15,CsCl,5.5,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cs,Cs,pure melt,918.15,CsCl,16.0,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,918.15,CsCl,16.0,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cs,Cl,pure melt,1018.15,CsCl,5.3,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cs,Cs,pure melt,1018.15,CsCl,15.3,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1018.15,CsCl,15.6,0.5,first min of g(r),WBK polarisable FF MD,"B,S",P1 Table S1,S; source states CN uncertainty ~0.5
+Li,Cl,pure melt,878.15,LiCl,3.9,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Li,Li,pure melt,878.15,LiCl,11.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,878.15,LiCl,11.7,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Li,Cl,pure melt,978.15,LiCl,3.9,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Li,Li,pure melt,978.15,LiCl,11.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,978.15,LiCl,11.6,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Na,Cl,pure melt,1074.15,NaCl,4.9,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Na,Na,pure melt,1074.15,NaCl,14.5,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1074.15,NaCl,14.3,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Na,Cl,pure melt,1174.15,NaCl,4.8,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Na,Na,pure melt,1174.15,NaCl,14.1,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1174.15,NaCl,14.0,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+K,Cl,pure melt,1043.15,KCl,5.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+K,K,pure melt,1043.15,KCl,16.0,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1043.15,KCl,15.8,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+K,Cl,pure melt,1143.15,KCl,5.2,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+K,K,pure melt,1143.15,KCl,15.3,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1143.15,KCl,15.3,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Rb,Cl,pure melt,991.15,RbCl,5.5,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Rb,Rb,pure melt,991.15,RbCl,16.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,991.15,RbCl,16.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Rb,Cl,pure melt,1091.15,RbCl,5.4,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Rb,Rb,pure melt,1091.15,RbCl,16.0,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1091.15,RbCl,15.8,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cs,Cl,pure melt,918.15,CsCl,5.8,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cs,Cs,pure melt,918.15,CsCl,17.1,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,918.15,CsCl,17.2,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cs,Cl,pure melt,1018.15,CsCl,5.6,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cs,Cs,pure melt,1018.15,CsCl,16.6,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Cl,Cl,pure melt,1018.15,CsCl,16.6,0.5,first min of g(r),JC non-polarisable FF MD,"B,S",P1 Table S2,S; source states CN uncertainty ~0.5
+Li,Cl,pure melt,883,LiCl,4.9,,,MC,"C,S",P1 Table S4,"original: Lewis, Singer & Woodcock"
+Li,Cl,pure melt,900,LiCl,4.05,,,MC,"C,S",P1 Table S4,original: Wang et al. 2014 (P1 ref 27)
+Li,Cl,pure melt,1096,LiCl,4.05,,,MD,"C,S",P1 Table S4,original: Lantelme & Turq 1982
+Li,Cl,pure melt,1050,LiCl,4.1,,,MD,"C,S",P1 Table S4,original: Caccamo & Dixon 1980
+Li,Cl,pure melt,918,LiCl,4.2,,,MD,"C,S",P1 Table S4,original: Caccamo & Dixon 1980
+Li,Cl,pure melt,923,LiCl,4.0,,,MC,"C,S",P1 Table S4,"original: Baranyai, Ruff & McGreevy 1986; whether this MC was constrained by diffraction data (reverse MC) was not checked"
+Li,Cl,pure melt,1073,LiCl,4.1,,,MC,"C,S",P1 Table S4,original: Krogh-Moe
+Na,Cl,pure melt,1080,NaCl,4.76,,,MD,"C,S",P1 Table S4,original: Wang et al. 2014 (P1 ref 27)
+Na,Cl,pure melt,1074,NaCl,5.2,,,MC,"C,S",P1 Table S4,"original: Lewis, Singer & Woodcock"
+Na,Cl,pure melt,1123,NaCl,5.0,,,MC,"C,S",P1 Table S4,"original: Baranyai, Ruff & McGreevy 1986; whether this MC was constrained by diffraction data (reverse MC) was not checked"
+K,Cl,pure melt,1045,KCl,5.3,,,MC,"C,S",P1 Table S4,original: Woodcock & Singer
+K,Cl,pure melt,1306,KCl,5.2,,,MC,"C,S",P1 Table S4,original: Woodcock & Singer
+K,Cl,pure melt,1053,KCl,5.18,,,MD,"C,S",P1 Table S4,original: Wang et al. 2014
+K,Cl,pure melt,1096,KCl,5.13,,,MD,"C,S",P1 Table S4,original: Lantelme & Turq
+K,Cl,pure melt,1043,KCl,5.2,,,MD,"C,S",P1 Table S4,original: Caccamo & Dixon 1980
+K,Cl,pure melt,1073,KCl,5.8,,,MC,"C,S",P1 Table S4,"original: Baranyai, Ruff & McGreevy 1986; whether this MC was constrained by diffraction data (reverse MC) was not checked"
+K,Cl,pure melt,1173,KCl,4.7,,,MD,"C,S",P1 Table S4,"original: Takagi, Ohno & Furukawa 1979 (P1 ref list describes it as experimental)"
+K,Cl,pure melt,1173,KCl,5.1,,,MD,"C,S",P1 Table S4,"original: Takagi, Ohno & Furukawa 1979 (P1 ref list describes it as experimental)"
+Rb,Cl,pure melt,1000,RbCl,5.41,,,MD,"C,S",P1 Table S4,original: Wang et al. 2014
+Rb,Cl,pure melt,995,RbCl,5.8,,,MC,"C,S",P1 Table S4,"original: Lewis, Singer & Woodcock"
+Rb,Cl,pure melt,1023,RbCl,5.7,,,MC,"C,S",P1 Table S4,"original: Baranyai, Ruff & McGreevy 1986; whether this MC was constrained by diffraction data (reverse MC) was not checked"
+Cs,Cl,pure melt,900,CsCl,5.7,,,MD,"C,S",P1 Table S4,original: Wang et al. 2014
+Cs,Cl,pure melt,973,CsCl,5.8,,,MC,"C,S",P1 Table S4,"original: Baranyai, Ruff & McGreevy 1986; whether this MC was constrained by diffraction data (reverse MC) was not checked"
+Li,Cl,pure melt,1100,LiCl,4.34,,3.6,PIM MD,"B,S",P2 Table 2,S; r_dagger = first-shell boundary from cation-anion g(r)
+Li,Cl,pure melt,1100,LiCl,3.90,,3.6,RIM MD,"B,S",P2 Table 2,S; same r_dagger as PIM
+Na,Cl,pure melt,1100,NaCl,5.16,,4.1,PIM MD,"B,S",P2 Table 2,S; r_dagger = first-shell boundary from cation-anion g(r)
+Na,Cl,pure melt,1100,NaCl,4.82,,4.1,RIM MD,"B,S",P2 Table 2,S; same r_dagger as PIM
+K,Cl,pure melt,1100,KCl,5.18,,4.5,PIM MD,"B,S",P2 Table 2,S; r_dagger = first-shell boundary from cation-anion g(r)
+K,Cl,pure melt,1100,KCl,4.89,,4.5,RIM MD,"B,S",P2 Table 2,S; same r_dagger as PIM
+Na,Cl,pure melt,1100,NaCl,5.06,,first min of g(r) (value not given),PIM MD,"B,S",P10,S
+Na,Cl,pure melt,,NaCl,4.83,,,experiment,"C,M",P10,"quoted from McGreevy, Solid State Phys. 40, 247 (1987); T not given by P10"
+Mg,Cl,pure melt,,MgCl2,5.21 to 4.72,,first min of g(r),PIM MD,"B,S",P10,S; decreases with T; end temperatures only in P10 Fig. 2
+Mg,Cl,pure melt,998,MgCl2,4.3,,,neutron diffraction (isotopic substitution),"C,M",P23,"value as compiled by Enderby 1987 [Q21] and quoted in P23; T from P23 for original Biggin, Gay & Enderby 1984"
+Ca,Cl,pure melt,1093,CaCl2,5.3,,,neutron diffraction (isotopic substitution),"C,M",P23,value as compiled by Enderby 1987 [Q21] and quoted in P23; T from P23 for original Biggin & Enderby 1981
+Sr,Cl,pure melt,1198,SrCl2,6.9,,,neutron diffraction (isotopic substitution),"C,M",P23,value as compiled by Enderby 1987 [Q21] and quoted in P23; T from P23 for original McGreevy & Mitchell 1982
+Ba,Cl,pure melt,1298,BaCl2,6.4,,,neutron diffraction (isotopic substitution),"C,M",P23,"value as compiled by Enderby 1987 [Q21] and quoted in P23; T from P23 for original Edwards, Howe, Enderby & Page 1978"
+Sr,Cl,pure melt,1198,SrCl2,6.9,,,thermal neutron scattering,"C,M",Q13,Q13 quotes McGreevy & Mitchell: CN 6.9 at 925 C (=1198 K); second independent quotation
+Mg,Cl,pure melt,998,MgCl2,4.3,,,neutron diffraction (compilation),"C,M",P22,carried from rev 2.1 (P22 Table 2 read in an earlier session); not re-read
+Ca,Cl,pure melt,1093,CaCl2,5.4,,,neutron diffraction (compilation),"C,M",P22,carried from rev 2.1 (P22 Table 2); not re-read
+Sr,Cl,pure melt,1198,SrCl2,6.9,,,neutron diffraction (compilation),"C,M",P22,carried from rev 2.1 (P22 Table 2; P22 text says 6.6); not re-read
+Ba,Cl,pure melt,1298,BaCl2,7.7,,,neutron diffraction (compilation),"C,M",P22,carried from rev 2.1 (P22 Table 2); not re-read; CONFLICTS with 6.4 (P23)
+Ba,Cl,pure melt,,BaCl2,"8 (""eightfold"")",,,unknown (qualitative),C,Q27,citing-paper snippet (Edgar et al. 2010) on ResearchGate; possibly paraphrased; source of the 8 unknown
+Mg,Cl,pure melt,998,MgCl2,5.2,0.9 (SD of per-ion distribution),,MD fitted to diffraction (BELION),"B,S",P23,S
+Mg,Cl,pure melt,1200,MgCl2,4.4,,not stated for pure MgCl2,AIMD,"B,S",P6,S
+Ca,Cl,pure melt,1200,CaCl2,6.0,,not stated,classical MD (BMH),"B,S",P8,"S; P8 also quotes 5.4 (exp, 1093 K) but its citation of Biggin is defective"
+Sr,Cl,pure Sr-Cl (crystal-structure ensemble),298,Sr-Cl binary,6.61,,,USPEX/DFT Boltzmann-weighted crystal ensemble,"B,S",Q13,not an MD liquid; model average. Q13 also gives 5.5 (500 C) and 4.88 (1000 C) in a sentence whose Sr/Zr attribution is ambiguous; omitted
+Cl,Mg,pure melt,998,MgCl2,2.15,,,derived,D,P23,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 4.3
+Cl,Ca,pure melt,1093,CaCl2,2.65,,,derived,D,P23,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 5.3
+Cl,Ca,pure melt,1093,CaCl2,2.70,,,derived,D,P22,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 5.4
+Cl,Sr,pure melt,1198,SrCl2,3.45,,,derived,D,P23/Q13,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 6.9
+Cl,Ba,pure melt,1298,BaCl2,3.20,,,derived,D,P23,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 6.4
+Cl,Ba,pure melt,1298,BaCl2,3.85,,,derived,D,P22,N(Cl-M) = N(M-Cl) x_M/x_Cl = N(M-Cl)/2 with N(M-Cl) = 7.7
+Cl,Li,pure melt,,LiCl,= N(M-Cl),,,derived,D,-,1:1 salt: N(Cl-M) = N(M-Cl) for the same cutoff
+Cl,Na,pure melt,,NaCl,= N(M-Cl),,,derived,D,-,1:1 salt: N(Cl-M) = N(M-Cl) for the same cutoff
+Cl,K,pure melt,,KCl,= N(M-Cl),,,derived,D,-,1:1 salt: N(Cl-M) = N(M-Cl) for the same cutoff
+Cl,Rb,pure melt,,RbCl,= N(M-Cl),,,derived,D,-,1:1 salt: N(Cl-M) = N(M-Cl) for the same cutoff
+Cl,Cs,pure melt,,CsCl,= N(M-Cl),,,derived,D,-,1:1 salt: N(Cl-M) = N(M-Cl) for the same cutoff
+Rb,Cl,pure melt,1050,RbCl,5.3,not given,none (first-shell fit),XAFS (Rb K-edge),"B,M",P3,fitted <r> = 3.20 A
+Rb,Cl,dilute in LiCl-KCl,873,15% RbCl in LiCl-KCl eutectic,5.8,not given,none (first-shell fit),XAFS (Rb K-edge),"B,M",P3,fitted <r> = 3.25 A; % basis not stated (probably mol%); 177 K below the pure-RbCl point
+Sr,Cl,dilute in NaCl (solid),298,5 mol% SrCl2 in NaCl,7.5,1.3,none (first-shell fit),EXAFS (Sr K-edge),"B,M",P5 SI Table S1,"fitted R = 3.01 A. SI Table S1 (p. S3) read once in session from the Clemson-hosted PDF; reviewer re-fetch did not return the SI. 298 and 1273 K N also in main text; 873 K N also in Q13 Table 3. Mix m.p. 782+/-2 C (=1055 K, P5 Table 1, origin not stated)"
+Sr,Cl,dilute in NaCl (solid),673,5 mol% SrCl2 in NaCl,6.5,1.4,none (first-shell fit),EXAFS (Sr K-edge),"B,M",P5 SI Table S1,"fitted R = 2.94 A. SI Table S1 (p. S3) read once in session from the Clemson-hosted PDF; reviewer re-fetch did not return the SI. 298 and 1273 K N also in main text; 873 K N also in Q13 Table 3. Mix m.p. 782+/-2 C (=1055 K, P5 Table 1, origin not stated)"
+Sr,Cl,dilute in NaCl (solid),873,5 mol% SrCl2 in NaCl,6.5,1.9,none (first-shell fit),EXAFS (Sr K-edge),"B,M",P5 SI Table S1,"fitted R = 2.92 A. SI Table S1 (p. S3) read once in session from the Clemson-hosted PDF; reviewer re-fetch did not return the SI. 298 and 1273 K N also in main text; 873 K N also in Q13 Table 3. Mix m.p. 782+/-2 C (=1055 K, P5 Table 1, origin not stated)"
+Sr,Cl,dilute in NaCl (melt),1073,5 mol% SrCl2 in NaCl,5.9,0.89,none (first-shell fit),EXAFS (Sr K-edge),"B,M",P5 SI Table S1,"fitted R = 2.93 A. SI Table S1 (p. S3) read once in session from the Clemson-hosted PDF; reviewer re-fetch did not return the SI. 298 and 1273 K N also in main text; 873 K N also in Q13 Table 3. Mix m.p. 782+/-2 C (=1055 K, P5 Table 1, origin not stated)"
+Sr,Cl,dilute in NaCl (melt),1273,5 mol% SrCl2 in NaCl,5.8,1.1,none (first-shell fit),EXAFS (Sr K-edge),"B,M",P5 SI Table S1,"fitted R = 3.03 A. SI Table S1 (p. S3) read once in session from the Clemson-hosted PDF; reviewer re-fetch did not return the SI. 298 and 1273 K N also in main text; 873 K N also in Q13 Table 3. Mix m.p. 782+/-2 C (=1055 K, P5 Table 1, origin not stated)"
+Sr,Cl,dilute in NaCl (model),298,<=10% Sr in Sr-Na-Cl,6.2,,,USPEX/DFT Boltzmann crystal ensemble,"B,S",Q13,model average compared with P5
+Sr,Cl,dilute in NaCl (model),873,<=10% Sr in Sr-Na-Cl,5.8,,,USPEX/DFT Boltzmann crystal ensemble,"B,S",Q13,model average compared with P5
+Sr,Cl,dilute in NaCl (model),1273,<=10% Sr in Sr-Na-Cl,5.6,,,USPEX/DFT Boltzmann crystal ensemble,"B,S",Q13,model average compared with P5
+Sr,Cl,"dilute in LiCl-KCl, with oxide",,SrO in LiCl-KCl (and LiCl-LiF),6,not given,,EXAFS,"A,M",Q15,"study also used Raman and DFT; Sr environment = 1 O + 6 Cl; abstract gives 298-923 K for the study, EXAFS T not stated"
+Sr,Cl,SrCl2-KCl-MgCl2 melt,873-1173,SrCl2-KCl-MgCl2,6-7 (dominant),,,DP-MD,"A,S",P19,abstract: 6- and 7-fold dominant; no mean CN
+Li,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Sm3+ (36 Li/25 K/64 Cl box),4.3,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,S; source says 'Li+ CN' without naming the partner; Cl assumed
+K,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Sm3+ (36 Li/25 K/64 Cl box),7.1,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,"S; source says 'K+ CN' without naming the partner; Cl assumed; high vs pure KCl ~5.2-5.4 (which is at 1043-1143 K, ~300 K hotter); definition-dependent"
+Li,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Ce3+ (36 Li/25 K/64 Cl box),4.1,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,S; source says 'Li+ CN' without naming the partner; Cl assumed
+K,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Ce3+ (36 Li/25 K/64 Cl box),6.8,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,"S; source says 'K+ CN' without naming the partner; Cl assumed; high vs pure KCl ~5.2-5.4 (which is at 1043-1143 K, ~300 K hotter); definition-dependent"
+Li,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Eu3+ (36 Li/25 K/64 Cl box),4.1,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,S; source says 'Li+ CN' without naming the partner; Cl assumed
+K,Cl,LiCl-KCl eutectic,773,LiCl-KCl eutectic 59.2 mol% LiCl + 1 Eu3+ (36 Li/25 K/64 Cl box),7.2,,RDF integrated to an unnumbered R_min (arrows in figures),AIMD (VASP PBE-D3),"B,S",Q14,"S; source says 'K+ CN' without naming the partner; Cl assumed; high vs pure KCl ~5.2-5.4 (which is at 1043-1143 K, ~300 K hotter); definition-dependent"
+Cl,Li,LiCl-KCl eutectic,773,Q14 box 36 Li/25 K/64 Cl (+1 Ln),2.34,,,derived,D,Q14,"N(Cl-Li) = N(Li-Cl)*N_Li/N_Cl, N(Li-Cl)=4.17 (mean of 3 runs); inherits Q14 caveats: R_min not numbered; neighbour of 'K+ CN' assumed Cl"
+Cl,K,LiCl-KCl eutectic,773,Q14 box 36 Li/25 K/64 Cl (+1 Ln),2.75,,,derived,D,Q14,"N(Cl-K) = N(K-Cl)*N_K/N_Cl, N(K-Cl)=7.03; inherits Q14 caveats: R_min not numbered; neighbour of 'K+ CN' assumed Cl"
+Cl,Li+K,LiCl-KCl eutectic,773,Q14 box 36 Li/25 K/64 Cl (+1 Ln),5.09,,,derived,D,Q14,sum of the two rows above (Ln neighbours excluded); ideal Ln-free 59.2:40.8 melt would give 2.47 + 2.87 = 5.34
+Sr,O,dilute in LiCl-KCl (and LiCl-LiF),,SrO in LiCl-KCl,1,not given,,EXAFS,"A,M",Q15,study also used Raman and DFT; Sr-centred; N(O-Sr) not derivable; SrOCl observed (298-923 K); 'more stable' from DFT/thermodynamic estimates
+Li,O,chloride melt with dissolved oxide,,,unavailable,,,,-,P13/P15,direct sources not readable (ScienceDirect)
+O,Li,chloride melt with dissolved oxide,,,unavailable,,,,-,P13/P15,direct sources not readable (ScienceDirect)
+Ca,O,chloride melt with dissolved oxide,,,unavailable,,,,-,Q16/Q17,speciation only: Ca4OCl6 below 1104 K; Ca2+ layer around O2-; no number
+O,Ca,chloride melt with dissolved oxide,,,unavailable,,,,-,Q16/Q17,speciation only; no number
+Ba,O,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+O,Ba,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+Na,O,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+O,Na,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+K,O,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+O,K,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+Mg,O,chloride melt with dissolved oxide,,,unavailable,,,,-,none found,
+O,Sr,chloride melt with dissolved oxide,,,unavailable,,,,-,Q15,Sr-centred value only (Sr-O = 1)
+Li,Cl,LiCl-KCl eutectic,,LiCl-KCl eutectic,~4,,,X-ray diffraction + MD,"C,S",-,quoted by a citing paper; cited DOI 10.1023/a:1023310006090 (to confirm)
+Y,Cl,15 mol% YCl3 in LiCl-KCl (trivalent reference),973,15 mol% YCl3 in LiCl-KCl,6.0,0.3,none (first-shell fit),EXAFS (Y K-edge),"B,M",Q19,"fitted R = 2.68 A; 30 and 50 mol%: 6.1 +/- 0.4, 5.9 +/- 0.4; not a target species"
+M3+,Cl,dilute M3+ in alkali chlorides (trivalent reference),,,"6 (""overwhelmingly likely"")",,,review of simulations,"B,S",Q28,qualitative; not a target species
+Cs,Cl,dilute in LiCl-KCl or NaCl,,,unavailable,,,,-,none found,no numeric value in any readable source
+Ba,Cl,dilute in LiCl-KCl or NaCl,,,unavailable,,,,-,none found,no numeric value in any readable source
+Na,Cl,dilute in LiCl-KCl,,,unavailable,,,,-,none found,no numeric value in any readable source
+Sr,Cl,dilute in LiCl-KCl without oxide,,,unavailable,,,,-,none found,no numeric value in any readable source
+M,M,pure MgCl2/CaCl2/SrCl2/BaCl2,,,unavailable,,,,-,none found,no numeric value in any readable source
+Cl,Cl,pure MgCl2/CaCl2/SrCl2/BaCl2,,,unavailable,,,,-,none found,no numeric value in any readable source
+Li/K,Li/K,LiCl-KCl eutectic,,,unavailable,,,,-,none found,no numeric value in any readable source
+Cl,Cl,LiCl-KCl eutectic,,,unavailable,,,,-,none found,no numeric value in any readable source
+Ba,Cl,pure melt (working value),1298,BaCl2,7,1,,estimate,E,P22/P23/Q27,E: brackets the unresolved 6.4 (P23) vs 7.7 (P22) and the qualitative 8 (Q27); not an average
+Cl,Ba,pure melt (working value),1298,BaCl2,3.5,0.5,,estimate,E,-,N(Ba-Cl)/2
+Sr,Cl,"dilute in LiCl-KCl, 773-823 K (working value)",773-823,dilute Sr2+ in LiCl-KCl,6,1,,estimate,E,P5/Q15/P19/Q13,"E: brackets P5 (5.8-5.9 in molten NaCl), Q15 (6 Cl with 1 O), P19 (6-7); Q13 trend favours slightly higher CN at lower T"
+Sr,O(framework),"dehydrated Sr/Tl-A, 6-ring",294,Sr1.6Tl8.8-A and Sr5.45Tl1.1-A,3,,n/a (crystal structure),single-crystal XRD,"A,M",Q25,"all Sr at 6-rings, 3-coordinate to O3; Sr-O3 2.21(2) and 2.31(1) A"
+Ba,O(framework),dehydrated Ba-A,,Ba-A series,3,,,single-crystal XRD,"A,M",Q26,abstract: 3-coordinate Ba2+ forms on dehydration; may disrupt framework
+Ag,O(framework),"K9(K4Br)0.75Ag4Br4-A, 6-ring",294,,3,,n/a (crystal structure),single-crystal XRD,"A,M",R28,Ag-O 2.52(3) A; each Ag also bonded within Ag4Br4
+Br,K,K4Br3+ unit in alpha-cage,294,K9(K4Br)0.75Ag4Br4-A,4,,,single-crystal XRD,"A,M",R28,"by unit formula; Br opposite a 4-ring, held by 2 8-ring + 2 6-ring K"
+Br,K,Ag4Br4 cluster in beta-cage,294,K9(K4Br)0.75Ag4Br4-A,1,,n/a (crystal structure),single-crystal XRD,"A,M",R28,Br-K 3.00(4) A; each cluster Br coordinates one K+ through a 6-ring
+Cl,K,K3Cl2+ unit in alpha-cage,294,R27 composition,3,,,single-crystal XRD,"A,M",R27,by unit formula
+Cl,K,Ag4Cl4 cluster in beta-cage,294,R27 composition,1,,n/a (crystal structure),single-crystal XRD,"A,M",R27,"Cl-K 2.70(3) A, through a 6-ring"
+I,K,K4I3+ unit in alpha-cage,,K9(K4I)(Ag4I4)0.5-A,4,,,single-crystal XRD,"A,M",R34,by unit formula
+Tl,Cl,Tl7Cl6+ in alpha-cage,,(WCl)0.6(Tl7Cl6)0.5Tl8.5-A,6,,,single-crystal XRD,"A,M",R30,"central Tl at the alpha-cage centre, octahedrally coordinated by 6 Cl"
+Cl,Tl,Tl7Cl6+ in alpha-cage,,(WCl)0.6(Tl7Cl6)0.5Tl8.5-A,2,,,single-crystal XRD,"A,M",R30,"1 central Tl + 1 8-ring Tl, by the described topology"

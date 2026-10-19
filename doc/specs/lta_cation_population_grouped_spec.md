@@ -14,11 +14,11 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the ratified sparse chloride extension is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** supported Group-I/II species, exact integer populations, formal charges, and charge neutrality are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the ratified sparse chloride extension (since 7.16.0 the legacy `sparse-v715` mode) is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`; the v7.16 cage-salt model is owned by `doc/specs/v7_16_molten_salt_occlusion_extension.md` and `doc/specs/v7_16_cage_salt_numerical_method.md` (see the v7.16 note at the end). This document imports those semantics and does not redefine them.
 
 # 1. Purpose
 
-`lta_cation_population_grouped.py` is the core module for grouped-site Group-I/II cation population and bounded v7.15 sparse chloride-guest assembly from an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, role-aware allocation/charge validation, dry volume validation, random placement, canonical-template cage selection/collision checks, grouped-site dry symmetry deduplication, reports, and structure serialization.
+`lta_cation_population_grouped.py` is the core module for grouped-site Group-I/II cation population and occlusion assembly (the v7.16 cage-salt model by default, the v7.15 sparse chloride model as a legacy mode) from an LTA CIF template. It owns input parsing, symmetry expansion, grouping positional variants, role-aware allocation/charge validation, dry volume validation, random placement, canonical-template cage selection/collision checks, grouped-site dry symmetry deduplication, reports, and structure serialization.
 
 The module does **not** perform energetic optimization, structural relaxation, or equilibrium sampling. Its CLI delegates the certified maximum-symmetry workflow to `lta_cation_maxsym_io.py`; the subgroup, optimizer, and symmetry-coupled smoothing algorithms remain outside this legacy population module.
 
@@ -632,3 +632,40 @@ Occlusion mode is fail-closed to the bound canonical primitive template and its
 validated alpha/beta center orbits. One requested cage in a two-cage family is
 selected by maximum minimum periodic distance to final cations, with canonical
 cage-ID tie breaking. Cl is serialized after all supported Group-I/II cations.
+
+## v7.16 cage-salt occlusion extension
+
+Authorities: D1 `v7_16_molten_salt_occlusion_extension.md` (r8), D2
+`v7_16_cage_salt_numerical_method.md` (r3) and the D3 "v7.16 architecture
+delta" (r3). This note records the D4 contract of this module only.
+
+- `resolve_occlusion_mode(occlusion_model, *, legacy arguments, cage_salt)`
+  is the only interpreter of the occlusion sentinels and returns
+  `OcclusionDry`, `OcclusionLegacySparse` or `OcclusionCageSalt`. Legacy
+  arguments default to `None` and need `occlusion_model="sparse-v715"`.
+- `resolve_volume_factor(value, mode)` maps `None` to 1.0 (dry, legacy,
+  maximum symmetry, unique batches) or to f_V(n_bar) (cage salt).
+- `generate_lta_cation_structure_from_specs(..., occlusion_model="cage-salt",
+  cage_salt=CageSaltRequest | None, salt_max_starts=20, volume_factor=None)`
+  validates up front (`validate_cage_salt_request`), populates at factor 1
+  with the salt deferred, then calls `finalize_cage_salt`. The private
+  `_defer_cage_salt` and `_skip_cage_salt_validation` are for the smoothing
+  entry point.
+- `finalize_cage_salt(result, request, *, volume_factor, seed,
+  salt_max_starts, density_settings)` rebalances, scales, computes floors,
+  builds, assembles and verifies V1-V6 on the assembled structure. It raises
+  `lta_cage_salt.CageSaltConstructionError` (carrying the record) on failure.
+- `assemble_structure(...) -> (Structure, List[AtomMeta])` is the only
+  assembler; `build_p1_structure` returns its structure. `output_site_order`
+  owns the written order.
+- `PopulationResult` gains `cage_salt_ions`, `cage_salt_record` and
+  `cage_salt_pending`. With salt present, chloride counts, `cation_counts`
+  and the excess charge include the salt. `write()` refuses a pending result,
+  rejects `significant_figures < 8` in cage-salt mode, and writes
+  `<path>.salt.json` atomically before the structure.
+- Every cage-salt ion is kept at least T_min = 3.0 Å from framework Si/Al
+  (D1 r8 S-13); V2 reports it as the `salt-T` slack class.
+- CLI exit codes: 0 on success; 2 for input or validation errors (nothing
+  written); 1 for a construction failure. On failure only the failure
+  `.salt.json` and any `--report` text are written; an existing structure file
+  is left untouched.

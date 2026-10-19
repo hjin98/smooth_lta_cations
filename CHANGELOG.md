@@ -1,5 +1,49 @@
 # Changelog
 
+## v7.16.0 - cage-salt (molten-salt) occlusion
+
+- Added the per-cage, variable-loading cage-salt model as the default
+  `--occlusion-model cage-salt`: 0-12 Cl per alpha-cage, 0-1 per beta-cage,
+  cations from Li/Na/K/Rb/Cs/Sr/Ba, set per cage type or per cage.
+- Pair minima, first-shell boundaries and coordination come from the bound
+  evidence CSV (SHA-256 checked); coordination floors follow rule B
+  (per ion, a = 0.4) with the density reduction C = T_bulk min(1, N_Cl/n_melt)
+  and an 800 K melt effective volume with a 0.3 Angstrom interface range.
+- Added exact cage-charge rebalancing of salt counterions (`--salt-counterion-n4/6/8`).
+- Added the modelled lattice contraction f_V(n_bar) as the cage-salt default
+  volume factor; `--volume-factor` overrides it.
+- Added penalty-relaxation construction with restarts (`--salt-max-starts`) and
+  exact float64 verification V1-V6 on the final assembled structure.
+- Added `<output>.salt.json` (run record plus per-atom role sidecar, structure
+  SHA-256, atomic writes) and a fail-closed failure record.
+- Added `--attempt-seed` to the smoothing CLI.
+- The v7.15 sparse model is kept as `--occlusion-model sparse-v715`; its flags
+  are rejected without that selector. Dry and legacy outputs are byte-identical
+  to v7.15.0 (68 golden comparisons).
+- Every cage-salt ion is kept at least 3.0 Angstrom from framework Si/Al
+  (D1 r8, stakeholder decision S-13), after an exploratory campaign found small
+  cations in framework wall pockets.
+- The `.salt.json` record grew during the 7.16.0 cycle under `schema_version` 1.
+  Before the closeout fixes, the salt-T histogram key was
+  `d_minus_r_cut/salt-T`; it is now `d_minus_T_min/salt-T`. The `traceback`
+  field and the relocation charge fields are new. Records from the earlier
+  development commits are therefore not fully comparable.
+- Added SciPy as a declared dependency (L-BFGS-B, KD-tree); dry and legacy runs
+  do not import the cage-salt modules.
+- Authorities: D1 `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r8),
+  D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r3), D3 "v7.16
+  architecture delta" (r3, with a post-D4 reconciliation note).
+- Qualification: the S-12 census retained rule B (run 5, 90/90 on the shipped
+  code). The independent reviews were:
+  - D4 review and delta review, covering code to `fedfc2d`;
+  - a focused D1 r8 / D2 r3 amendment review;
+  - the closeout integration review in two parts, covering `e4e42d8`, which
+    includes the S-13 code. Its findings are fixed in `2165d33`, `6164d80`,
+    `4e42bad` and `a0bf2df`, plus a final small pass after the closeout delta
+    check.
+
+  See `qualification/v716/CLOSEOUT.md`.
+
 ## v7.15.0 - sparse chloride-occlusion initialization
 
 - Added sparse alpha/beta Cl cage guests for the canonical Al24Si24O96
