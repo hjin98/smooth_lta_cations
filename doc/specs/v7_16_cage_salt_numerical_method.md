@@ -717,9 +717,9 @@ S-13. It adds the T_min term to E_W, the T_min condition to insertion, the
 salt–T clause to V2, and the salt–T slack class to the report. Nothing else
 changes. Relocation is unaffected because it moves ring cations, to which
 T_min does not apply. An independent focused review is recorded in D1 §17.
-- The S-12 census recorded under r2 is void for r3 (the code changed). It is
-  re-run under a new freeze before D4 acceptance (§9: "any re-tuning re-runs
-  the whole census").
+- The S-12 census recorded under r2 is void for r3 (the code changed). It was
+  re-run under new freezes: run 3, then run 4 on the closeout code, both 90/90,
+  all on start 1. Rule B is retained (`qualification/v716/census-record.md`).
 - The human acknowledgement of the τ_w and δ_b margins (§12) is taken to
   cover the T_min clause. It uses the same margins on written atoms with the
   same quantization; the stakeholder may object.
