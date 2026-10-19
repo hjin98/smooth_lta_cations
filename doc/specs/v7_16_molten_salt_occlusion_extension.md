@@ -20,11 +20,14 @@ header-includes:
 salt-ion–T minimum (§6). It was chosen by the stakeholder on 2026-10-19 after
 finding F-E1-1 (§13, T23). The authoring session (an AI agent) records the
 ratification and the decision; it does not supply them.
-- **r8 status.** The S-13 value is stakeholder-set. One r8 item is an agent
-  proposal pending stakeholder acknowledgement: V_eff stays O-defined (§7, §15).
-- **Census.** The S-12 census recorded under r7 (90/90, rule B retained) is void
-  for r8, because the frozen code changed. Rule B is pending re-qualification
-  by a re-frozen census (§7 S-12, D2 §9). Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
+- **r8 status.** The S-13 value is stakeholder-set. Keeping V_eff O-defined
+  (§7) was an agent proposal; the stakeholder acknowledged it on 2026-10-19
+  ("Keep V_eff O-defined, I acknowledge.", S-14, §15).
+- **Census.** The S-12 census recorded under r7 is void for r8, because the
+  frozen code changed. Rule B was re-qualified by census run 3 on the r8 code
+  (90/90; `qualification/v716/census-record.md`).
+
+Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
 SSDP 7.2.1, by Claude Code session
 https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
 
@@ -467,7 +470,7 @@ n_melt range(c)  = [ n_melt at d_wall(c) + 0.3 Å , n_melt at d_wall(c) - 0.3 Å
   O-distance d_wall alone.
   - Under r7: Si/Al lie inside the O shell, so excluding them at a small T
     radius changes V_eff by 4 Å³ or less (review 3).
-  - Under r8 (agent proposal, pending stakeholder acknowledgement): the S-13
+  - Under r8 (agent proposal, stakeholder-acknowledged 2026-10-19, S-14): the S-13
     T_min of §6 constrains ion *centres* only. V_eff measures the volume the
     melt occupies, ion bodies included.
   - Applying a 3.0 Å centre exclusion to V_eff would remove about 40 % of the
@@ -1013,10 +1016,13 @@ certainty.
   minimum of 3.0 Å from any Si/Al for every salt cation and Cl. Per-cation data
   may replace it later (§6).
 
-**Open.**
-- Stakeholder acknowledgement of the agent proposal to keep V_eff O-defined
-  under S-13 (§7).
-- Re-qualification of rule B by the re-frozen S-12 census.
+- **S-14.** The stakeholder acknowledged the agent proposal to keep V_eff
+  defined by the O distance alone under S-13 (§7): "Keep V_eff O-defined, I
+  acknowledge." (chat, 2026-10-19).
+
+**Re-qualification.** Census run 3 on the r8 code retained rule B (90/90).
+
+**Open.** None.
 
 ## 16. D1 → D2 hand-off (on ratification)
 
