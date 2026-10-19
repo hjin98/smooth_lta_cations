@@ -33,18 +33,20 @@ https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
 
 - **What it governs.** The scientific meaning of the v7.16 cage-salt model,
   for the D2 method, D3 design and D4 implementation that follow.
-- **What it does not do.** It does not change shipped software behaviour.
-  Until v7.16 is implemented and qualified, the released generator still
-  behaves as v7.15.0. It does not self-qualify any implementation either:
-  independent post-implementation review remains required.
+- **What it does not do.** It does not itself change software behaviour; the
+  implementation (package 7.16.0) concretizes it. It does not self-qualify any
+  implementation either: qualification is the S-12 census plus the
+  independent reviews and the closeout record
+  (`qualification/v716/CLOSEOUT.md`).
 - **History.** It was revised r1-r7 through three independent falsification
   reviews (§17), stakeholder decisions S-1 to S-12 (§15), and r8 for S-13.
 - **Proposed items.** Items marked **(proposed)** were agent-chosen defaults.
   They are binding as ratified, and later changes go through this D1 owner.
-- **Workplan decisions.** Stakeholder decisions D-1 to D-25 are recorded in
+- **Workplan decisions.** Stakeholder decisions D-1 to D-27 are recorded in
   the workplan §2; this document is their ratified D1 form.
-- **Sole remaining gate.** The S-12 coordination-rule fallback is decided at
-  qualification against the stated criterion.
+- **S-12 gate (decided).** The coordination-rule fallback was decided at
+  qualification against the stated criterion: rule B is retained
+  (`qualification/v716/census-record.md`).
 
 **Predecessor.** `doc/specs/v7_15_chloride_occlusion_extension.md`
 (accepted-current, human-ratified) at base commit
@@ -761,8 +763,10 @@ remain rejected when any occlusion is active (v7.15):
 ## 12. Feasibility evidence (agent probes; exploratory, not acceptance evidence)
 
 **Evidence predates S-13.** P5-P8 used 0.85 × Shannon sums for Si/Al, a
-radius formula outside D-3. E1 and the r7 census used no T minimum. None of
-them tests the r8 T_min; the re-frozen census does.
+radius formula outside D-3. The first E1 campaign and the r7 census used no T
+minimum. The r8 T_min is tested by the E1 rerun on r8 code
+(`results/e1_cli_campaign_r8.jsonl`: 54/54 as expected, minimum salt–T 3.01 Å)
+and by the re-frozen census.
 
 Scripts: `workplans/v716-probes/`. P5 and P6 used the E-pair r_cut and
 r_min1 columns exactly, the D-12 relocation, the fixture
@@ -833,7 +837,7 @@ minimum, so it is an existence check only. |
     (Cs/Sr/Ba) shaping;
   - P6 and P7 were recounted on the Li and K species only.
 
-## 13. Tension assessment (agent-asserted, proposed until ratification)
+## 13. Tension assessment (agent-asserted; ratified with r7, T23 resolved by S-13)
 
 Searched: `doc/specs`, `doc/archs`, `workplans/` (including archive), the
 `qualification/` records, the repository's GitHub issues (none exist) and the
@@ -843,7 +847,7 @@ recorded tension against v7.13 was found.
 
 | ID | Tension | Assessment for this revision |
 |---|---|---|
-| T1 | Crowding at 10-12 Cl/α under rock-salt cut-offs | **Inapplicable to this revision.** The rock-salt bases are replaced by the E-pair onset r_cut, and P5 is feasible at 12/α. Under r8 (T_min), exploratory builds at 12/α still pass on start 1; the re-frozen S-12 census decides. Reopen if r_cut is recalibrated upward (E-pair §6.1, Zeidler NaCl partials). |
+| T1 | Crowding at 10-12 Cl/α under rock-salt cut-offs | **Inapplicable to this revision.** The rock-salt bases are replaced by the E-pair onset r_cut, and P5 is feasible at 12/α. Under r8 (T_min), the re-frozen S-12 census passed every 12/α request on start 1. Reopen if r_cut is recalibrated upward (E-pair §6.1, Zeidler NaCl partials). |
 | T2 | Unsourced melt densities | **Superseded by T19.** The E-occ §5 handbook densities are not used. The §7 density reference uses the cited Janz correlations. |
 | T3 | No ion–framework or dopant pair data | **Resolved by S-1 with an approximation.** Rb, Sr and Ba pairs are supplied, mostly grade E. Ion–framework minima use the free-oxide rows (grade E). The salt-ion–T minimum is S-13 (T23). Reopen if framework-O or M–T data arrive. |
 | T4 | R10/R14 author lists vs v7.15 citations | **Resolved.** E-occ rev 2.1 lists R14 as Simpson & Gougar and R10 as Lewis, Fischer, Smith, matching v7.15. |
@@ -1028,7 +1032,7 @@ certainty.
 
 D2 must preserve:
 - §4 exact inventory and invariants;
-- §6 hard minima with exact final verification (no tolerance below r_cut);
+- §6 hard minima with exact final verification (no tolerance below r_cut or, from r8, T_min);
 - §7 anchoring (enforced explicitly; see P8);
 - the S-11 per-ion rule max(1, ⌈a·C(ρ)⌉) ≤ N_i ≤ U_M for every α-cage
   `cage_salt` cation, with a as a governed parameter (default 0.4);

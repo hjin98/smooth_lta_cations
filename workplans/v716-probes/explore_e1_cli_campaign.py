@@ -173,7 +173,9 @@ def analyse(path, rec):
 def main():
     outdir = Path(sys.argv[1]).resolve()
     outdir.mkdir(parents=True, exist_ok=True)
-    log = Path(os.environ.get("E1_LOG", REPO / "workplans" / "v716-probes" / "results" / "e1_cli_campaign.jsonl"))
+    if "E1_LOG" not in os.environ:
+        raise SystemExit("set E1_LOG to the output .jsonl path (results/ holds the _r7 and _r8 logs)")
+    log = Path(os.environ["E1_LOG"])
     log.write_text("")
     with ThreadPoolExecutor(max_workers=4) as pool:
         for row in pool.map(lambda c: run_case(c, outdir), CASES):

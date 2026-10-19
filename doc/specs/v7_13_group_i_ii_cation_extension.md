@@ -23,7 +23,7 @@ For current releases:
 - this document owns the supported cation set, formal charges, exact framework-compensating population semantics, and independent +24 framework-charge invariant;
 - `v7_14_group_i_ii_volume_reference_extension.md` owns the dry-volume reference model and empirical endpoint bindings;
 - `v7_15_chloride_occlusion_extension.md` owns the separate occlusion-counterion/Cl charge invariant and sparse cage-guest semantics (now the v7.16 legacy model);
-- `v7_16_molten_salt_occlusion_extension.md` (accepted-current D1, 2026-10-17; not yet implemented) owns the cage-salt occlusion model. When that model is active, every cation in the structure must belong to its pair-data species set S = {Li, Na, K, Rb, Cs, Sr, Ba}. That restricts, without redefining, the supported set and charges owned here;
+- `v7_16_molten_salt_occlusion_extension.md` (accepted-current D1, r7 2026-10-17, r8 2026-10-19; implemented in package 7.16.0) owns the cage-salt occlusion model. When that model is active, every cation in the structure must belong to its pair-data species set S = {Li, Na, K, Rb, Cs, Sr, Ba}. That restricts, without redefining, the supported set and charges owned here;
 - module specifications own their public software behavior and import these chemistry/volume semantics rather than redefining them;
 - the architecture manual explains how the modules compose these authorities.
 

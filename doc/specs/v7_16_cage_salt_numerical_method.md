@@ -35,8 +35,9 @@ History of the draft:
   SERIOUS CHALLENGES and 15 findings.
 - **r2 folds in D2 review 2,** which raised no SERIOUS CHALLENGE and eight
   new findings, N1-N8 (§13).
-- **Status of choices:** every parameter value is an agent-proposed D2
-  default (§10) until this document is accepted.
+- **Status of choices:** the §10 values were agent-proposed D2 defaults; with
+  acceptance (r2, 2026-10-18) they are binding. T_min (r3) is stakeholder-set
+  (D1 S-13).
 - **Acceptance gate:** independent review, then human acknowledgement of the
   output-changing choices (§12).
 
@@ -59,8 +60,8 @@ These D1 invariants hold throughout:
 - **Fail-closed.** No structure is written unless every check passes.
 - **No sampling claim.** No sampling law is claimed (D-9).
 
-**D2 readings of D1. The D1 owner must confirm both before D2 is
-accepted.**
+**D2 readings of D1. Both were confirmed by the D1 owner on 2026-10-18
+(D1 §3) before D2 was accepted.**
 - **(R-1) Cage membership applies to `cage_salt` ions only.** D1 §4 requires
   every "role, cage and species count" to equal its input. Ring roles have
   per-family inputs, not per-cage inputs, so for them the exact check is the
@@ -270,6 +271,19 @@ with a surplus:
 - its target site is drawn uniformly from that class's empty sites with R_q,
   and its variant uniformly from that site's variants with R_q, as v7.15
   placement does.
+
+**Cross-group order (r3 clarification).** Groups of one family share the
+same physical sites, so the order across groups matters. Realization runs
+per family in two phases:
+1. every surplus counterion of every group in the family vacates its site;
+2. deficits are filled in canonical (group, class) order, groups by charge,
+   with the R_q draws above.
+
+Without phase 1, a deficit class could still be held by another group's
+leaving ions, and the draw would have no empty site (review finding B1).
+For single-group families the result is identical to the within-group rule.
+This clarification is agent-adopted (closeout 2026-10-19) to record the D4
+realization; the stakeholder may object.
 
 The report keeps only the chosen vector, its objective, and the next 5 best
 vectors.
@@ -606,7 +620,7 @@ vectorisation, CLI and schema, errors and report format.
     v7.15's scale-then-smooth;
   - the S-12 census and decision rule;
   - the added report fields.
-- **D1 owner confirmations required.**
+- **D1 owner confirmations (given 2026-10-18).**
   - R-1 narrows D1 §3's tie rule to `cage_salt` ions.
   - R-2: window weights are fixed per physical site.
   - The D1 §16 deviation: the CN miss probability is bounded only by the

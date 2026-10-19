@@ -1,6 +1,6 @@
 ---
 title: "Grouped-Site LTA Cation Generator: Architecture Manual"
-author: "Reverse-engineered and reconciled through package v7.15.0 (MS0-MS7 plus bounded sparse chloride occlusion)"
+author: "Reverse-engineered and reconciled through package v7.15.0 (MS0-MS7 plus bounded sparse chloride occlusion); v7.16 cage-salt delta at the end"
 date: "2026-10-05"
 toc: true
 toc-depth: 3
@@ -15,11 +15,11 @@ header-includes:
     \setlength{\emergencystretch}{3em}
 ---
 
-> **Current authority routing:** supported Group-I/II framework-compensation species, exact integer populations, formal charges, and the +24 framework invariant are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the human-ratified sparse chloride/occlusion-counterion extension is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`. This document imports those semantics and does not redefine them.
+> **Current authority routing:** supported Group-I/II framework-compensation species, exact integer populations, formal charges, and the +24 framework invariant are owned by `doc/specs/v7_13_group_i_ii_cation_extension.md`; the Al24Si24O96 charge-equivalent dry-volume model and empirical endpoint provenance are owned by `doc/specs/v7_14_group_i_ii_volume_reference_extension.md`; the human-ratified sparse chloride/occlusion-counterion extension (the v7.16 legacy model `sparse-v715`) is owned by `doc/specs/v7_15_chloride_occlusion_extension.md`; the v7.16 cage-salt model is owned by `doc/specs/v7_16_molten_salt_occlusion_extension.md` (D1 r8) and `doc/specs/v7_16_cage_salt_numerical_method.md` (D2 r3), with its architecture in the "v7.16 architecture delta" section at the end of this manual. This document imports those semantics and does not redefine them.
 
 # 1. Purpose and status
 
-This package generates Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and cation-template coordinates. It supports the qualified dry Group-I/II cation path and, in random mode only, the bounded v7.15 sparse chloride-occlusion initialization extension. Nearby split or off-center template coordinates are treated as positional variants of one physical ring site.
+This package generates Al24Si24O96 LTA initial structures from a symmetry-reduced CIF containing framework atoms and cation-template coordinates. It supports the qualified dry Group-I/II cation path and, in random mode only, the v7.16 cage-salt occlusion model (default) and the v7.15 sparse chloride-occlusion model (`--occlusion-model sparse-v715`). Nearby split or off-center template coordinates are treated as positional variants of one physical ring site.
 
 The current implementation provides:
 
@@ -1641,8 +1641,8 @@ implicit property of v7.15.
   fourth found no SERIOUS CHALLENGE and stated that a diff check of its
   minor items F1-F6 suffices. The authoring agent performed that diff check
   after the fixes.
-- **Current for:** D4 implementation. The shipped behaviour stays v7.15.0
-  until D4 is complete.
+- **Current for:** the implemented package 7.16.0 (D4 complete; see the
+  post-D4 reconciliation note at the end of this delta).
 - **Human gate:** none required. The public CLI names were delegated by the
   stakeholder (D1 O7 under S-3), and the stakeholder may still object.
 - **r3 folds in D3 delta check 3:** No-Pass, no SERIOUS CHALLENGE; major N9,
@@ -1651,13 +1651,13 @@ implicit property of v7.15.
   N1-N3 and minors N4-N8, plus the partial closures of SC-3, M3, M4, M6, M8
   and M10.
 - **Parents:** the accepted D1
-  `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7) and the accepted
-  D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r2, whose §11 is the
-  hand-off).
+  `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7 at acceptance; now
+  r8) and the accepted D2 `doc/specs/v7_16_cage_salt_numerical_method.md` (r2
+  at acceptance, whose §11 is the hand-off; now r3).
 - **r1 folds in independent D3 review 1:** No-Pass, with SERIOUS CHALLENGES
   SC-1 to SC-3, major findings M1-M10 and minor findings m1-m9.
-- **Acceptance:** current after a focused re-review passes, before any D4
-  code change. Until v7.16 is implemented, the shipped generator is v7.15.0.
+- **Acceptance:** current after a focused re-review passed, before any D4
+  code change (accepted 2026-10-18 at `7ce7ec3`).
 
 ### Component ownership
 
@@ -1980,3 +1980,62 @@ verification passes) and its `.salt.json`.
 - A writer that cannot meet τ_w.
 - Any break in dry or legacy byte identity.
 - A value in `D1_BOUND` disagreeing with D1.
+
+### Post-D4 reconciliation note (2026-10-19, AI agent; closeout)
+
+This note records how the implementation (package 7.16.0) relates to this r3
+delta after D4, D1 r8 and D2 r3. No item changes component ownership,
+interfaces, state, dependency direction or the reopen triggers, so none
+reopens D3.
+
+**Equivalent reconciliation:**
+- **Parents.** The parents are now D1 r8 (S-13 T_min = 3.0 Å to every
+  framework Si/Al; S-14 V_eff stays O-defined) and D2 r3. T_min is a hard
+  minimum like the others:
+  - it lives in `D1_BOUND["T_MIN"]`;
+  - it enters E_W and insertion (build module) and V2 (domain module);
+  - it appears in the record as the `salt-T` slack class, `parameters.t_min`
+    and the `d_minus_T_min/salt-T` histogram.
+- **`D1_BOUND` contents.** Beyond the list above it holds T_MIN,
+  ALPHA_CL_CAP, D_WALL_HALF_RANGE and DOPANT_FLAG_FRACTION, each with a D1
+  locator and literal. It also holds the molar masses M_Li, M_K and M_Cl,
+  whose literals are in the evidence file E-occ §5 rather than D1. The literal
+  test checks each entry against its own named source.
+- **D2 constants.** Each now carries its D2 section in a comment.
+- **Streams.** `derive_streams(seed)` is realized as `rebalance_stream(seed)`
+  (R_q) and `start_stream(seed, k)` (R_s,k), with the same tags and OS entropy
+  for seed None.
+- **Record fields added within the "canonical record" clause:**
+  - rebalancing: next-best vectors, q before and after, `blocking_sites`
+    (the framework sites of the counterion families);
+  - floors: per-α C over the d_wall range, `anchoring_binding`,
+    `floor_threshold_distance`;
+  - histograms: `N_minus_L` with `floor_binding`, `ring_ring_slack_min`;
+  - starts: per-round membership margin and dead-zone distance;
+  - relocations: `to_ion_id` and the cage charge before and after each move;
+  - failures: `traceback` on internal errors.
+
+  `schema_version` stays 1.
+- **Request validation.** Cage and ring keys are checked when a
+  `CageSaltRequest` is constructed. Counts must be non-negative integers
+  (`validate_request`), so API inputs get the same domain as the CLI SPEC
+  parser.
+- **V1 ring counts.** V1 compares ring counts per (role, family, species) with
+  the input allocations (D1 §4), not with the realized placement.
+
+**Recorded drift (D3 text is narrower than the implementation; accepted as
+D4 detail):**
+- **Failure table.** Any unexpected exception inside `finalize_cage_salt`
+  (steps 4-8) becomes `CageSaltConstructionError` with the message prefix
+  "internal construction error" and the traceback in the record. The CLI then
+  writes the failure sidecar and exits 1. This also covers a
+  `CageSaltInputError` raised by the in-finalize site re-check, which is
+  unreachable after up-front validation.
+- **Linkage.** A ring cation's `ion_id` is `R<site_id>`, so it changes when
+  the cation moves. Each rebalancing and relocation move records both `ion`
+  (from-site id) and `to_ion_id` (final id) so the sidecar can be linked.
+- **Resources.** The G = 192 V_eff field peaks at about 1.7 GB per process
+  (measured 1685 MB on the README example), as noted in the README.
+- **D2 owner item, not D3.** The rebalancing realization runs in two phases
+  per ring family: all surplus counterions vacate first, then deficits are
+  filled in canonical (group, class) order. D2 r3 §5 now states this order.

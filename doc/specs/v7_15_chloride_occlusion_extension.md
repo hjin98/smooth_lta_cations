@@ -225,5 +225,6 @@ one:
 
 This document's charge-partition invariants (generalised in v7.16 §4), Al24
 scope, template gating and maximum-symmetry and unique-batch rejection
-continue to apply. Until v7.16 is implemented, the shipped generator behaves
-as specified here.
+continue to apply. Since package 7.16.0 this model ships as the explicitly
+selected legacy mode `--occlusion-model sparse-v715`, with output byte-identical
+to v7.15.0.

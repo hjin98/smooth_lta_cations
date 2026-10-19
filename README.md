@@ -49,10 +49,12 @@ Module specifications:
 - `doc/specs/lta_cation_performance_optimization_spec.md` and `.pdf`
 - `doc/specs/v7_13_group_i_ii_cation_extension.md` and `.pdf` - accepted-current framework-compensation chemistry/charge authority for v7.15; the historical filename records its introduction in v7.13.
 - `doc/specs/v7_14_group_i_ii_volume_reference_extension.md` and `.pdf` - accepted-current scientific/numerical authority for the Al24Si24O96 dry-volume model, empirical endpoints, classifications, and source transformations.
-- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization (the legacy model once v7.16 is implemented).
-- `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified (2026-10-17) D1 scientific contract for the variable-loading cage-salt occlusion model. Its PDF is produced at release qualification.
-- `doc/specs/v7_16_cage_salt_numerical_method.md` - accepted-current D2 numerical method for the cage-salt build (charge rebalancing, effective volume, penalty relaxation, exact verification). The D3 design is the "v7.16 architecture delta" section of the architecture manual; the D4 workplan is `workplans/V7.16-D4-IMPLEMENTATION.md`.
+- `doc/specs/v7_15_chloride_occlusion_extension.md` and `.pdf` - accepted-current, human-ratified scientific/numerical contract for bounded sparse chloride-occlusion initialization (since 7.16.0 the legacy model, `--occlusion-model sparse-v715`).
+- `doc/specs/v7_16_molten_salt_occlusion_extension.md` - accepted-current, human-ratified D1 scientific contract for the variable-loading cage-salt occlusion model (r7 ratified 2026-10-17; r8 adds stakeholder decisions S-13, the 3.0 Angstrom salt-ion-Si/Al minimum, and S-14, 2026-10-19). No PDF yet (see below).
+- `doc/specs/v7_16_cage_salt_numerical_method.md` - accepted-current D2 (r3) numerical method for the cage-salt build (charge rebalancing, effective volume, penalty relaxation, exact verification). The D3 design is the "v7.16 architecture delta" section of the architecture manual; the D4 workplan is `workplans/V7.16-D4-IMPLEMENTATION.md`.
 - `doc/evidence/` - stakeholder-supplied, non-authoritative evidence package (rev 3) for v7.16: occlusion literature, molten-salt pair distances, coordination numbers and lattice contraction, with CSVs and generator scripts.
+
+**PDF status (v7.16).** The Markdown files are canonical. The v7.16 D1 and D2 have no PDF yet. These PDFs predate v7.16 edits to their Markdown sources and are stale until re-rendered: the architecture manual, `lta_cation_population_grouped_spec`, `generate_smooth_lta_cations_grouped_spec`, and the v7.13, v7.14 and v7.15 extensions. Rendering needs a LaTeX engine; the residual is recorded in `qualification/v716/CLOSEOUT.md`.
 
 The architecture manual describes the implemented MS0-MS7 path, its mathematical guarantees, algorithmic provenance, and the distinction between grouped occupation symmetry, exact atomic-coordinate symmetry, and locally optimized density under a preserved subgroup.
 
@@ -77,14 +79,14 @@ The current source hierarchy is intentionally explicit:
 - **Architecture authority:** `doc/archs/lta_cation_generator_architecture.md`.
 - **Stable module/API contracts:** the corresponding files under `doc/specs/`.
 - **Executable concretization:** the Python modules and native tests.
-- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md` and `qualification/v715/`; these records evidence the authorities but do not redefine them.
+- **Qualification evidence:** release validation/qualification records such as `V7_14_2_QUALIFICATION.md`, `qualification/v715/` and `qualification/v716/` (S-12 census, closeout); these records evidence the authorities but do not redefine them.
 
 This separation keeps current scientific meaning reconstructible without relying on repair chronology or hidden review context.
 
 
 ## Supported framework scope
 
-The current v7.15 scientific contract remains intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
+The current scientific contract (v7.13-v7.16) remains intentionally limited to one LTA framework normalization: **Al24Si24O96**, with 24 framework Al, 24 framework Si, and Si:Al = 1:1. The empirical `V_i^(24)` constants and the `/24` interpolation denominator are defined for this domain. Non-24-Al cells, other Si:Al ratios, and alternative cell normalizations are outside the supported generator contract and are deferred to a future scientific/numerical implementation. The user-facing generation paths reject frameworks outside this scope.
 
 Some small synthetic non-24-Al CIFs remain under `tests/` solely as internal algorithm fixtures. They are not supported scientific generator inputs and tests that use them explicitly disable the production scope guard.
 
@@ -272,7 +274,7 @@ For H, Be, Fr, and Ra the package intentionally binds no species-specific empiri
 pytest -q
 ```
 
-The suite covers legacy random batching and smoothing; MS0 template/symmetry invariants; MS1 subgroup infrastructure; MS2 occupation optimization; MS3 exact selected-orbit realization; MS4 assembly, filtering, reporting, and round-trip certification; MS5 complete-orbit repair, required-subgroup preservation, search guards, and smooth-CLI integration; and MS6 forced-variant acceleration, realization-catalog reuse, scale-fixture certification, and diagnostic reporting.
+The suite covers legacy random batching and smoothing; MS0 template/symmetry invariants; MS1 subgroup infrastructure; MS2 occupation optimization; MS3 exact selected-orbit realization; MS4 assembly, filtering, reporting, and round-trip certification; MS5 complete-orbit repair, required-subgroup preservation, search guards, and smooth-CLI integration; MS6 forced-variant acceleration, realization-catalog reuse, scale-fixture certification, and diagnostic reporting; the v7.15 sparse-occlusion chemistry and guards (`tests/test_v715_chloride_occlusion.py`); byte identity of dry and legacy output against the captured v7.15.0 goldens (`tests/test_v716_golden_identity.py`); and the v7.16 cage-salt model, including D2 oracles 1-7 and an independent re-parse verifier (`tests/test_v716_cage_salt.py`). The full suite takes about 8-10 minutes.
 
 ## Algorithmic provenance
 
@@ -346,9 +348,10 @@ software stack) plus one row per written atom, in written order, with its role
 (`framework_atom`, `framework`, `occlusion_counterion`, `cage_salt`), ion id,
 cage and site. CIF, POSCAR and LAMMPS cannot carry roles, so use the sidecar to
 tell salt cations from ring cations of the same element. The sidecar records the
-structure file's SHA-256. If the build fails, only the `.salt.json` is written
-(`status: failed`) and the exit code is non-zero; an input error exits with
-code 2 and writes nothing.
+structure file's SHA-256. If the build fails, no structure is written: the
+`.salt.json` (`status: failed`, with the reason and, for an internal error, the
+traceback) and any `--report` file are written, and the exit code is 1. An input
+error exits with code 2 and writes nothing.
 
 Resources: a cage-salt run builds a 192^3-point effective-volume field, which
 peaks at about 1.7 GB of memory per process; a run typically takes 15-20 s
