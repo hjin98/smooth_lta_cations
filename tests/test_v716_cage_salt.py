@@ -466,6 +466,19 @@ def test_each_single_violation_is_rejected_by_exactly_that_check(salt_result, re
     assert S.verify(M, F, atoms, req, **kw).failing == ["V6_single_image"]
 
 
+def test_salt_ions_keep_t_min_from_framework_si_al(salt_result, ref_cell, monkeypatch):
+    """D1 r8 S-13: every cage_salt ion is >= 3.0 A from every Si/Al, and V2 enforces it alone."""
+    M, F, atoms, req, kw = _verify_inputs(salt_result, ref_cell[0])
+    salt = [i for i, a in enumerate(atoms) if a.role == "cage_salt"]
+    tet = [i for i, a in enumerate(atoms) if a.element in ("Si", "Al")]
+    d_min = min(float(np.linalg.norm(S.min_image(F[j] - F[i], M))) for i in salt for j in tet)
+    assert S.T_MIN == 3.0 and d_min >= 3.0 + S.TAU_W
+    base = S.verify(M, F, atoms, req, **kw)
+    assert base.detail["V2"]["min_slack"]["salt-T"] == pytest.approx(d_min - 3.0)
+    monkeypatch.setattr(S, "T_MIN", d_min + 1e-4)
+    assert S.verify(M, F, atoms, req, **kw).failing == ["V2_hard_minima"]
+
+
 def test_v4_cage_charge_violation_is_rejected_alone():
     # alpha-0 carries +3 e and alpha-1 -3 e of salt (framework q_fw is at most 1 e);
     # Q_exc = N_Cl still holds, so V5 passes
@@ -669,42 +682,48 @@ def test_forced_ring_conflict_is_resolved_by_relocation_end_to_end(monkeypatch, 
 
 
 def test_relocation_picks_the_largest_min_slack_resolving_candidate():
-    """D2 §6.4 choice rule, recomputed independently of B._relocate."""
+    """D2 §6.4 choice rule, recomputed independently of B._relocate, over several configurations."""
     prob = _problem("B")
     model = B._Model(prob, prob.ring_ions)
-    X = B._insert(model, np.random.default_rng(3))
     ring = list(prob.ring_ions)
     k = next(n for n, r in enumerate(ring) if r.ring_class == "4" and r.role == "framework")
     target = ring[k]
     cage = S.site_class(target.site_id).split("@")[1]
     i = next(n for n, x in enumerate(prob.salt) if x.element == "Cl" and x.cage_id == cage)
-    X[i] = np.asarray(target.frac, float) @ model.M + np.array([0.3, 0.0, 0.0])
-    new_ring, moves = B._relocate(model, X, prob, ring)
-    # independent candidate scan: empty 4R sites and the other variants of the own site
-    occupied = {r.site_id for r in ring}
-    best = None
-    for site in prob.sites_by_ring["4"]:
-        if site.site_id != target.site_id and site.site_id in occupied:
+    moved = 0
+    for seed in range(10):
+        X = B._insert(model, np.random.default_rng(seed))
+        X[i] = np.asarray(target.frac, float) @ model.M + np.array([0.3, 0.0, 0.0])
+        _, moves = B._relocate(model, X, prob, ring)
+        # independent candidate scan: empty 4R sites and the other variants of the own site
+        occupied = {r.site_id for r in ring}
+        best = None
+        for site in prob.sites_by_ring["4"]:
+            if site.site_id != target.site_id and site.site_id in occupied:
+                continue
+            for vid, var in enumerate(site.variants):
+                if site.site_id == target.site_id and vid == target.variant_id:
+                    continue
+                y = np.asarray(var.frac, float) @ model.M
+                slack = min(float(np.linalg.norm(S.min_image((X[j] - y) @ np.linalg.inv(model.M), model.M)))
+                            - (prob.pairs.r_cut(x.element, target.element) + S.DELTA_B)
+                            for j, x in enumerate(prob.salt))
+                if slack < 0:
+                    continue
+                trial = list(ring)
+                trial[k] = replace(target, frac=np.asarray(var.frac, float), site_id=site.site_id, variant_id=vid)
+                if any(S.charge_violations(*S.cage_charges_quarters(prob.request, trial, P.CATION_CHARGES)).values()):
+                    continue
+                key = (-slack, site.site_id, vid)
+                best = key if best is None or key < best else best
+        mine = [m for m in moves if m["from_site"] == target.site_id]
+        if best is None:
+            assert not mine, seed  # no resolving candidate: the cation stays
             continue
-        for vid, var in enumerate(site.variants):
-            if site.site_id == target.site_id and vid == target.variant_id:
-                continue
-            y = np.asarray(var.frac, float) @ model.M
-            slack = min(float(np.linalg.norm(S.min_image((X[j] - y) @ np.linalg.inv(model.M), model.M)))
-                        - (prob.pairs.r_cut(x.element, target.element) + S.DELTA_B)
-                        for j, x in enumerate(prob.salt))
-            if slack < 0:
-                continue
-            trial = list(ring)
-            trial[k] = replace(target, frac=np.asarray(var.frac, float), site_id=site.site_id, variant_id=vid)
-            if any(S.charge_violations(*S.cage_charges_quarters(prob.request, trial, P.CATION_CHARGES)).values()):
-                continue
-            key = (-slack, site.site_id, vid)
-            best = key if best is None or key < best else best
-    assert best is not None
-    move = next(m for m in moves if m["from_site"] == target.site_id)
-    assert (move["to_site"], move["to_variant"]) == (best[1], best[2])
-    assert move["min_slack_after"] == pytest.approx(-best[0])
+        moved += 1
+        assert (mine[0]["to_site"], mine[0]["to_variant"]) == (best[1], best[2]), seed
+        assert mine[0]["min_slack_after"] == pytest.approx(-best[0])
+    assert moved >= 1
 
 
 def test_rebalancing_realization_follows_d2_departure_and_draw_order():
@@ -918,6 +937,8 @@ def independent_verify(path: Path, tau: float = 0.0):
             ok &= d >= 1.5 + tau
             if rows[j]["element"] == "O":
                 ok &= d >= r_cut(ei, "O") + tau
+            elif rows[j]["element"] in ("Si", "Al"):
+                ok &= d >= 3.0 + tau  # D1 r8 S-13 T_min
     checks["V2"] = ok
     # V3 counts (rule B), anchoring and caps
     floors = side["floors"]

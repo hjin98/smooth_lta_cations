@@ -14,10 +14,12 @@ header-includes:
 
 # v7.16 variable-loading molten-salt occlusion extension
 
-**Lifecycle: ACCEPTED-CURRENT D1 (human-ratified 2026-10-17).** The
-stakeholder ratified revision r7 in chat on 2026-10-17 ("Sounds good. I
-ratify."). The authoring session (an AI agent) records the ratification; it
-does not supply it. Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
+**Lifecycle: ACCEPTED-CURRENT D1 (human-ratified 2026-10-17; r8 amendment
+2026-10-19).** The stakeholder ratified revision r7 in chat on 2026-10-17
+("Sounds good. I ratify."). Revision r8 adds stakeholder decision S-13, a
+salt-ion–T minimum (§6). It was chosen by the stakeholder on 2026-10-19 after
+finding F-E1-1 (§13, T23). The authoring session (an AI agent) records the
+ratification and the decision; it does not supply them. Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
 SSDP 7.2.1, by Claude Code session
 https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
 
@@ -352,9 +354,18 @@ d_ab ≥ r_cut(a, b), with r_cut from E-pair:
   Check: Sr–O 2.09 Å ≤ crystal Sr–O3 2.21 Å. The rejected alternatives were a
   supplied table and guard-only. Guard-only would have been scientifically
   inadmissible, since it permits Cl⁻ or Li⁺ 1.5 Å from framework O.
-  Framework Si/Al: no data. Proposed: no separate T-atom minimum beyond the
-  catastrophic guard below. (The probes used 0.85 × Shannon sums for Si/Al.
-  That is a radius formula outside D-3 and is disclosed in §12.)
+- **Framework Si/Al (stakeholder decision S-13, 2026-10-19; replaces the r7
+  "no separate T-atom minimum").** Every `cage_salt` ion is at least
+  **T_min = 3.0 Å** from every framework Si and Al. This interim value is the
+  same for every salt species, Cl included.
+  - **Basis (grade E).** The template's own crystallographic cation sites lie
+    at least 3.05 Å from T (4R 3.05, 6R 3.23, 8R 3.05 Å). E-pair has no T rows.
+    T_min is replaceable by bound per-cation M–T data when they are supplied.
+  - **Why.** Under r7, small cations (mostly Li) passed every O minimum while
+    sitting 1.5–2.6 Å from Si/Al, inside wall pockets. This happened in 28 of
+    39 exploratory structures (F-E1-1, §13 T23).
+  - Ring cations keep their template sites; T_min applies to `cage_salt` ions
+    only.
 - **Reading of D-3.** "Same-sign cut-off larger than opposite-sign" holds per
   pair member in the table: every like pair's r_cut exceeds both members' r_cut
   against Cl. It does not hold globally (for example Li–Sr 2.65 < Cs–Cl
@@ -446,8 +457,16 @@ n_melt range(c)  = [ n_melt at d_wall(c) + 0.3 Å , n_melt at d_wall(c) - 0.3 Å
   the Shannon O²⁻ radius of 1.40 Å [P7].
 - **Uncertainty ±0.3 Å.** This is half the Li–K spread of d_M (0.58 Å). It is
   an agent choice, and the range is reported, not used.
-- **T-atom exclusion dropped.** Framework Si/Al lie inside the O shell, so
-  excluding them changes V_eff by 4 Å³ or less (review 3).
+- **T-atom exclusion dropped from V_eff.** V_eff stays defined by the
+  O-distance d_wall alone.
+  - Under r7: Si/Al lie inside the O shell, so excluding them at a small T
+    radius changes V_eff by 4 Å³ or less (review 3).
+  - Under r8 (agent-proposed, reported, not stakeholder-decided): the S-13
+    T_min of §6 constrains ion *centres* only. V_eff measures the volume the
+    melt occupies, ion bodies included.
+  - Applying a 3.0 Å centre exclusion to V_eff would remove about 40 % of the
+    α volume and 79 % of the β volume (measured on the Na-A fixture at f_V).
+    That would roughly halve n_melt and so lower the floors.
 - **Ring cations not excluded.** Ring-cation volume is not subtracted (about
   −2 % if it were). This is conservative for the minimum.
 - V_eff is computed on the realized, scaled cell with a deterministic
@@ -824,6 +843,7 @@ recorded tension against v7.13 was found.
 | T20 | The r3 q_c excluded framework cations, hiding a ±1 e local imbalance (review 2) | **Resolved:** q_c^fw added (§4). |
 | T21 | The dividing surface d_wall (E-pair derived) and its ±0.3 Å range are agent choices. The interfacial structure is unknown (S-8). Rb- and Cs-rich cages are extrapolated | **Applicable.** Reopen with MD density profiles of salt in LTA. |
 | T22 | Whether the S-7 minimum applies to the mean (A) or to each ion (B). The basis of a = 0.7 is the spread between definitions, a stand-in (review 3) | **Resolved by S-11:** per ion, a = 0.4, stakeholder-set. |
+| T23 | F-E1-1 (AI agent, exploratory CLI campaign E1, 2026-10-18): with no T minimum, salt cations (mostly Li) sat 1.5–2.6 Å from Si/Al in 28 of 39 structures, satisfying every O minimum (`workplans/V7.16-D4-IMPLEMENTATION.md`, E1 findings) | **Resolved by S-13:** T_min = 3.0 Å for every `cage_salt` ion (§6), stakeholder-set, interim. |
 
 No SERIOUS CHALLENGE against v7.13, v7.14 or the retained parts of v7.15 is
 raised. v7.15's sparse semantics are superseded only by explicit model
@@ -966,7 +986,14 @@ certainty.
   to reading A with a = 0.7. Recorded as a qualification-time fallback with a
   proposed reference grid and pass criterion (§7).
 
-**Open.** None. Ready for stakeholder ratification.
+**Stakeholder decision, fifth round (human, via chat question, 2026-10-19).**
+- **S-13.** Asked how salt ions should be kept off framework Si/Al after
+  finding F-E1-1, the stakeholder chose "Interim 3.0 Å (Recommended)": one
+  minimum of 3.0 Å from any Si/Al for every salt cation and Cl. Per-cation data
+  may replace it later (§6). Keeping V_eff O-defined (§7) is the agent's
+  proposal under this decision, and is reported.
+
+**Open.** None.
 
 ## 16. D1 → D2 hand-off (on ratification)
 
@@ -1163,3 +1190,9 @@ stakeholder's S-11 answer selected listed reading B and set the governed
 parameter a = 0.4. The pooling rule now applies only within the S-12
 fallback to reading A. A further independent review is therefore not required unless
 ratification changes content beyond that.
+
+**r8 amendment (2026-10-19).** It adds stakeholder decision S-13 (§6, §15) and
+T23 (§13), and records V_eff's treatment of T_min as an agent proposal (§7).
+Basis: the AI agent's exploratory finding F-E1-1. A focused independent review
+of the r8 and D2 r3 amendments is required before the implementation is
+accepted; its outcome is recorded below.

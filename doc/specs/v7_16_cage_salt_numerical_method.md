@@ -14,7 +14,8 @@ header-includes:
 
 # v7.16 cage-salt construction: numerical method (D2)
 
-**Lifecycle: ACCEPTED-CURRENT D2 (r2; human acknowledgement 2026-10-18).**
+**Lifecycle: ACCEPTED-CURRENT D2 (r2; human acknowledgement 2026-10-18; r3
+amendment 2026-10-19 concretizes D1 r8 S-13, the salt-ion–T minimum).**
 The stakeholder acknowledged the §12 items and the D1 readings in chat:
 "Sounds ok. These are very specific items. I'll need to run the program later
 myself in order to figure out the problems." An AI agent recorded this.
@@ -45,7 +46,8 @@ These D1 invariants hold throughout:
 - **Inventory.** Inventory and charge invariants are exact (D1 §4), and each
   `cage_salt` ion stays in its own cage (S-10).
 - **Hard minima.** d_ij ≥ r_cut(i, j) holds on the written coordinates (D1
-  §6), and so does the 1.5 Å guard.
+  §6), and so do the 1.5 Å guard and, since r3, the salt-ion–T minimum
+  T_min = 3.0 Å to every framework Si/Al (D1 r8 S-13).
 - **Coordination.** Anchoring holds, together with
   max(1, ⌈a·C_M(c)⌉) ≤ N_i(Cl) ≤ U_M (D1 §7, S-11, a = 0.4). Under the S-12
   fallback, rule A with a = 0.7 applies instead.
@@ -284,6 +286,7 @@ E_W(x) = W * [ sum_{i<j in S} h(rho_cut(i,j) - d_ij)
              + sum_{i in S, k in R} h(rho_cut(i,k) - d_ik)
              + sum_{i in S, o in F_O} h(rho_cut(i,o) - d_io)
              + sum_{i in S, k in F} h(1.5 + delta_b - d_ik)
+         + sum_{i in S, t in F_T} h(T_min + delta_b - d_it)
              + sum_{i in S} h(eps_m - margin(i)) ]
          + W_dz * sum_{i in S, j opposite to i} h(delta_cn - |d_ij - r_min1(i,j)|)
          + sum_{i in S, cation} [ h(L_i + mu - s_i) + h(s_i - (U_i - mu)) ]
@@ -320,7 +323,8 @@ polish stage (§6.3).
   - margin ≥ ε_m;
   - it is at least ρ_cut from every framework O, ring cation and placed salt
     ion;
-  - it is at least 1.5 + δ_b from every framework atom.
+  - it is at least 1.5 + δ_b from every framework atom;
+  - it is at least T_min + δ_b from every framework Si/Al (r3).
 - **Fallback.** After M_ins = 2000 rejections, the candidate with the
   smallest sum of squared violations is kept.
 
@@ -396,7 +400,7 @@ sum_{i in M, c} N_i >= sum_{i in M, c} 0.7 * C_M(c)
 | # | Check | Margin |
 |---|---|---|
 | V1 | `cage_salt` inventory per cage and species, by nearest centre; ring cations as counts per (role, family, species) equal to the input, with each occupied site holding one cation at a template variant (R-1) | margin(i) ≥ τ_w |
-| V2 | d_ij ≥ r_cut(i, j) + τ_w for every pair with at least one `cage_salt` ion, against ring cations and framework O; d ≥ 1.5 + τ_w to every atom | +τ_w (stricter than D1) |
+| V2 | d_ij ≥ r_cut(i, j) + τ_w for every pair with at least one `cage_salt` ion, against ring cations and framework O; d ≥ 1.5 + τ_w to every atom; d ≥ T_min + τ_w to every framework Si/Al (r3) | +τ_w (stricter than D1) |
 | V3 | Anchoring and L_i ≤ N_i ≤ U_i (rule A if adopted), with every opposite-charge pair |d − r_min1| ≥ τ_w | exact counts |
 | V4 | Every |q_c| ≤ q_max(c) | exact fractions |
 | V5 | Q_fw = 24 and Q_exc = N_Cl | exact |
@@ -456,7 +460,7 @@ Fields added to the D1 §14 per-run report:
   from an integer threshold.
 - **Per start:**
   - E_W after each stage;
-  - the best slack per constraint class (salt–salt, salt–ring, salt–O, guard,
+  - the best slack per constraint class (salt–salt, salt–ring, salt–O, salt–T, guard,
     membership, count dead zone);
   - CN deficit and excess;
   - relocation moves;
@@ -546,6 +550,7 @@ variant of this method. They motivate it but are not acceptance evidence.
 | W continuation | 10, 100, 1000 | P6-P8 |
 | W_dz dead-zone weight | 0 in continuation; 10 in the final polish (W = 1000) | review 2 N4; agent choice, not probed |
 | Single-image precondition margin | 0.1 Å | agent choice |
+| T_min salt-ion–T minimum | 3.0 Å | D1 r8 S-13 (stakeholder), not a D2 choice |
 | L-BFGS-B options | maxiter 6000, maxfun 15000, maxcor 10, ftol 2.2e-9, gtol 1e-5, maxls 20 | SciPy defaults, except maxiter |
 | M_ins and insertion fallback metric | 2000; minimum sum of squared violations | agent choice, no external basis |
 | Relocation choice | resolving candidates only; maximum minimum slack; (site_id, variant_id) | D1 §8 |
@@ -689,3 +694,9 @@ addressed below.
 - the precondition cut-off is population-dependent, with the reason
   nearest-centre stays exact;
 - the D1 §16 deviation is recorded.
+
+**r3 amendment (2026-10-19, AI agent).** This amendment concretizes D1 r8
+S-13. It adds the T_min term to E_W, the T_min condition to insertion, the
+salt–T clause to V2, and the salt–T slack class to the report. Nothing else
+changes. Relocation is unaffected because it moves ring cations, to which
+T_min does not apply. An independent focused review is recorded in D1 §17.

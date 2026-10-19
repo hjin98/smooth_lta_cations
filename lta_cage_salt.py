@@ -50,6 +50,7 @@ D1_BOUND: Dict[str, Tuple[Any, str, str]] = {
     "D_WALL_HALF_RANGE": (0.3, D1_SPEC + " §7", "**Uncertainty ±0.3 Å.**"),
     "DOPANT_FLAG_FRACTION": (0.2, D1_SPEC + " §7", "If dopants exceed 20 % of a cage's"),
     "ALPHA_CL_CAP": (12, D1_SPEC + " §4", "0 <= N_Cl(alpha_k) <= 12"),
+    "T_MIN": (3.0, D1_SPEC + " §6", "**T_min = 3.0 Å**"),
     "M_Li": (6.941, E_OCC + " §5", "Li 6.941"),
     "M_K": (39.098, E_OCC + " §5", "K 39.098"),
     "M_Cl": (35.453, E_OCC + " §5", "Cl 35.453"),
@@ -67,6 +68,8 @@ T_REF_K = D1_BOUND["T_REF_K"][0]
 ALPHA_CL_CAP = D1_BOUND["ALPHA_CL_CAP"][0]
 D_WALL_HALF_RANGE = D1_BOUND["D_WALL_HALF_RANGE"][0]
 DOPANT_FLAG_FRACTION = D1_BOUND["DOPANT_FLAG_FRACTION"][0]
+T_MIN = D1_BOUND["T_MIN"][0]  # D1 r8 S-13: every cage_salt ion >= 3.0 A from framework Si/Al
+T_ELEMENTS = ("Si", "Al")
 
 # Release default coordination rule (D1 §7 S-11; S-12 fallback decided at qualification).
 COORDINATION_RULE = "B"
@@ -966,6 +969,8 @@ def verify(
                 upd("guard", float(d) - GUARD_DISTANCE)
                 if atoms[j].element == "O":
                     upd("salt-O", float(d) - pairs.r_cut(ei, "O"))
+                elif atoms[j].element in T_ELEMENTS:
+                    upd("salt-T", float(d) - T_MIN)
     for cls, s in slack.items():
         if s < tau:
             v2 = False
@@ -1136,7 +1141,7 @@ def parameters_snapshot(k_max: int) -> Dict[str, Any]:
     return {"delta_b": DELTA_B, "tau_w": TAU_W, "eps_m": EPS_M, "delta_cn": DELTA_CN, "w_s": W_S, "mu": MU,
             "w_stages": list(W_STAGES), "w_dz_polish": W_DZ_POLISH, "lbfgs": dict(LBFGS_OPTIONS),
             "m_ins": M_INS, "k_max": k_max, "r_reloc": R_RELOC, "v_eff_grid": V_EFF_GRID,
-            "a_rule_b": A_RULE_B, "a_rule_a": A_RULE_A, "f_ref": F_REF, "n_ref": N_REF}
+            "a_rule_b": A_RULE_B, "a_rule_a": A_RULE_A, "f_ref": F_REF, "n_ref": N_REF, "t_min": T_MIN}
 
 
 def histogram(values: Sequence[float], lo: float, hi: float, width: float) -> Dict[str, Any]:

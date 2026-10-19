@@ -78,6 +78,9 @@ class _Model:
         self.R_so = np.array([[pt.r_cut(a, f) + db if f == "O" else 0.0 for f in fw_el] for a in el]).reshape(
             n, len(fw_el))
         self.R_sg = np.full((n, len(fw_el)), guard)
+        # D1 r8 S-13 / D2 r3: every salt ion >= T_min from framework Si/Al
+        self.R_st = np.array([[S.T_MIN + db if f in S.T_ELEMENTS else 0.0 for f in fw_el] for _ in el]).reshape(
+            n, len(fw_el))
         self.set_ring(ring_ions)
         # opposite-charge salt pairs and their counting radii
         rm = np.zeros((n, n))
@@ -154,7 +157,8 @@ class _Model:
         E += 0.5 * W * float((viol ** 2).sum())
         G += W * (-2.0 * (viol / D)[..., None] * V).sum(axis=1)
         # salt vs ring and framework
-        for Y, R in ((self.ring_cart, self.R_sr), (self.fw_cart, self.R_so), (self.fw_cart, self.R_sg)):
+        for Y, R in ((self.ring_cart, self.R_sr), (self.fw_cart, self.R_so), (self.fw_cart, self.R_sg),
+                     (self.fw_cart, self.R_st)):
             if len(Y) == 0:
                 continue
             V2 = self.mic(X[:, None, :] - Y[None, :, :])
@@ -233,7 +237,8 @@ def _insert(model: _Model, rng: np.random.Generator) -> np.ndarray:
         Do = Dc.copy()
         Do[:, model.home[i]] = np.inf
         tot += _h(S.EPS_M - (Do.min(axis=1) - dh)) ** 2
-        for Y, R in ((model.fw_cart, model.R_so[i]), (model.fw_cart, model.R_sg[i]), (model.ring_cart, model.R_sr[i])):
+        for Y, R in ((model.fw_cart, model.R_so[i]), (model.fw_cart, model.R_sg[i]), (model.fw_cart, model.R_st[i]),
+                     (model.ring_cart, model.R_sr[i])):
             if len(Y):
                 D = np.linalg.norm(model.mic(C[:, None, :] - Y[None, :, :]), axis=-1)
                 tot += (_h(R[None, :] - D) ** 2).sum(axis=1)

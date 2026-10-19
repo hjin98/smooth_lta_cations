@@ -2089,7 +2089,8 @@ def _pair_histograms(S: Any, matrix: np.ndarray, fracs: np.ndarray, atoms: Seque
     salt = [i for i, a in enumerate(atoms) if a.role == "cage_salt"]
     ring = [i for i, a in enumerate(atoms) if a.role in ("framework", "occlusion_counterion")]
     oxy = [i for i, a in enumerate(atoms) if a.role == "framework_atom" and a.element == "O"]
-    by_class: Dict[str, List[float]] = {"salt-salt": [], "salt-ring": [], "salt-O": []}
+    tet = [i for i, a in enumerate(atoms) if a.role == "framework_atom" and a.element in S.T_ELEMENTS]
+    by_class: Dict[str, List[float]] = {"salt-salt": [], "salt-ring": [], "salt-O": [], "salt-T": []}
     band: List[float] = []
     for n_i, i in enumerate(salt):
         ei = atoms[i].element
@@ -2106,6 +2107,8 @@ def _pair_histograms(S: Any, matrix: np.ndarray, fracs: np.ndarray, atoms: Seque
                 band.append(d - pairs.r_min1(atoms[j].element))
         d_o = np.linalg.norm(S.min_image(fracs[oxy] - fracs[i], matrix), axis=1)
         by_class["salt-O"].extend(float(d) - pairs.r_cut(ei, "O") for d in d_o)
+        d_t = np.linalg.norm(S.min_image(fracs[tet] - fracs[i], matrix), axis=1)
+        by_class["salt-T"].extend(float(d) - S.T_MIN for d in d_t)
     out = {f"d_minus_r_cut/{k}": S.histogram([v for v in vals if v < 0.5], 0.0, 0.5, 0.05)
            for k, vals in by_class.items()}
     out["d_minus_r_min1/opposite"] = S.histogram([v for v in band if abs(v) <= 0.5], -0.5, 0.5, 0.01)
