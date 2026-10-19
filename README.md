@@ -65,7 +65,7 @@ Qualification and implementation-history evidence:
 - `qualification/v715/POST-IMPLEMENTATION-REVIEW.md` - independent SSDP 6.6.0 post-implementation PASS assessment of evidence head `b7101a29261b48a18c5358c62c766099c9232995`; it is review/evidence, not scientific authority.
 - `qualification/v715/CLOSEOUT.md` - terminal merge-readiness record for the completed v7.15 cycle, including the required non-squash lineage-preservation constraint.
 - `workplans/archive/V7.15-CHLORIDE-OCCLUSION.md` - completed historical implementation workplan. Current scientific/numerical meaning remains owned by the accepted specifications above.
-- `qualification/v716/CLOSEOUT.md` - v7.16 closeout integration review record: terminal identities, review history, finding dispositions, evidence, residual register R1-R12 and verdict (PASS with recorded residuals; merge ready).
+- `qualification/v716/CLOSEOUT.md` - v7.16 closeout integration review record: terminal identities, review history, finding dispositions, evidence, residual register R1-R12 and verdict (PASS with recorded residuals; merged as `622410e`, released as v7.16.0).
 - `qualification/v716/census-record.md` - qualifying S-12 census (run 5, 90/90, rule B retained); voided earlier runs are kept beside it with `VOID.md`.
 - `workplans/archive/V7.16-MOLTEN-SALT-OCCLUSION.md`, `workplans/archive/V7.16-D4-IMPLEMENTATION.md`, `workplans/archive/V7.16-HANDOFF.md` - completed historical v7.16 change plan, D4 workplan and hand-off. Current meaning is owned by the accepted v7.16 specifications.
 - `workplans/v716-probes/` - exploratory feasibility probes (P1-P8) and the CLI campaign E1 cited by the v7.16 D1 §12; exploratory evidence, not acceptance evidence.
