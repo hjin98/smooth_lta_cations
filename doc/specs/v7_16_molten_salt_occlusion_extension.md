@@ -19,7 +19,12 @@ header-includes:
 ("Sounds good. I ratify."). Revision r8 adds stakeholder decision S-13, a
 salt-ion–T minimum (§6). It was chosen by the stakeholder on 2026-10-19 after
 finding F-E1-1 (§13, T23). The authoring session (an AI agent) records the
-ratification and the decision; it does not supply them. Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
+ratification and the decision; it does not supply them.
+- **r8 status.** The S-13 value is stakeholder-set. One r8 item is an agent
+  proposal pending stakeholder acknowledgement: V_eff stays O-defined (§7, §15).
+- **Census.** The S-12 census recorded under r7 (90/90, rule B retained) is void
+  for r8, because the frozen code changed. Rule B is pending re-qualification
+  by a re-frozen census (§7 S-12, D2 §9). Drafted under workplan `LTA-V7.16-MOLTEN-SALT-OCCLUSION`,
 SSDP 7.2.1, by Claude Code session
 https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
 
@@ -30,7 +35,7 @@ https://claude.ai/code/session_01Cu3UQGuLVrywXY9rpJEEJi.
   behaves as v7.15.0. It does not self-qualify any implementation either:
   independent post-implementation review remains required.
 - **History.** It was revised r1-r7 through three independent falsification
-  reviews (§17) and stakeholder decisions S-1 to S-12 (§15).
+  reviews (§17), stakeholder decisions S-1 to S-12 (§15), and r8 for S-13.
 - **Proposed items.** Items marked **(proposed)** were agent-chosen defaults.
   They are binding as ratified, and later changes go through this D1 owner.
 - **Workplan decisions.** Stakeholder decisions D-1 to D-25 are recorded in
@@ -102,7 +107,8 @@ equilibrate them. The generator's product is the configuration; it estimates
 no thermodynamic quantity.
 
 **What a configuration claims.** Exact inventory and charge (§4); no ion pair
-closer than the bound melt onset distance (§6); every ion anchored to an
+closer than the bound melt onset distance (§6), and no salt ion within
+T_min = 3.0 Å of framework Si/Al (§6, S-13); every ion anchored to an
 opposite-charge first neighbour, and every α-cage salt cation's first-shell
 Cl coordination between a conservative fraction a = 0.4 of a
 density-projected melt value and a bound cap (§7); a cell volume from the bound contraction model (§9). Ring cations are
@@ -461,12 +467,21 @@ n_melt range(c)  = [ n_melt at d_wall(c) + 0.3 Å , n_melt at d_wall(c) - 0.3 Å
   O-distance d_wall alone.
   - Under r7: Si/Al lie inside the O shell, so excluding them at a small T
     radius changes V_eff by 4 Å³ or less (review 3).
-  - Under r8 (agent-proposed, reported, not stakeholder-decided): the S-13
+  - Under r8 (agent proposal, pending stakeholder acknowledgement): the S-13
     T_min of §6 constrains ion *centres* only. V_eff measures the volume the
     melt occupies, ion bodies included.
   - Applying a 3.0 Å centre exclusion to V_eff would remove about 40 % of the
-    α volume and 79 % of the β volume (measured on the Na-A fixture at f_V).
-    That would roughly halve n_melt and so lower the floors.
+    α volume and 79 % of the β volume (Na-A fixture at f_V). It would cut
+    n_melt to about 0.6×, which *raises* φ = min(1, N_Cl/n_melt) and so
+    raises C_M and the floors. For example, at 12 Cl the K floor would go
+    from 2 to 3. That would double-count the exclusion.
+  - A T dividing surface built like the O one (T_min minus the Cl–O onset gap,
+    about 1.8 Å from T) removes only about 1 % of the α volume. That is below
+    the neglected ring-cation term (about 2 %) and the ±0.3 Å range (about
+    ±8 %).
+  - T_min removes no Cl-accessible α volume (319 Å³ either way). It removes
+    only the small-cation wall pockets: Li-allowed α volume falls from 431 to
+    302 Å³ (review of r8).
 - **Ring cations not excluded.** Ring-cation volume is not subtracted (about
   −2 % if it were). This is conservative for the minimum.
 - V_eff is computed on the realized, scaled cell with a deterministic
@@ -722,7 +737,7 @@ per-cage inputs use new names (D3).
 7. exact verification on the final scaled coordinates. It covers:
    - inventory (§4);
    - cage charge, |q_c| ≤ q_max(c) (§4);
-   - hard minima (§6), with no tolerance below r_cut;
+   - hard minima (§6), with no tolerance below r_cut or T_min;
    - anchoring, the CN rule and the per-ion range (§7).
 
    Verification of an unscaled cell does not count, because isotropic scaling
@@ -741,6 +756,10 @@ remain rejected when any occlusion is active (v7.15):
 - candidate-variant output.
 
 ## 12. Feasibility evidence (agent probes; exploratory, not acceptance evidence)
+
+**Evidence predates S-13.** P5-P8 used 0.85 × Shannon sums for Si/Al, a
+radius formula outside D-3. E1 and the r7 census used no T minimum. None of
+them tests the r8 T_min; the re-frozen census does.
 
 Scripts: `workplans/v716-probes/`. P5 and P6 used the E-pair r_cut and
 r_min1 columns exactly, the D-12 relocation, the fixture
@@ -821,9 +840,9 @@ recorded tension against v7.13 was found.
 
 | ID | Tension | Assessment for this revision |
 |---|---|---|
-| T1 | Crowding at 10-12 Cl/α under rock-salt cut-offs | **Inapplicable to this revision.** The rock-salt bases are replaced by the E-pair onset r_cut, and P5 is feasible at 12/α. Reopen if r_cut is recalibrated upward (E-pair §6.1, Zeidler NaCl partials). |
+| T1 | Crowding at 10-12 Cl/α under rock-salt cut-offs | **Inapplicable to this revision.** The rock-salt bases are replaced by the E-pair onset r_cut, and P5 is feasible at 12/α. Under r8 (T_min), exploratory builds at 12/α still pass on start 1; the re-frozen S-12 census decides. Reopen if r_cut is recalibrated upward (E-pair §6.1, Zeidler NaCl partials). |
 | T2 | Unsourced melt densities | **Superseded by T19.** The E-occ §5 handbook densities are not used. The §7 density reference uses the cited Janz correlations. |
-| T3 | No ion–framework or dopant pair data | **Resolved by S-1 with an approximation.** Rb, Sr and Ba pairs are supplied, mostly grade E. Ion–framework minima use the free-oxide rows (grade E). Reopen if framework-O data arrive. |
+| T3 | No ion–framework or dopant pair data | **Resolved by S-1 with an approximation.** Rb, Sr and Ba pairs are supplied, mostly grade E. Ion–framework minima use the free-oxide rows (grade E). The salt-ion–T minimum is S-13 (T23). Reopen if framework-O or M–T data arrive. |
 | T4 | R10/R14 author lists vs v7.15 citations | **Resolved.** E-occ rev 2.1 lists R14 as Simpson & Gougar and R10 as Lewis, Fischer, Smith, matching v7.15. |
 | T5 | Trivalent dopants outside v7.13 | **Applicable; out of scope** (§5). v7.13 is not reopened. |
 | T6 | K–Cl CN is definition-dependent (5.2 vs 7.0) | **Applicable; Option A adopted** (consistent with the r_min1 boundary). |
@@ -872,7 +891,7 @@ selection, not found false.
 - α and β CN reported separately, with the CN option, a, and the per-ion
   floor and cap in force.
 - The x_M weights and the resulting Cl–Cl r_cut.
-- Ion–framework slack per class.
+- Ion–framework slack per class, including the salt-ion–T (Si/Al) minimum and its slack (S-13).
 - The minimum cage-assignment margin.
 - A statement that verification ran on the final scaled cell.
 - Ring-cation density after relocation (nearest-neighbour statistics).
@@ -891,6 +910,8 @@ selection, not found false.
 **Falsifiers and reopen triggers.**
 - MD shows systematic expulsion or crystallization traceable to the initial
   minima or CN.
+- Bound per-cation M–T (Si/Al) minimum data supplied (replaces the interim
+  S-13 T_min).
 - Recalibrated r_cut values.
 - Matched f_V data.
 - A CN definition resolved against the chosen option.
@@ -990,10 +1011,12 @@ certainty.
 - **S-13.** Asked how salt ions should be kept off framework Si/Al after
   finding F-E1-1, the stakeholder chose "Interim 3.0 Å (Recommended)": one
   minimum of 3.0 Å from any Si/Al for every salt cation and Cl. Per-cation data
-  may replace it later (§6). Keeping V_eff O-defined (§7) is the agent's
-  proposal under this decision, and is reported.
+  may replace it later (§6).
 
-**Open.** None.
+**Open.**
+- Stakeholder acknowledgement of the agent proposal to keep V_eff O-defined
+  under S-13 (§7).
+- Re-qualification of rule B by the re-frozen S-12 census.
 
 ## 16. D1 → D2 hand-off (on ratification)
 
@@ -1194,5 +1217,12 @@ ratification changes content beyond that.
 **r8 amendment (2026-10-19).** It adds stakeholder decision S-13 (§6, §15) and
 T23 (§13), and records V_eff's treatment of T_min as an agent proposal (§7).
 Basis: the AI agent's exploratory finding F-E1-1. A focused independent review
-of the r8 and D2 r3 amendments is required before the implementation is
-accepted; its outcome is recorded below.
+of the r8 and D2 r3 amendments (AI agent, 2026-10-19) found no SERIOUS
+CHALLENGE and no blocker, and returned "acceptable with fixes":
+- **M1:** the census was not marked void; now stated in the header, D2 r3 and
+  §15.
+- **M2:** sign error in the §7 V_eff rationale; corrected, with its measured
+  support.
+- **Minors:** §2/§11/§12/§13/§14 wording, governance of the V_eff proposal, D2
+  F_T definition, parent line, T23 search, salt–T histogram, margin
+  acknowledgement; all folded in.

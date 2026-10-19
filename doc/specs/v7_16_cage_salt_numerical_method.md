@@ -30,7 +30,7 @@ History of the draft:
   `LTA-V7.16-MOLTEN-SALT-OCCLUSION`, SSDP 7.2.1.
 - **Parent:** the accepted-current D1
   `doc/specs/v7_16_molten_salt_occlusion_extension.md` (r7, human-ratified
-  2026-10-17), cited as **D1 §n**.
+  2026-10-17; r8 amendment S-13 2026-10-19), cited as **D1 §n**.
 - **r1 folds in independent D2 review 1 (§13).** That review raised two
   SERIOUS CHALLENGES and 15 findings.
 - **r2 folds in D2 review 2,** which raised no SERIOUS CHALLENGE and eight
@@ -77,6 +77,8 @@ accepted.**
 
 ## 2. Definitions
 
+- **Framework sets.** F is every framework atom, F_O its oxygens and F_T its
+  tetrahedral atoms (Si and Al). T_min = 3.0 Å (D1 r8 S-13).
 - **Cell and metric.**
   - L is the lattice matrix of the cell in use (rows are lattice vectors, Å),
     and r = f L.
@@ -467,7 +469,8 @@ Fields added to the D1 §14 per-run report:
   - the failing check.
 - **Final structure:**
   - the V1-V6 table;
-  - histograms of d − r_cut per pair class (0-0.5 Å, 0.05 Å bins);
+  - histograms of d − r_cut per pair class, and of d − T_min for salt–T
+    (r3) (0-0.5 Å, 0.05 Å bins);
   - a histogram of d − r_min1 for opposite-charge pairs (±0.5 Å, 0.01 Å
     bins), which shows the dead-zone band;
   - N_i − L_i per species;
@@ -608,7 +611,7 @@ vectorisation, CLI and schema, errors and report format.
   - R-2: window weights are fixed per physical site.
   - The D1 §16 deviation: the CN miss probability is bounded only by the
     S-12 census.
-- **Tensions.** Searched D1 §13 (T1-T22), the workplans, the D1 git log and
+- **Tensions.** Searched D1 §13 (T1-T22; T23 added with r8), the workplans, the D1 git log and
   the repository issues (none). Relevant: T8 (anchoring), T17/T21 (V_eff,
   handled deterministically) and T22 (fallback, §6.6). None is closed here.
 
@@ -700,3 +703,9 @@ S-13. It adds the T_min term to E_W, the T_min condition to insertion, the
 salt–T clause to V2, and the salt–T slack class to the report. Nothing else
 changes. Relocation is unaffected because it moves ring cations, to which
 T_min does not apply. An independent focused review is recorded in D1 §17.
+- The S-12 census recorded under r2 is void for r3 (the code changed). It is
+  re-run under a new freeze before D4 acceptance (§9: "any re-tuning re-runs
+  the whole census").
+- The human acknowledgement of the τ_w and δ_b margins (§12) is taken to
+  cover the T_min clause. It uses the same margins on written atoms with the
+  same quantization; the stakeholder may object.
